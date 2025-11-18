@@ -3,7 +3,7 @@ interface PublicLayoutProps {
 }
 
 export default function PublicLayout({ children }: PublicLayoutProps) {
-  // Clear floating circles - outside card
+  // Clear floating circles - outside card and around edges
   const clearCircles = [
     { id: 1, size: 10, left: 15, top: 10 },
     { id: 2, size: 8, left: 85, top: 15 },
@@ -11,14 +11,24 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     { id: 4, size: 9, left: 88, top: 75 },
     { id: 5, size: 7, left: 5, top: 50 },
     { id: 6, size: 11, left: 92, top: 45 },
+    { id: 11, size: 9, left: 20, top: 30 },
+    { id: 12, size: 10, left: 78, top: 25 },
+    { id: 13, size: 8, left: 12, top: 85 },
+    { id: 14, size: 11, left: 90, top: 60 },
+    { id: 15, size: 7, left: 25, top: 88 },
+    { id: 16, size: 10, left: 82, top: 90 },
   ];
 
-  // Blurred circles - behind card
+  // Blurred circles - positioned around card edges to look like going behind
   const blurredCircles = [
-    { id: 7, size: 80, left: 30, top: 25 },
-    { id: 8, size: 100, left: 60, top: 40 },
-    { id: 9, size: 70, left: 45, top: 60 },
-    { id: 10, size: 90, left: 55, top: 20 },
+    { id: 7, size: 90, left: 20, top: 15 },
+    { id: 8, size: 110, left: 75, top: 25 },
+    { id: 9, size: 85, left: 35, top: 70 },
+    { id: 10, size: 95, left: 70, top: 65 },
+    { id: 17, size: 80, left: 50, top: 10 },
+    { id: 18, size: 100, left: 25, top: 45 },
+    { id: 19, size: 75, left: 80, top: 50 },
+    { id: 20, size: 90, left: 45, top: 80 },
   ];
 
   return (
@@ -75,8 +85,18 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
       <style>{`
         @keyframes floatSlow {
-          0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
-          50% { transform: translateY(-20px) translateX(10px); opacity: 0.5; }
+          0%, 100% { 
+            transform: translateY(0) translateX(0) translate(-50%, -50%); 
+            opacity: 0.3; 
+          }
+          33% { 
+            transform: translateY(-25px) translateX(15px) translate(-50%, -50%); 
+            opacity: 0.5; 
+          }
+          66% { 
+            transform: translateY(-15px) translateX(-20px) translate(-50%, -50%); 
+            opacity: 0.4; 
+          }
         }
       `}</style>
     </div>
