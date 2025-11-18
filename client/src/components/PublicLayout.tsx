@@ -25,18 +25,18 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
   // Uneven circular elements with varying opacity
   const unevenCircles = [
-    { id: 1, size: 35, left: 30, top: 20, duration: 45, delay: 0, opacity: 0.15, xRange: 10, yRange: 12 },
-    { id: 2, size: 50, left: 70, top: 65, duration: 50, delay: 3, opacity: 0.25, xRange: -8, yRange: 15 },
-    { id: 3, size: 28, left: 18, top: 55, duration: 42, delay: 1.5, opacity: 0.12, xRange: 12, yRange: -10 },
-    { id: 4, size: 42, left: 85, top: 35, duration: 48, delay: 4, opacity: 0.2, xRange: -10, yRange: 14 },
-    { id: 5, size: 38, left: 50, top: 80, duration: 46, delay: 2.5, opacity: 0.18, xRange: 9, yRange: -12 },
-    { id: 6, size: 32, left: 12, top: 25, duration: 44, delay: 5, opacity: 0.16, xRange: -11, yRange: 13 },
-    { id: 7, size: 45, left: 60, top: 10, duration: 47, delay: 1, opacity: 0.22, xRange: 8, yRange: 11 },
-    { id: 8, size: 30, left: 92, top: 70, duration: 43, delay: 3.5, opacity: 0.14, xRange: -9, yRange: -14 },
+    { id: 1, size: 25, left: 30, top: 20, duration: 40, delay: 0, opacity: 0.08, xRange: 18, yRange: 22 },
+    { id: 2, size: 35, left: 70, top: 65, duration: 38, delay: 3, opacity: 0.32, xRange: -20, yRange: 25 },
+    { id: 3, size: 20, left: 18, top: 55, duration: 42, delay: 1.5, opacity: 0.06, xRange: 22, yRange: -18 },
+    { id: 4, size: 30, left: 85, top: 35, duration: 36, delay: 4, opacity: 0.25, xRange: -19, yRange: 24 },
+    { id: 5, size: 28, left: 50, top: 80, duration: 44, delay: 2.5, opacity: 0.15, xRange: 21, yRange: -20 },
+    { id: 6, size: 22, left: 12, top: 25, duration: 39, delay: 5, opacity: 0.1, xRange: -23, yRange: 26 },
+    { id: 7, size: 32, left: 60, top: 10, duration: 41, delay: 1, opacity: 0.28, xRange: 17, yRange: 19 },
+    { id: 8, size: 24, left: 92, top: 70, duration: 37, delay: 3.5, opacity: 0.12, xRange: -21, yRange: -23 },
   ];
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-x-hidden relative">
+    <div className="min-h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 text-white overflow-x-hidden relative">
       
       {/* Animated Light Waves - Behind everything */}
       <div className="absolute inset-0 pointer-events-none" style={{ zIndex: -1 }}>
