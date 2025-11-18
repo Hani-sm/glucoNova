@@ -37,13 +37,17 @@ Preferred communication style: Simple, everyday language.
 - Reusable UI components from shadcn/ui (Button, Card, Input, etc.)
 - Custom composite components (MetricCard, GlucoseTrendChart, VoiceAssistantCard)
 - Layout components (PublicLayout for auth pages, MainLayout with AppSidebar for authenticated pages)
-- Page-level components for each route (DashboardPage, LoginPage, RegisterPage, etc.)
+- Page-level components for each route (DashboardPage, LoginPage, RegisterPage, RoleSelectionPage, etc.)
 
 **Routing Strategy:**
 - Protected routes with role-based access control
 - Automatic redirect to login for unauthenticated users
 - Account approval check with pending approval screen
 - Role-specific dashboards (patient, doctor, admin)
+- Three-step registration flow:
+  1. `/role-selection` - User selects Patient or Healthcare Provider role
+  2. `/register?role=patient|doctor` - User enters credentials (role pre-selected via URL parameter)
+  3. `/login` - User logs in after successful registration
 
 ### Backend Architecture
 
@@ -62,12 +66,18 @@ Preferred communication style: Simple, everyday language.
 - Approval status middleware for pending users
 - Centralized error handling
 
-**Authentication Flow:**
+**Authentication & Registration Flow:**
 - JWT tokens with 7-day expiration
 - Token stored in localStorage on client
 - Bearer token authentication in request headers
 - Middleware validates token and extracts user information
 - Admin approval required for new user accounts
+- Registration flow separates role selection from credential entry:
+  1. User clicks "Create account" on login page → navigates to `/role-selection`
+  2. User selects role (Patient or Healthcare Provider) → navigates to `/register?role=<selected-role>`
+  3. RegisterPage reads role from URL parameter, validates it, and redirects to role selection if missing
+  4. User completes registration → redirects to `/login` (not directly to dashboard)
+  5. After login → redirects to dashboard (shows "Account Pending Approval" if not yet approved by admin)
 
 **Database Schema:**
 - Users collection (name, email, password hash, role, approval status)
