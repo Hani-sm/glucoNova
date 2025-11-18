@@ -52,7 +52,7 @@ export default function RegisterPage() {
 
   return (
     <PublicLayout>
-      <Card className="w-full max-w-md p-8 bg-slate-900/70 backdrop-blur-lg border-white/10">
+      <Card className="w-full max-w-lg p-10 bg-slate-900/70 backdrop-blur-lg border-white/10">
         <h1 className="text-2xl font-bold text-white text-center mb-8">
           Create Your GlucoNova Account
         </h1>
