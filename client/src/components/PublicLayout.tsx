@@ -19,24 +19,16 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     { id: 16, size: 10, left: 82, top: 90 },
   ];
 
-  // Blurred circles - positioned around card edges to look like going behind
-  const blurredCircles = [
-    { id: 7, size: 50, left: 20, top: 15 },
-    { id: 8, size: 60, left: 75, top: 25 },
-    { id: 9, size: 45, left: 35, top: 70 },
-    { id: 10, size: 55, left: 70, top: 65 },
-    { id: 17, size: 40, left: 50, top: 10 },
-    { id: 18, size: 58, left: 25, top: 45 },
-    { id: 19, size: 42, left: 80, top: 50 },
-    { id: 20, size: 48, left: 45, top: 75 },
-  ];
-
-  // Traversing elements - move across screen, behind and in front of card
-  const traversingElements = [
-    { id: 21, size: 38, startY: 20, direction: 'right' },
-    { id: 22, size: 42, startY: 45, direction: 'left' },
-    { id: 23, size: 35, startY: 65, direction: 'right' },
-    { id: 24, size: 40, startY: 35, direction: 'left' },
+  // Darker emerald green floating elements with blur - behind card
+  const darkerEmeraldCircles = [
+    { id: 30, size: 80, left: 25, top: 20, delay: 0 },
+    { id: 31, size: 100, left: 70, top: 35, delay: 2 },
+    { id: 32, size: 90, left: 15, top: 60, delay: 4 },
+    { id: 33, size: 110, left: 80, top: 70, delay: 6 },
+    { id: 34, size: 75, left: 50, top: 15, delay: 1 },
+    { id: 35, size: 95, left: 35, top: 80, delay: 3 },
+    { id: 36, size: 85, left: 65, top: 50, delay: 5 },
+    { id: 37, size: 105, left: 45, top: 45, delay: 7 },
   ];
 
   return (
@@ -78,25 +70,26 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               height: `${circle.size}px`,
               left: `${circle.left}%`,
               top: `${circle.top}%`,
-              animation: `floatSlow ${12 + circle.id}s ease-in-out infinite`,
+              animation: `floatGentle ${15 + circle.id % 8}s ease-in-out infinite`,
               animationDelay: `${circle.id * 0.5}s`,
             }}
           />
         ))}
       </div>
 
-      {/* Traversing Elements - Move across screen */}
+      {/* Darker Emerald Green Floating Elements - Behind Card with Blur */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {traversingElements.map((element) => (
+        {darkerEmeraldCircles.map((circle) => (
           <div
-            key={element.id}
-            className="absolute rounded-full bg-emerald-400/35 traversing-element"
+            key={circle.id}
+            className="absolute rounded-full bg-emerald-600/40 blur-xl"
             style={{
-              width: `${element.size}px`,
-              height: `${element.size}px`,
-              top: `${element.startY}%`,
-              animation: `traverse${element.direction === 'right' ? 'Right' : 'Left'} ${15 + element.id}s linear infinite`,
-              animationDelay: `${element.id * 2}s`,
+              width: `${circle.size}px`,
+              height: `${circle.size}px`,
+              left: `${circle.left}%`,
+              top: `${circle.top}%`,
+              animation: `floatDarker ${20 + circle.id % 5}s ease-in-out infinite`,
+              animationDelay: `${circle.delay}s`,
             }}
           />
         ))}
@@ -104,119 +97,51 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-8">
         <div className="relative w-full max-w-lg">
-          {/* Blurred Floating Circles - Behind Card */}
-          <div className="absolute inset-0 overflow-visible pointer-events-none" style={{ zIndex: -1 }}>
-            {blurredCircles.map((circle) => (
-              <div
-                key={circle.id}
-                className="absolute rounded-full bg-emerald-400/30 blur-2xl"
-                style={{
-                  width: `${circle.size}px`,
-                  height: `${circle.size}px`,
-                  left: `${circle.left}%`,
-                  top: `${circle.top}%`,
-                  transform: 'translate(-50%, -50%)',
-                  animation: `floatSlow ${60 + circle.id * 5}s ease-in-out infinite`,
-                  animationDelay: `${circle.id * 0.3}s`,
-                }}
-              />
-            ))}
-          </div>
-          
           {children}
         </div>
       </div>
 
       <style>{`
-        @keyframes floatSlow {
+        @keyframes floatGentle {
           0%, 100% { 
-            transform: translateY(0) translateX(0) translate(-50%, -50%); 
-            opacity: 0.3; 
+            transform: translate(0, 0); 
+            opacity: 0.25; 
           }
-          33% { 
-            transform: translateY(-15px) translateX(12px) translate(-50%, -50%); 
+          25% { 
+            transform: translate(20px, -30px); 
             opacity: 0.35; 
           }
-          66% { 
-            transform: translateY(-8px) translateX(-15px) translate(-50%, -50%); 
-            opacity: 0.32; 
+          50% { 
+            transform: translate(-15px, -50px); 
+            opacity: 0.3; 
+          }
+          75% { 
+            transform: translate(-25px, -25px); 
+            opacity: 0.28; 
           }
         }
 
-        @keyframes traverseRight {
-          0% { 
-            left: -100px; 
-            filter: blur(0px);
-            opacity: 0;
+        @keyframes floatDarker {
+          0%, 100% { 
+            transform: translate(0, 0) scale(1); 
+            opacity: 0.4; 
           }
-          10% {
-            opacity: 0.4;
-            filter: blur(0px);
+          20% { 
+            transform: translate(30px, -40px) scale(1.1); 
+            opacity: 0.5; 
           }
-          35% {
-            filter: blur(0px);
+          40% { 
+            transform: translate(-20px, -70px) scale(0.95); 
+            opacity: 0.45; 
           }
-          45% {
-            filter: blur(20px);
-            opacity: 0.3;
+          60% { 
+            transform: translate(-40px, -50px) scale(1.05); 
+            opacity: 0.48; 
           }
-          55% {
-            filter: blur(20px);
-            opacity: 0.3;
+          80% { 
+            transform: translate(10px, -30px) scale(0.98); 
+            opacity: 0.42; 
           }
-          65% {
-            filter: blur(0px);
-            opacity: 0.4;
-          }
-          90% {
-            opacity: 0.4;
-            filter: blur(0px);
-          }
-          100% { 
-            left: calc(100% + 100px); 
-            filter: blur(0px);
-            opacity: 0;
-          }
-        }
-
-        @keyframes traverseLeft {
-          0% { 
-            left: calc(100% + 100px); 
-            filter: blur(0px);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.4;
-            filter: blur(0px);
-          }
-          35% {
-            filter: blur(0px);
-          }
-          45% {
-            filter: blur(20px);
-            opacity: 0.3;
-          }
-          55% {
-            filter: blur(20px);
-            opacity: 0.3;
-          }
-          65% {
-            filter: blur(0px);
-            opacity: 0.4;
-          }
-          90% {
-            opacity: 0.4;
-            filter: blur(0px);
-          }
-          100% { 
-            left: -100px; 
-            filter: blur(0px);
-            opacity: 0;
-          }
-        }
-
-        .traversing-element {
-          transition: filter 0.8s ease-in-out;
         }
 
         @keyframes wave1 {
