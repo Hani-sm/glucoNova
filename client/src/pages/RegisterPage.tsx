@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import PublicLayout from '@/components/PublicLayout';
 import { Card } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/hooks/use-toast';
+import { User, Stethoscope } from 'lucide-react';
 
 export default function RegisterPage() {
   const [, navigate] = useLocation();
@@ -16,11 +17,28 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState<'patient' | 'doctor'>('patient');
+  const [role, setRole] = useState<'patient' | 'doctor' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const roleParam = params.get('role');
+    
+    if (!roleParam || (roleParam !== 'patient' && roleParam !== 'doctor')) {
+      navigate('/role-selection');
+      return;
+    }
+    
+    setRole(roleParam as 'patient' | 'doctor');
+  }, [navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    
+    if (!role) {
+      navigate('/role-selection');
+      return;
+    }
     
     if (password !== confirmPassword) {
       toast({
@@ -38,7 +56,7 @@ export default function RegisterPage() {
         title: 'Registration successful',
         description: 'Your account will be reviewed by our admin team',
       });
-      navigate('/dashboard');
+      navigate('/login');
     } catch (error: any) {
       toast({
         title: 'Registration failed',
@@ -50,6 +68,10 @@ export default function RegisterPage() {
     }
   };
 
+  if (!role) {
+    return null;
+  }
+
   return (
     <PublicLayout>
       <Card 
@@ -57,6 +79,19 @@ export default function RegisterPage() {
       >
         <h1 className="text-4xl font-bold tracking-tight text-white text-center mb-3">GlucoNova</h1>
         <p className="text-2xl font-semibold text-emerald-400 text-center mb-8">Create Account</p>
+        
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+            {role === 'patient' ? (
+              <User className="h-5 w-5 text-emerald-400" />
+            ) : (
+              <Stethoscope className="h-5 w-5 text-emerald-400" />
+            )}
+            <span className="text-base font-medium text-emerald-400">
+              {role === 'patient' ? 'Patient Account' : 'Healthcare Provider Account'}
+            </span>
+          </div>
+        </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -113,35 +148,6 @@ export default function RegisterPage() {
               required
               data-testid="input-confirm-password"
             />
-          </div>
-
-          <div>
-            <Label className="text-gray-200 text-base font-medium mb-2 block">Role</Label>
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                onClick={() => setRole('patient')}
-                className={role === 'patient' ? 'flex-1 h-12 text-lg bg-emerald-600 hover:bg-emerald-500 text-white' : 'flex-1 h-12 text-lg bg-white/5 border border-white/10 text-gray-200 hover:bg-white/10'}
-                variant={role === 'patient' ? 'default' : 'outline'}
-                data-testid="button-role-patient"
-              >
-                Patient
-              </Button>
-              <Button
-                type="button"
-                onClick={() => setRole('doctor')}
-                className={role === 'doctor' ? 'flex-1 h-12 text-lg bg-emerald-600 hover:bg-emerald-500 text-white' : 'flex-1 h-12 text-lg bg-white/5 border border-white/10 text-gray-200 hover:bg-white/10'}
-                variant={role === 'doctor' ? 'default' : 'outline'}
-                data-testid="button-role-doctor"
-              >
-                Healthcare Provider
-              </Button>
-            </div>
-            <p className="text-base text-gray-400 mt-3">
-              {role === 'patient' 
-                ? 'Manage your diabetes with personalized predictions'
-                : 'Access patient records and provide remote care'}
-            </p>
           </div>
 
           <Card className="p-4 bg-white/5 border-white/10">

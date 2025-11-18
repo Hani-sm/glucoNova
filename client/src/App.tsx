@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
+import RoleSelectionPage from "@/pages/RoleSelectionPage";
 import DashboardPage from "@/pages/DashboardPage";
 import DoctorDashboard from "@/pages/DoctorDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
@@ -59,6 +60,7 @@ function Router() {
         {user ? <Redirect to="/dashboard" /> : <Redirect to="/login" />}
       </Route>
       <Route path="/login" component={LoginPage} />
+      <Route path="/role-selection" component={RoleSelectionPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/dashboard">
         {(params) => (

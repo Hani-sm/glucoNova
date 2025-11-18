@@ -107,7 +107,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-gray-200 mt-8">
           Don't have an account?{' '}
-          <a href="/register" className="text-emerald-400 hover:text-emerald-300 transition-colors" data-testid="link-register">
+          <a href="/role-selection" className="text-emerald-400 hover:text-emerald-300 transition-colors" data-testid="link-register">
             Create one
           </a>
         </p>
