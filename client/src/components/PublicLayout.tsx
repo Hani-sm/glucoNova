@@ -3,24 +3,24 @@ interface PublicLayoutProps {
 }
 
 export default function PublicLayout({ children }: PublicLayoutProps) {
-  // Small floating dots - scattered around the screen
+  // Floating emerald dots - scattered around the screen
   const floatingDots = [
-    { id: 1, size: 8, left: 15, top: 10, duration: 18, delay: 0, xRange: 25, yRange: 35 },
-    { id: 2, size: 10, left: 85, top: 15, duration: 22, delay: 2, xRange: -30, yRange: 40 },
-    { id: 3, size: 12, left: 10, top: 70, duration: 20, delay: 4, xRange: 35, yRange: -30 },
-    { id: 4, size: 9, left: 88, top: 75, duration: 24, delay: 1, xRange: -25, yRange: 35 },
-    { id: 5, size: 11, left: 5, top: 50, duration: 19, delay: 3, xRange: 30, yRange: -40 },
-    { id: 6, size: 10, left: 92, top: 45, duration: 21, delay: 5, xRange: -28, yRange: 38 },
-    { id: 7, size: 8, left: 20, top: 30, duration: 23, delay: 0.5, xRange: 32, yRange: 42 },
-    { id: 8, size: 13, left: 78, top: 25, duration: 17, delay: 2.5, xRange: -35, yRange: -35 },
-    { id: 9, size: 9, left: 12, top: 85, duration: 25, delay: 1.5, xRange: 28, yRange: 36 },
-    { id: 10, size: 11, left: 90, top: 60, duration: 20, delay: 3.5, xRange: -30, yRange: 40 },
-    { id: 11, size: 10, left: 25, top: 88, duration: 22, delay: 4.5, xRange: 33, yRange: -38 },
-    { id: 12, size: 12, left: 82, top: 90, duration: 19, delay: 2.2, xRange: -27, yRange: 34 },
-    { id: 13, size: 14, left: 40, top: 18, duration: 21, delay: 1.8, xRange: 29, yRange: 37 },
-    { id: 14, size: 9, left: 65, top: 55, duration: 23, delay: 3.2, xRange: -31, yRange: -39 },
-    { id: 15, size: 11, left: 8, top: 35, duration: 18, delay: 0.8, xRange: 26, yRange: 33 },
-    { id: 16, size: 13, left: 95, top: 82, duration: 24, delay: 4.2, xRange: -34, yRange: 41 },
+    { id: 1, size: 12, left: 15, top: 10, duration: 18, delay: 0, xRange: 25, yRange: 35 },
+    { id: 2, size: 14, left: 85, top: 15, duration: 22, delay: 2, xRange: -30, yRange: 40 },
+    { id: 3, size: 16, left: 10, top: 70, duration: 20, delay: 4, xRange: 35, yRange: -30 },
+    { id: 4, size: 13, left: 88, top: 75, duration: 24, delay: 1, xRange: -25, yRange: 35 },
+    { id: 5, size: 15, left: 5, top: 50, duration: 19, delay: 3, xRange: 30, yRange: -40 },
+    { id: 6, size: 14, left: 92, top: 45, duration: 21, delay: 5, xRange: -28, yRange: 38 },
+    { id: 7, size: 12, left: 20, top: 30, duration: 23, delay: 0.5, xRange: 32, yRange: 42 },
+    { id: 8, size: 17, left: 78, top: 25, duration: 17, delay: 2.5, xRange: -35, yRange: -35 },
+    { id: 9, size: 13, left: 12, top: 85, duration: 25, delay: 1.5, xRange: 28, yRange: 36 },
+    { id: 10, size: 15, left: 90, top: 60, duration: 20, delay: 3.5, xRange: -30, yRange: 40 },
+    { id: 11, size: 14, left: 25, top: 88, duration: 22, delay: 4.5, xRange: 33, yRange: -38 },
+    { id: 12, size: 16, left: 82, top: 90, duration: 19, delay: 2.2, xRange: -27, yRange: 34 },
+    { id: 13, size: 18, left: 40, top: 18, duration: 21, delay: 1.8, xRange: 29, yRange: 37 },
+    { id: 14, size: 13, left: 65, top: 55, duration: 23, delay: 3.2, xRange: -31, yRange: -39 },
+    { id: 15, size: 15, left: 8, top: 35, duration: 18, delay: 0.8, xRange: 26, yRange: 33 },
+    { id: 16, size: 17, left: 95, top: 82, duration: 24, delay: 4.2, xRange: -34, yRange: 41 },
   ];
 
   return (
@@ -56,7 +56,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         {floatingDots.map((dot) => (
           <div
             key={dot.id}
-            className="absolute rounded-full bg-emerald-400/30"
+            className="absolute rounded-full bg-emerald-400/50"
             style={{
               width: `${dot.size}px`,
               height: `${dot.size}px`,
@@ -80,19 +80,19 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           @keyframes floatDot${dot.id} {
             0%, 100% { 
               transform: translate3d(0, 0, 0); 
-              opacity: 0.2; 
+              opacity: 0.4; 
             }
             25% { 
               transform: translate3d(${dot.xRange * 0.4}px, ${dot.yRange * 0.4}px, 0); 
-              opacity: 0.3; 
+              opacity: 0.5; 
             }
             50% { 
               transform: translate3d(${dot.xRange}px, ${dot.yRange}px, 0); 
-              opacity: 0.35; 
+              opacity: 0.6; 
             }
             75% { 
               transform: translate3d(${dot.xRange * 0.6}px, ${dot.yRange * 0.7}px, 0); 
-              opacity: 0.28; 
+              opacity: 0.48; 
             }
           }
         `).join('\n')}
