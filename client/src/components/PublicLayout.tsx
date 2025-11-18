@@ -116,7 +116,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   left: `${circle.left}%`,
                   top: `${circle.top}%`,
                   transform: 'translate(-50%, -50%)',
-                  animation: `floatSlow ${40 + circle.id * 3}s ease-in-out infinite`,
+                  animation: `floatSlow ${60 + circle.id * 5}s ease-in-out infinite`,
                   animationDelay: `${circle.id * 0.3}s`,
                 }}
               />
@@ -133,17 +133,13 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             transform: translateY(0) translateX(0) translate(-50%, -50%); 
             opacity: 0.3; 
           }
-          25% { 
-            transform: translateY(-40px) translateX(30px) translate(-50%, -50%); 
-            opacity: 0.5; 
+          33% { 
+            transform: translateY(-15px) translateX(12px) translate(-50%, -50%); 
+            opacity: 0.35; 
           }
-          50% { 
-            transform: translateY(-20px) translateX(-35px) translate(-50%, -50%); 
-            opacity: 0.4; 
-          }
-          75% { 
-            transform: translateY(-50px) translateX(15px) translate(-50%, -50%); 
-            opacity: 0.45; 
+          66% { 
+            transform: translateY(-8px) translateX(-15px) translate(-50%, -50%); 
+            opacity: 0.32; 
           }
         }
 
