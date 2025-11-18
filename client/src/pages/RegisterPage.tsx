@@ -52,14 +52,25 @@ export default function RegisterPage() {
 
   return (
     <PublicLayout>
-      <Card className="w-full max-w-lg p-10 bg-slate-900/70 backdrop-blur-lg border-white/10">
-        <h1 className="text-2xl font-bold text-white text-center mb-8">
-          Create Your GlucoNova Account
-        </h1>
+      <div className="relative w-full max-w-lg">
+        {/* Floating Glow Effect */}
+        <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-3xl blur-xl opacity-50 animate-float-slow -z-10"></div>
+        
+        {/* Enhanced Glass Card */}
+        <Card 
+          className="w-full p-10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl"
+          style={{
+            background: 'radial-gradient(100% 100% at 50% 0%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+          }}
+        >
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent text-center mb-8">
+            Create Your GlucoNova Account
+          </h1>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="name" className="text-foreground">Full Name</Label>
+            <Label htmlFor="name" className="text-cyan-100">Full Name</Label>
             <Input
               id="name"
               type="text"
@@ -72,7 +83,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <Label htmlFor="email" className="text-foreground">Email</Label>
+            <Label htmlFor="email" className="text-cyan-100">Email</Label>
             <Input
               id="email"
               type="email"
@@ -85,7 +96,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <Label htmlFor="password" className="text-foreground">Password</Label>
+            <Label htmlFor="password" className="text-cyan-100">Password</Label>
             <Input
               id="password"
               type="password"
@@ -98,7 +109,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
+            <Label htmlFor="confirmPassword" className="text-cyan-100">Confirm Password</Label>
             <Input
               id="confirmPassword"
               type="password"
@@ -111,7 +122,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <Label className="text-foreground mb-2 block">Role</Label>
+            <Label className="text-cyan-100 mb-2 block">Role</Label>
             <div className="flex gap-2">
               <Button
                 type="button"
@@ -132,31 +143,32 @@ export default function RegisterPage() {
                 Healthcare Provider
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="text-sm text-cyan-100/70 mt-2">
               {role === 'patient' 
                 ? 'Manage your diabetes with personalized predictions'
                 : 'Access patient records and provide remote care'}
             </p>
           </div>
 
-          <Card className="p-3 bg-secondary/30 border-white/10">
-            <p className="text-xs text-muted-foreground">
+          <Card className="p-3 bg-white/5 border-white/10">
+            <p className="text-xs text-cyan-100/70">
               Your account will be reviewed by our admin team. You'll receive an email notification upon approval.
             </p>
           </Card>
 
-          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading} data-testid="button-create-account">
+          <Button type="submit" className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white shadow-lg" disabled={isLoading} data-testid="button-create-account">
             {isLoading ? 'Creating Account...' : 'Create Account'}
           </Button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground mt-6">
+        <p className="text-center text-sm text-cyan-100/70 mt-6">
           Already have an account?{' '}
-          <a href="/login" className="text-accent hover:underline" data-testid="link-login">
+          <a href="/login" className="text-cyan-300 hover:underline" data-testid="link-login">
             Log in
           </a>
         </p>
-      </Card>
+        </Card>
+      </div>
     </PublicLayout>
   );
 }

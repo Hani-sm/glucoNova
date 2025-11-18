@@ -42,13 +42,24 @@ export default function LoginPage() {
 
   return (
     <PublicLayout>
-      <Card className="w-full max-w-lg p-10 bg-slate-900/70 backdrop-blur-lg border-white/10">
-        <h1 className="text-3xl font-bold text-white text-center mb-2">GlucoNova</h1>
-        <p className="text-accent text-center mb-8">Login</p>
+      <div className="relative w-full max-w-lg">
+        {/* Floating Glow Effect */}
+        <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-3xl blur-xl opacity-50 animate-float-slow -z-10"></div>
+        
+        {/* Enhanced Glass Card */}
+        <Card 
+          className="w-full p-10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl"
+          style={{
+            background: 'radial-gradient(100% 100% at 50% 0%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+          }}
+        >
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent text-center mb-2">GlucoNova</h1>
+          <p className="text-cyan-100 text-center mb-8">Login to Your Account</p>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="email" className="text-foreground">Email Address</Label>
+            <Label htmlFor="email" className="text-cyan-100">Email Address</Label>
             <Input
               id="email"
               type="email"
@@ -61,7 +72,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <Label htmlFor="password" className="text-foreground">Password</Label>
+            <Label htmlFor="password" className="text-cyan-100">Password</Label>
             <Input
               id="password"
               type="password"
@@ -81,27 +92,28 @@ export default function LoginPage() {
                 onCheckedChange={(checked) => setRememberMe(checked as boolean)}
                 data-testid="checkbox-remember"
               />
-              <label htmlFor="remember" className="text-sm text-foreground cursor-pointer">
+              <label htmlFor="remember" className="text-sm text-cyan-100 cursor-pointer">
                 Remember me
               </label>
             </div>
-            <a href="#" className="text-sm text-accent hover:underline">
+            <a href="#" className="text-sm text-cyan-300 hover:underline">
               Forgot password?
             </a>
           </div>
 
-          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading} data-testid="button-signin">
+          <Button type="submit" className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white shadow-lg" disabled={isLoading} data-testid="button-signin">
             {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground mt-6">
+        <p className="text-center text-sm text-cyan-100/70 mt-6">
           Don't have an account?{' '}
-          <a href="/register" className="text-accent hover:underline" data-testid="link-register">
+          <a href="/register" className="text-cyan-300 hover:underline" data-testid="link-register">
             Create one
           </a>
         </p>
-      </Card>
+        </Card>
+      </div>
     </PublicLayout>
   );
 }
