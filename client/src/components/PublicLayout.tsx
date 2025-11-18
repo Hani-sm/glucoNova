@@ -3,7 +3,7 @@ interface PublicLayoutProps {
 }
 
 export default function PublicLayout({ children }: PublicLayoutProps) {
-  // Clear floating circles - outside card and around edges
+  // Small clear floating circles - outside card and around edges
   const clearCircles = [
     { id: 1, size: 10, left: 15, top: 10 },
     { id: 2, size: 8, left: 85, top: 15 },
@@ -19,16 +19,24 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     { id: 16, size: 10, left: 82, top: 90 },
   ];
 
-  // Darker emerald green floating elements with blur - behind card
-  const darkerEmeraldCircles = [
-    { id: 30, size: 80, left: 25, top: 20, delay: 0 },
-    { id: 31, size: 100, left: 70, top: 35, delay: 2 },
-    { id: 32, size: 90, left: 15, top: 60, delay: 4 },
-    { id: 33, size: 110, left: 80, top: 70, delay: 6 },
-    { id: 34, size: 75, left: 50, top: 15, delay: 1 },
-    { id: 35, size: 95, left: 35, top: 80, delay: 3 },
-    { id: 36, size: 85, left: 65, top: 50, delay: 5 },
-    { id: 37, size: 105, left: 45, top: 45, delay: 7 },
+  // Darker, clearer circular elements - subtle floating
+  const darkerCircles = [
+    { id: 40, size: 60, left: 18, top: 25, delay: 0 },
+    { id: 41, size: 70, left: 75, top: 20, delay: 1.5 },
+    { id: 42, size: 55, left: 12, top: 55, delay: 3 },
+    { id: 43, size: 65, left: 82, top: 65, delay: 4.5 },
+    { id: 44, size: 50, left: 30, top: 75, delay: 2 },
+    { id: 45, size: 58, left: 88, top: 40, delay: 3.5 },
+  ];
+
+  // Elements that cross behind the card with blur effect
+  const crossingElements = [
+    { id: 50, size: 90, startY: 25, direction: 'right', duration: 25, delay: 0 },
+    { id: 51, size: 100, startY: 50, direction: 'left', duration: 28, delay: 5 },
+    { id: 52, size: 85, startY: 65, direction: 'right', duration: 30, delay: 10 },
+    { id: 53, size: 95, startY: 35, direction: 'left', duration: 26, delay: 15 },
+    { id: 54, size: 80, startY: 55, direction: 'right', duration: 32, delay: 8 },
+    { id: 55, size: 105, startY: 45, direction: 'left', duration: 27, delay: 12 },
   ];
 
   return (
@@ -59,7 +67,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         />
       </div>
 
-      {/* Clear Floating Circles - Outside Card */}
+      {/* Small Clear Floating Circles - Outside Card */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {clearCircles.map((circle) => (
           <div
@@ -77,19 +85,36 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         ))}
       </div>
 
-      {/* Darker Emerald Green Floating Elements - Behind Card with Blur */}
+      {/* Darker, Clearer Circular Elements - Subtle Floating */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {darkerEmeraldCircles.map((circle) => (
+        {darkerCircles.map((circle) => (
           <div
             key={circle.id}
-            className="absolute rounded-full bg-emerald-600/40 blur-xl"
+            className="absolute rounded-full bg-emerald-700/50"
             style={{
               width: `${circle.size}px`,
               height: `${circle.size}px`,
               left: `${circle.left}%`,
               top: `${circle.top}%`,
-              animation: `floatDarker ${20 + circle.id % 5}s ease-in-out infinite`,
+              animation: `floatSubtle ${18 + circle.id % 6}s ease-in-out infinite`,
               animationDelay: `${circle.delay}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Crossing Elements - Blur Only When Behind Card */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {crossingElements.map((element) => (
+          <div
+            key={element.id}
+            className="absolute rounded-full bg-emerald-600/45"
+            style={{
+              width: `${element.size}px`,
+              height: `${element.size}px`,
+              top: `${element.startY}%`,
+              animation: `crossWith${element.direction === 'right' ? 'Right' : 'Left'}Blur ${element.duration}s linear infinite`,
+              animationDelay: `${element.delay}s`,
             }}
           />
         ))}
@@ -121,26 +146,88 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           }
         }
 
-        @keyframes floatDarker {
+        @keyframes floatSubtle {
           0%, 100% { 
-            transform: translate(0, 0) scale(1); 
-            opacity: 0.4; 
-          }
-          20% { 
-            transform: translate(30px, -40px) scale(1.1); 
+            transform: translate(0, 0); 
             opacity: 0.5; 
           }
-          40% { 
-            transform: translate(-20px, -70px) scale(0.95); 
-            opacity: 0.45; 
+          33% { 
+            transform: translate(15px, -20px); 
+            opacity: 0.55; 
           }
-          60% { 
-            transform: translate(-40px, -50px) scale(1.05); 
-            opacity: 0.48; 
+          66% { 
+            transform: translate(-18px, -35px); 
+            opacity: 0.52; 
           }
-          80% { 
-            transform: translate(10px, -30px) scale(0.98); 
-            opacity: 0.42; 
+        }
+
+        @keyframes crossWithRightBlur {
+          0% { 
+            left: -120px; 
+            filter: blur(0px);
+            opacity: 0;
+          }
+          5% {
+            opacity: 0.45;
+          }
+          35% {
+            filter: blur(0px);
+            opacity: 0.45;
+          }
+          45% {
+            filter: blur(25px);
+            opacity: 0.3;
+          }
+          55% {
+            filter: blur(25px);
+            opacity: 0.3;
+          }
+          65% {
+            filter: blur(0px);
+            opacity: 0.45;
+          }
+          95% {
+            opacity: 0.45;
+          }
+          100% { 
+            left: calc(100% + 120px); 
+            filter: blur(0px);
+            opacity: 0;
+          }
+        }
+
+        @keyframes crossWithLeftBlur {
+          0% { 
+            left: calc(100% + 120px); 
+            filter: blur(0px);
+            opacity: 0;
+          }
+          5% {
+            opacity: 0.45;
+          }
+          35% {
+            filter: blur(0px);
+            opacity: 0.45;
+          }
+          45% {
+            filter: blur(25px);
+            opacity: 0.3;
+          }
+          55% {
+            filter: blur(25px);
+            opacity: 0.3;
+          }
+          65% {
+            filter: blur(0px);
+            opacity: 0.45;
+          }
+          95% {
+            opacity: 0.45;
+          }
+          100% { 
+            left: -120px; 
+            filter: blur(0px);
+            opacity: 0;
           }
         }
 
