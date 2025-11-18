@@ -14,11 +14,11 @@ export default function RoleSelectionPage() {
   return (
     <PublicLayout>
       <Card 
-        className="w-full max-w-5xl backdrop-blur-md bg-white/8 border border-white/15 rounded-2xl p-16 shadow-2xl"
+        className="w-full max-w-3xl backdrop-blur-md bg-white/8 border border-white/15 rounded-2xl p-16 shadow-2xl"
       >
         <h1 className="text-4xl font-bold tracking-tight text-white text-center mb-3">GlucoNova</h1>
         <p className="text-2xl font-semibold text-emerald-400 text-center mb-3">Select Your Role</p>
-        <p className="text-base text-gray-300 text-center mb-12">Choose how you'll use GlucoNova</p>
+        <p className="text-base text-gray-300 text-center mb-8">Choose how you'll use GlucoNova</p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
           <Card 
