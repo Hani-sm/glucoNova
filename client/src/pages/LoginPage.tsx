@@ -43,7 +43,7 @@ export default function LoginPage() {
   return (
     <PublicLayout>
       <Card 
-        className="w-full max-w-lg backdrop-blur-md bg-white/8 border border-white/15 rounded-2xl p-10 shadow-2xl"
+        className="w-full max-w-xl backdrop-blur-md bg-white/8 border border-white/15 rounded-2xl p-12 shadow-2xl"
       >
         <h1 className="text-3xl font-bold text-white text-center mb-2">GlucoNova</h1>
         <p className="text-xl font-semibold text-emerald-400 text-center mb-8">Login</p>
