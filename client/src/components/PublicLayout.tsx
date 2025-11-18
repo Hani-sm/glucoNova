@@ -116,7 +116,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   left: `${circle.left}%`,
                   top: `${circle.top}%`,
                   transform: 'translate(-50%, -50%)',
-                  animation: `floatSlow ${10 + circle.id}s ease-in-out infinite`,
+                  animation: `floatSlow ${25 + circle.id * 2}s ease-in-out infinite`,
                   animationDelay: `${circle.id * 0.3}s`,
                 }}
               />
