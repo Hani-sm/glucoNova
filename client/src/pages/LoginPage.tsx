@@ -45,18 +45,18 @@ export default function LoginPage() {
       <Card 
         className="w-full max-w-3xl backdrop-blur-md bg-white/8 border border-white/15 rounded-2xl p-20 shadow-2xl"
       >
-        <h1 className="text-3xl font-bold text-white text-center mb-2">GlucoNova</h1>
-        <p className="text-xl font-semibold text-emerald-400 text-center mb-8">Login</p>
+        <h1 className="text-5xl font-bold text-white text-center mb-3">GlucoNova</h1>
+        <p className="text-2xl font-semibold text-emerald-400 text-center mb-10">Login</p>
         
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <Label htmlFor="email" className="text-gray-200 text-sm mb-2 block">Email Address</Label>
+            <Label htmlFor="email" className="text-gray-200 text-base mb-3 block">Email Address</Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
+              className="w-full h-14 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
               placeholder="email@example.com"
               required
               data-testid="input-email"
@@ -64,40 +64,40 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <Label htmlFor="password" className="text-gray-200 text-sm mb-2 block">Password</Label>
+            <Label htmlFor="password" className="text-gray-200 text-base mb-3 block">Password</Label>
             <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
+              className="w-full h-14 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
               placeholder="Enter your password"
               required
               data-testid="input-password"
             />
           </div>
 
-          <div className="flex items-center justify-between pt-1">
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center space-x-3">
               <Checkbox
                 id="remember"
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                className="border-white/20 bg-white/5 text-emerald-500 focus:ring-emerald-500"
+                className="border-white/20 bg-white/5 text-emerald-500 focus:ring-emerald-500 h-5 w-5"
                 data-testid="checkbox-remember"
               />
-              <label htmlFor="remember" className="text-sm text-gray-200 cursor-pointer">
+              <label htmlFor="remember" className="text-base text-gray-200 cursor-pointer">
                 Remember me
               </label>
             </div>
-            <a href="#" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+            <a href="#" className="text-base text-emerald-400 hover:text-emerald-300 transition-colors">
               Forgot password?
             </a>
           </div>
 
           <Button 
             type="submit" 
-            className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold py-3 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-emerald-500/25" 
+            className="w-full h-14 text-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-emerald-500/25" 
             disabled={isLoading} 
             data-testid="button-signin"
           >
@@ -105,14 +105,14 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-gray-200 mt-6">
+        <p className="text-center text-base text-gray-200 mt-8">
           Don't have an account?{' '}
           <a href="/register" className="text-emerald-400 hover:text-emerald-300 transition-colors" data-testid="link-register">
             Create one
           </a>
         </p>
 
-        <p className="text-center text-xs text-gray-400 mt-8">
+        <p className="text-center text-sm text-gray-400 mt-10">
           © 2025 GlucoNova. All rights reserved.
         </p>
       </Card>
