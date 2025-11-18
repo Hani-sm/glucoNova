@@ -31,6 +31,14 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     { id: 20, size: 90, left: 45, top: 80 },
   ];
 
+  // Traversing elements - move across screen, behind and in front of card
+  const traversingElements = [
+    { id: 21, size: 60, startY: 20, direction: 'right' },
+    { id: 22, size: 70, startY: 45, direction: 'left' },
+    { id: 23, size: 55, startY: 65, direction: 'right' },
+    { id: 24, size: 65, startY: 35, direction: 'left' },
+  ];
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden relative">
       
@@ -53,6 +61,23 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               top: `${circle.top}%`,
               animation: `floatSlow ${20 + circle.id * 2}s ease-in-out infinite`,
               animationDelay: `${circle.id * 0.5}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Traversing Elements - Move across screen */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {traversingElements.map((element) => (
+          <div
+            key={element.id}
+            className="absolute rounded-full bg-emerald-400/35 traversing-element"
+            style={{
+              width: `${element.size}px`,
+              height: `${element.size}px`,
+              top: `${element.startY}%`,
+              animation: `traverse${element.direction === 'right' ? 'Right' : 'Left'} ${25 + element.id}s linear infinite`,
+              animationDelay: `${element.id * 2}s`,
             }}
           />
         ))}
@@ -101,6 +126,82 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             transform: translateY(-50px) translateX(15px) translate(-50%, -50%); 
             opacity: 0.45; 
           }
+        }
+
+        @keyframes traverseRight {
+          0% { 
+            left: -100px; 
+            filter: blur(0px);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.4;
+            filter: blur(0px);
+          }
+          35% {
+            filter: blur(0px);
+          }
+          45% {
+            filter: blur(20px);
+            opacity: 0.3;
+          }
+          55% {
+            filter: blur(20px);
+            opacity: 0.3;
+          }
+          65% {
+            filter: blur(0px);
+            opacity: 0.4;
+          }
+          90% {
+            opacity: 0.4;
+            filter: blur(0px);
+          }
+          100% { 
+            left: calc(100% + 100px); 
+            filter: blur(0px);
+            opacity: 0;
+          }
+        }
+
+        @keyframes traverseLeft {
+          0% { 
+            left: calc(100% + 100px); 
+            filter: blur(0px);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.4;
+            filter: blur(0px);
+          }
+          35% {
+            filter: blur(0px);
+          }
+          45% {
+            filter: blur(20px);
+            opacity: 0.3;
+          }
+          55% {
+            filter: blur(20px);
+            opacity: 0.3;
+          }
+          65% {
+            filter: blur(0px);
+            opacity: 0.4;
+          }
+          90% {
+            opacity: 0.4;
+            filter: blur(0px);
+          }
+          100% { 
+            left: -100px; 
+            filter: blur(0px);
+            opacity: 0;
+          }
+        }
+
+        .traversing-element {
+          transition: filter 0.8s ease-in-out;
         }
       `}</style>
     </div>
