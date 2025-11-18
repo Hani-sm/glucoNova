@@ -5,10 +5,12 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/hooks/use-toast';
 import { Search, Users } from 'lucide-react';
 
 export default function DoctorDashboard() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [patients, setPatients] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
@@ -18,15 +20,20 @@ export default function DoctorDashboard() {
       try {
         const response = await api.getPatients();
         setPatients(response.patients);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to fetch patients:', error);
+        toast({
+          title: 'Failed to load patients',
+          description: error.message || 'Please try refreshing the page',
+          variant: 'destructive',
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchPatients();
-  }, []);
+  }, [toast]);
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

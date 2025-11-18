@@ -8,6 +8,7 @@ export interface AuthRequest extends Request {
   user?: {
     userId: string;
     role: UserRole;
+    isApproved: boolean;
   };
 }
 
@@ -19,7 +20,7 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
       return res.status(401).json({ message: 'Authentication required' });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; role: UserRole };
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; role: UserRole; isApproved: boolean };
     req.user = decoded;
     next();
   } catch (error) {
@@ -31,6 +32,10 @@ export function roleMiddleware(...allowedRoles: UserRole[]) {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ message: 'Authentication required' });
+    }
+
+    if (req.user.role !== 'admin' && !req.user.isApproved) {
+      return res.status(403).json({ message: 'Account pending approval' });
     }
 
     if (!allowedRoles.includes(req.user.role)) {
@@ -46,12 +51,18 @@ export function approvalMiddleware(req: AuthRequest, res: Response, next: NextFu
     return res.status(401).json({ message: 'Authentication required' });
   }
 
+  if (req.user.role !== 'admin' && !req.user.isApproved) {
+    return res.status(403).json({ message: 'Account pending approval' });
+  }
+
   next();
 }
 
-export function generateToken(userId: string, role: UserRole): string {
+export const authWithApproval = [authMiddleware, approvalMiddleware];
+
+export function generateToken(userId: string, role: UserRole, isApproved: boolean): string {
   return jwt.sign(
-    { userId, role },
+    { userId, role, isApproved },
     JWT_SECRET,
     { expiresIn: '7d' }
   );

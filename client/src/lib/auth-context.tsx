@@ -27,9 +27,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const initAuth = async () => {
       const token = getAuthToken();
-      const savedUser = getCurrentUser();
       
-      if (token && savedUser) {
+      if (token) {
         try {
           const response = await api.getMe();
           setUser(response);
@@ -37,6 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (error) {
           removeAuthToken();
           removeCurrentUser();
+          setUser(null);
         }
       }
       

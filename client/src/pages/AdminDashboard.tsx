@@ -19,8 +19,13 @@ export default function AdminDashboard() {
     try {
       const response = await api.getAllUsers();
       setUsers(response.users);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch users:', error);
+      toast({
+        title: 'Failed to load users',
+        description: error.message || 'Please try refreshing the page',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }

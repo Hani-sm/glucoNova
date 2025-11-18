@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import { storage } from "./storage";
-import { authMiddleware, roleMiddleware, generateToken, type AuthRequest } from "./middleware/auth";
+import { authMiddleware, roleMiddleware, approvalMiddleware, authWithApproval, generateToken, type AuthRequest } from "./middleware/auth";
 import { hashPassword, comparePassword } from "./utils/password";
 import { insertUserSchema, loginSchema, healthDataSchema, mealSchema } from "@shared/schema";
 import { MedicalReportModel } from "./models/MedicalReport";
@@ -43,7 +43,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password: hashedPassword,
       });
 
-      const token = generateToken(user._id, user.role);
+      const token = generateToken(user._id, user.role, user.isApproved);
 
       res.status(201).json({
         message: 'Registration successful. Awaiting admin approval.',
@@ -75,7 +75,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
-      const token = generateToken(user._id, user.role);
+      const token = generateToken(user._id, user.role, user.isApproved);
 
       res.json({
         message: 'Login successful',
@@ -241,7 +241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==================== FILE UPLOAD ROUTES ====================
   
-  app.post('/api/reports/upload', authMiddleware, upload.single('file'), async (req: AuthRequest, res) => {
+  app.post('/api/reports/upload', authWithApproval, upload.single('file'), async (req: AuthRequest, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
@@ -278,7 +278,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/reports', authMiddleware, async (req: AuthRequest, res) => {
+  app.get('/api/reports', authWithApproval, async (req: AuthRequest, res) => {
     try {
       const patientId = req.query.patientId as string || req.user!.userId;
       
