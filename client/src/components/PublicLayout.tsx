@@ -3,55 +3,45 @@ interface PublicLayoutProps {
 }
 
 export default function PublicLayout({ children }: PublicLayoutProps) {
-  // Generate circular floating elements - small and subtle
-  const floatingCircles = Array.from({ length: 8 }, (_, i) => ({
-    id: i,
-    size: Math.random() * 12 + 6,
-    left: Math.random() * 100,
-    top: Math.random() * 100,
-    delay: Math.random() * 5,
-    duration: 15 + Math.random() * 10,
-    color: ['bg-cyan-400/30', 'bg-emerald-400/30', 'bg-blue-400/20', 'bg-slate-400/20'][Math.floor(Math.random() * 4)]
-  }));
+  // Generate minimal floating particles - very small and subtle
+  const particles = [
+    { id: 1, size: 8, left: 15, top: 10 },
+    { id: 2, size: 10, left: 85, top: 15 },
+    { id: 3, size: 6, left: 25, top: 70 },
+    { id: 4, size: 8, left: 75, top: 60 },
+    { id: 5, size: 7, left: 90, top: 80 },
+    { id: 6, size: 9, left: 10, top: 85 },
+  ];
 
   return (
-    <div className="min-h-screen w-full bg-[#1a2332] text-white overflow-hidden relative">
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden relative">
       
-      {/* Light Wave Background - subtle */}
+      {/* Minimal Floating Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-r from-cyan-500/8 to-emerald-500/8 rounded-t-full animate-wave-slow"></div>
-        <div className="absolute bottom-8 left-0 right-0 h-20 bg-gradient-to-r from-emerald-500/6 to-blue-500/6 rounded-t-full animate-wave-medium"></div>
-        <div className="absolute bottom-16 left-0 right-0 h-16 bg-gradient-to-r from-blue-500/4 to-cyan-500/4 rounded-t-full animate-wave-fast"></div>
-      </div>
-
-      {/* Small Floating Circles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {floatingCircles.map((circle) => (
+        {particles.map((particle) => (
           <div
-            key={circle.id}
-            className={`absolute rounded-full ${circle.color}`}
+            key={particle.id}
+            className="absolute rounded-full bg-emerald-400/20"
             style={{
-              width: `${circle.size}px`,
-              height: `${circle.size}px`,
-              left: `${circle.left}%`,
-              top: `${circle.top}%`,
-              animation: `floatSlow ${circle.duration}s ease-in-out infinite`,
-              animationDelay: `${circle.delay}s`,
+              width: `${particle.size}px`,
+              height: `${particle.size}px`,
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
+              animation: `floatSlow ${20 + particle.id * 2}s ease-in-out infinite`,
+              animationDelay: `${particle.id * 0.5}s`,
             }}
           />
         ))}
       </div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-4">
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-8">
         {children}
       </div>
 
       <style>{`
         @keyframes floatSlow {
-          0%, 100% { transform: translateY(0) translateX(0); }
-          25% { transform: translateY(-30px) translateX(15px); }
-          50% { transform: translateY(-15px) translateX(-15px); }
-          75% { transform: translateY(-40px) translateX(10px); }
+          0%, 100% { transform: translateY(0) translateX(0); opacity: 0.2; }
+          50% { transform: translateY(-20px) translateX(10px); opacity: 0.3; }
         }
       `}</style>
     </div>
