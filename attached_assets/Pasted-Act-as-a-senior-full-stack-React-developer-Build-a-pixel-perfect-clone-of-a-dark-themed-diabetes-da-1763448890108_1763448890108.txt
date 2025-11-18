@@ -1,0 +1,185 @@
+Act as a senior full-stack React developer.
+Build a pixel-perfect clone of a dark themed diabetes dashboard web app called “GlucoNova”.
+Use this tech stack:
+Frontend: React + Vite + TypeScript
+Styling: Tailwind CSS (no inline styles, no CSS modules)
+Routing: React Router
+Charts: Recharts (or another simple React chart library if needed)
+State: Local React state only (no Redux)
+The app must have the following pages, layout and visual style, closely matching these screenshots:
+Dark blue/teal GlucoNova login screen with a centered glass card
+Role selection screen (Patient vs Healthcare Provider)
+Dashboard with left sidebar + top metrics cards + glucose trend graph + quick actions + voice assistant card
+Register / create account form with patient vs provider toggle
+Additional dashboard view with “Glucose Trends” line chart and summary stats
+GLOBAL STYLE & THEME
+General background: dark navy gradient from #040815 to #071627.
+Add very subtle floating circular particles in the background (low opacity, teal or light blue). This can be simple absolutely positioned divs, no need for complex animations.
+Card background: very dark bluish gray, e.g. #121826 to #1b2436.
+Card border radius: 18–24px.
+Accent colors:
+Primary green for success: #16a34a
+Teal/emerald for highlights: #10b981
+Orange for CTA buttons (like “Log Meal”): #f97316
+Typography: use system font stack or Tailwind’s default; headings should be semibold/bold, body text normal.
+Use soft drop shadows on cards: e.g. shadow-xl with low opacity.
+APP STRUCTURE
+Implement a layout with:
+MainLayout (for logged-in pages)
+Left sidebar:
+Top: round avatar with initials inside a green circle, app name “GlucoNova” next to it.
+Below: user card showing name (e.g. “Hanisha SM”) and a tag like “Diabetes in Range: 85%”.
+Navigation items as a vertical list with icons:
+Dashboard
+My Details
+My Doctors
+Glucose
+Insulin
+Food AI
+Medications
+Voice AI
+Records
+Reports
+Settings
+Bottom: “Logout” in red.
+Right content area for the dashboard cards and graphs.
+PublicLayout (for login/register/role selection)
+Same dark gradient background with floating dots.
+Centered card or content panel.
+Use React Router routes:
+/login
+/register
+/role-selection
+/dashboard
+Default route / should redirect to /login.
+PAGE 1 – LOGIN PAGE (/login)
+Centered vertical card with glassmorphism effect:
+Width around 420px.
+Background: semi-transparent dark (bg-slate-900/70), border border-white/10, backdrop-blur.
+Content:
+Title: GlucoNova (large, white, centered).
+Subtitle: Login in teal/green.
+Form fields:
+Email Address (label above, filled rounded input inside the card).
+Password (label above, filled rounded input).
+Row with:
+Left: checkbox “Remember me”
+Right: teal link “Forgot password?”
+Full-width green button: Sign In.
+Below: “Don’t have an account? Create one” with “Create one” as clickable teal link that goes to /register.
+At bottom of page: “© 2025 GlucoNova. All rights reserved.” centered with low opacity.
+No real auth needed: on submit just preventDefault and navigate to /role-selection.
+PAGE 2 – ROLE SELECTION (/role-selection)
+Centered large transparent card with blurred background.
+Title: GlucoNova (top center).
+Subheading: “Select Your Role” and smaller sub-text: “Choose how you’ll use GlucoNova”.
+Two big cards in a row:
+Patient Account card:
+Icon circle on top with a user icon.
+Badge “PATIENT”.
+Title “Patient Account”.
+Description: “Manage your diabetes with AI-powered insights”.
+At bottom, a small teal link: “Click to continue as Patient”.
+Healthcare Provider card:
+Stethoscope icon circle.
+Badge “PROVIDER”.
+Title “Healthcare Provider”.
+Description: “Access patient records and provide remote care”.
+Hover effect: slightly raise and brighten card.
+Clicking a card should navigate("/dashboard").
+Below the cards, a small back link: “← Back to Login” that goes to /login.
+PAGE 3 – REGISTER / CREATE ACCOUNT (/register)
+Use a similar narrow centered card as login.
+Title: “Create Your GlucoNova Account”.
+Fields:
+Email
+Password
+Confirm Password
+Role toggle: Patient vs Healthcare Provider as two side-by-side pill buttons. Selected one is filled green, other is outlined.
+Text under role: “Manage your diabetes with personalized predictions” when “Patient” is selected; and a provider-related text when “Healthcare Provider” is selected.
+Info box card below:
+Light border and small text: “Your account will be reviewed by our admin team. You’ll receive an email notification upon approval.”
+Big green button: Create Account.
+Below: “Already have an account? Log in” link that navigates to /login.
+No backend logic, just fake success and navigate to /role-selection.
+PAGE 4 – MAIN DASHBOARD (/dashboard) – PATIENT VIEW
+Use MainLayout with sidebar on the left and main content on the right.
+Top Welcome Section
+At top of content, a large headline:
+Welcome back, Hanisha SM
+Smaller text: “Here’s your health overview for today”.
+Row of 4 metric cards (full width)
+Each card rectangle has:
+Glucose
+Big number: 112
+Unit: mg/dL
+Small text: In Range
+Time in Range
+Big number: 85%
+Small text: Excellent • +12%
+Carbs
+Big number: 45g
+Small text: On Track • 25% used
+Active Insulin
+Big number: 2.5U
+Small text: Active • -1.2U
+Each card uses an icon in the top-right (drop icon for glucose, bullseye for time-in-range, fork/knife for carbs, syringe for insulin).
+Add small status labels as rounded pills (e.g. “In Range”, “Excellent”, “On Track”, “Active”) in green.
+Glucose Trends Card
+Big card with title: “Glucose Trends”.
+Top right: toggle segmented control with 4 buttons: 6h, 24h, 7d, 30d. The selected one is green; others are dark.
+Main body: line chart (Recharts) showing glucose values across time-of-day (x-axis: 12 AM, 6 AM, 12 PM, 6 PM, 12 AM).
+Use light green line with round dots and subtle area fill.
+Bottom: summary row:
+“Current Status 98 mg/dL” with badge “Within Target”.
+Right Columns – Voice + Stats
+On the right side of this view (or below on smaller screens) add stacked cards:
+Voice Food Logging / Voice Health Assistant card
+Title: “Voice Food Logging” or “Voice Health Assistant”.
+Inside: microphone icon in a circle.
+Subtext “Tap mic to log your meal” or “Tap microphone to record health data”.
+Button: orange Log Meal or green Record.
+Recognized text area below (mock): “Recognized: Glucose 120, BMI 24.5, Age 45”.
+Streak and goals card
+Title: nothing big, just label + stats:
+“3 Days in Range – 100%” with horizontal teal progress bar.
+“Weekly Logging – 85%” progress bar.
+“Activity Goal – 70%” progress bar.
+Quick Actions Section (Alternative/Second View)
+Another view or section similar to one of the screenshots:
+Card titled “Quick Actions”.
+Inside, a grid of cards (2 or 3 per row) for:
+Blood Sugar Tracking
+Medication Reminders
+Doctor Communication
+Health Reports
+Each quick-action card has:
+Icon on left (heart, pill, chat bubble, document)
+Title and short description.
+Use dummy data arrays for glucose values and progress percentages.
+INTERACTIONS (FRONTEND ONLY)
+Clicking Sign In on login → navigate to /role-selection.
+On role selection, clicking a role card → navigate to /dashboard.
+On dashboard, clicking the time range buttons (6h/24h/7d/30d) should change the dummy data used by the Glucose Trends chart (so the line graph visibly changes).
+Voice cards and quick actions can just log to console with console.log when clicked; no real APIs needed.
+CODE ORGANIZATION
+Use a src/components folder for reusable pieces like:
+Sidebar.tsx
+MetricCard.tsx
+GlucoseTrendChart.tsx
+ProgressBar.tsx
+QuickActionCard.tsx
+VoiceAssistantCard.tsx
+Use src/pages for:
+LoginPage.tsx
+RegisterPage.tsx
+RoleSelectionPage.tsx
+DashboardPage.tsx
+App.tsx handles Router and layouts.
+GOAL
+Deliver a fully working React + Tailwind project that, when run in Replit, shows a polished GlucoNova interface with:
+Pixel-perfect dark theme similar to modern health dashboards
+All pages wired via routes
+Responsive layout (sidebar collapses or the content stacks nicely on smaller screens)
+Clean, well-structured TypeScript code and Tailwind classes only.
+Do all necessary setup: Tailwind config, Router setup, chart library installation, and example data so the dashboard looks full and real.
