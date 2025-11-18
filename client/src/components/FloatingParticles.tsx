@@ -1,7 +1,7 @@
 export default function FloatingParticles() {
   const particles = Array.from({ length: 20 }, (_, i) => ({
     id: i,
-    size: Math.random() * 100 + 50,
+    size: Math.random() * 40 + 20,
     left: Math.random() * 100,
     top: Math.random() * 100,
     delay: Math.random() * 5,
