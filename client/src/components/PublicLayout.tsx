@@ -43,21 +43,21 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         <div 
           className="absolute top-0 left-0 right-0 h-96 opacity-30"
           style={{
-            background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(16, 185, 129, 0.08), transparent)',
+            background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(4, 120, 87, 0.08), transparent)',
             animation: 'wave1 15s ease-in-out infinite',
           }}
         />
         <div 
           className="absolute top-1/3 left-0 right-0 h-96 opacity-20"
           style={{
-            background: 'radial-gradient(ellipse 70% 40% at 30% 50%, rgba(6, 182, 212, 0.06), transparent)',
+            background: 'radial-gradient(ellipse 70% 40% at 30% 50%, rgba(4, 120, 87, 0.06), transparent)',
             animation: 'wave2 18s ease-in-out infinite',
           }}
         />
         <div 
           className="absolute bottom-0 left-0 right-0 h-96 opacity-25"
           style={{
-            background: 'radial-gradient(ellipse 75% 45% at 70% 100%, rgba(16, 185, 129, 0.07), transparent)',
+            background: 'radial-gradient(ellipse 75% 45% at 70% 100%, rgba(4, 120, 87, 0.07), transparent)',
             animation: 'wave3 20s ease-in-out infinite',
           }}
         />
@@ -68,7 +68,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         {floatingDots.map((dot) => (
           <div
             key={dot.id}
-            className="absolute rounded-full bg-emerald-400/50"
+            className="absolute rounded-full bg-emerald-700/50"
             style={{
               width: `${dot.size}px`,
               height: `${dot.size}px`,
@@ -86,7 +86,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         {unevenCircles.map((circle) => (
           <div
             key={`circle-${circle.id}`}
-            className="absolute rounded-full bg-emerald-400"
+            className="absolute rounded-full bg-emerald-700"
             style={{
               width: `${circle.size}px`,
               height: `${circle.size}px`,

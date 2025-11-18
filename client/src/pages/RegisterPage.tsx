@@ -78,16 +78,16 @@ export default function RegisterPage() {
         className="w-full max-w-3xl backdrop-blur-md bg-white/8 border border-white/15 rounded-2xl p-16 shadow-2xl"
       >
         <h1 className="text-4xl font-bold tracking-tight text-white text-center mb-3">GlucoNova</h1>
-        <p className="text-2xl font-semibold text-emerald-400 text-center mb-8">Create Account</p>
+        <p className="text-2xl font-semibold text-emerald-500 text-center mb-8">Create Account</p>
         
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+          <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-emerald-700/10 border border-emerald-700/20">
             {role === 'patient' ? (
-              <User className="h-5 w-5 text-emerald-400" />
+              <User className="h-5 w-5 text-emerald-500" />
             ) : (
-              <Stethoscope className="h-5 w-5 text-emerald-400" />
+              <Stethoscope className="h-5 w-5 text-emerald-500" />
             )}
-            <span className="text-base font-medium text-emerald-400">
+            <span className="text-base font-medium text-emerald-500">
               {role === 'patient' ? 'Patient Account' : 'Healthcare Provider Account'}
             </span>
           </div>
@@ -101,7 +101,7 @@ export default function RegisterPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full h-12 px-5 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
+              className="w-full h-12 px-5 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 rounded-lg focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20 transition-all duration-300"
               placeholder="Enter your full name"
               required
               data-testid="input-name"
@@ -115,7 +115,7 @@ export default function RegisterPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-12 px-5 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
+              className="w-full h-12 px-5 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 rounded-lg focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20 transition-all duration-300"
               placeholder="email@example.com"
               required
               data-testid="input-email"
@@ -129,7 +129,7 @@ export default function RegisterPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-12 px-5 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
+              className="w-full h-12 px-5 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 rounded-lg focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20 transition-all duration-300"
               placeholder="Create a strong password"
               required
               data-testid="input-password"
@@ -143,7 +143,7 @@ export default function RegisterPage() {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full h-12 px-5 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-300"
+              className="w-full h-12 px-5 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 rounded-lg focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20 transition-all duration-300"
               placeholder="Re-enter your password"
               required
               data-testid="input-confirm-password"
@@ -158,7 +158,7 @@ export default function RegisterPage() {
 
           <Button 
             type="submit" 
-            className="w-full h-12 text-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold transition-all duration-300 shadow-lg hover:shadow-emerald-500/25" 
+            className="w-full h-12 text-lg bg-gradient-to-r from-emerald-800 to-emerald-700 hover:from-emerald-700 hover:to-emerald-600 text-white font-semibold transition-all duration-300 shadow-lg hover:shadow-emerald-800/30" 
             disabled={isLoading} 
             data-testid="button-create-account"
           >
@@ -168,7 +168,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-gray-200 mt-8">
           Already have an account?{' '}
-          <a href="/login" className="text-emerald-400 hover:text-emerald-300 transition-colors" data-testid="link-login">
+          <a href="/login" className="text-emerald-500 hover:text-emerald-400 transition-colors" data-testid="link-login">
             Log in
           </a>
         </p>
