@@ -23,9 +23,18 @@ Preferred communication style: Simple, everyday language.
 - shadcn/ui component library with customized "new-york" style preset
 - Dark-themed interface with navy gradients (#040815 to #071627)
 - Glassmorphism effects with backdrop blur on cards and modals
-- Emerald green (#10b981) as primary accent color
-- Orange (#f97316) for call-to-action buttons
+- Bright emerald/teal (rgb(52, 211, 153) / #34d399 / emerald-400) as primary accent color
+- Button gradients use emerald-500 to emerald-400 with emerald-300 hover states
+- Floating animated elements and wave gradients in bright emerald tones
 - Responsive layout with sidebar navigation for desktop, collapsible for mobile
+
+**Color Palette:**
+- Primary text/links: emerald-400 (HSL 158 64% 52%) with emerald-300 hover
+- Backgrounds: emerald-400/10 and emerald-400/20 for subtle accents
+- Borders: emerald-400/20 and emerald-400/30
+- Focus states: emerald-400 with emerald-400/20 rings
+- CSS theme variables: primary, sidebar-primary, ring, and accent all use bright emerald (158 64% 52%)
+- Chart colors: Bright emerald range (158 64% 44-60% lightness)
 
 **State Management:**
 - React Context API for authentication state (AuthProvider)
