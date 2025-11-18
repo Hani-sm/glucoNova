@@ -5,34 +5,34 @@ interface PublicLayoutProps {
 export default function PublicLayout({ children }: PublicLayoutProps) {
   // Floating emerald dots - subtle slow movement
   const floatingDots = [
-    { id: 1, size: 12, left: 15, top: 10, duration: 35, delay: 0, xRange: 12, yRange: 15 },
-    { id: 2, size: 14, left: 85, top: 15, duration: 40, delay: 2, xRange: -15, yRange: 18 },
-    { id: 3, size: 16, left: 10, top: 70, duration: 38, delay: 4, xRange: 16, yRange: -14 },
-    { id: 4, size: 13, left: 88, top: 75, duration: 42, delay: 1, xRange: -12, yRange: 16 },
-    { id: 5, size: 15, left: 5, top: 50, duration: 36, delay: 3, xRange: 14, yRange: -18 },
-    { id: 6, size: 14, left: 92, top: 45, duration: 39, delay: 5, xRange: -13, yRange: 17 },
-    { id: 7, size: 12, left: 20, top: 30, duration: 41, delay: 0.5, xRange: 15, yRange: 19 },
-    { id: 8, size: 17, left: 78, top: 25, duration: 34, delay: 2.5, xRange: -16, yRange: -15 },
-    { id: 9, size: 13, left: 12, top: 85, duration: 43, delay: 1.5, xRange: 13, yRange: 16 },
-    { id: 10, size: 15, left: 90, top: 60, duration: 37, delay: 3.5, xRange: -14, yRange: 18 },
-    { id: 11, size: 14, left: 25, top: 88, duration: 40, delay: 4.5, xRange: 15, yRange: -17 },
-    { id: 12, size: 16, left: 82, top: 90, duration: 36, delay: 2.2, xRange: -13, yRange: 15 },
-    { id: 13, size: 18, left: 40, top: 18, duration: 39, delay: 1.8, xRange: 14, yRange: 16 },
-    { id: 14, size: 13, left: 65, top: 55, duration: 41, delay: 3.2, xRange: -15, yRange: -17 },
-    { id: 15, size: 15, left: 8, top: 35, duration: 35, delay: 0.8, xRange: 12, yRange: 14 },
-    { id: 16, size: 17, left: 95, top: 82, duration: 42, delay: 4.2, xRange: -16, yRange: 18 },
+    { id: 1, size: 12, left: 15, top: 10, duration: 35, delay: 0, xRange: 28, yRange: 35 },
+    { id: 2, size: 14, left: 85, top: 15, duration: 40, delay: 2, xRange: -32, yRange: 38 },
+    { id: 3, size: 16, left: 10, top: 70, duration: 38, delay: 4, xRange: 35, yRange: -30 },
+    { id: 4, size: 13, left: 88, top: 75, duration: 42, delay: 1, xRange: -26, yRange: 33 },
+    { id: 5, size: 15, left: 5, top: 50, duration: 36, delay: 3, xRange: 30, yRange: -36 },
+    { id: 6, size: 14, left: 92, top: 45, duration: 39, delay: 5, xRange: -29, yRange: 34 },
+    { id: 7, size: 12, left: 20, top: 30, duration: 41, delay: 0.5, xRange: 33, yRange: 40 },
+    { id: 8, size: 17, left: 78, top: 25, duration: 34, delay: 2.5, xRange: -34, yRange: -32 },
+    { id: 9, size: 13, left: 12, top: 85, duration: 43, delay: 1.5, xRange: 27, yRange: 35 },
+    { id: 10, size: 15, left: 90, top: 60, duration: 37, delay: 3.5, xRange: -31, yRange: 37 },
+    { id: 11, size: 14, left: 25, top: 88, duration: 40, delay: 4.5, xRange: 32, yRange: -35 },
+    { id: 12, size: 16, left: 82, top: 90, duration: 36, delay: 2.2, xRange: -28, yRange: 33 },
+    { id: 13, size: 18, left: 40, top: 18, duration: 39, delay: 1.8, xRange: 30, yRange: 34 },
+    { id: 14, size: 13, left: 65, top: 55, duration: 41, delay: 3.2, xRange: -33, yRange: -36 },
+    { id: 15, size: 15, left: 8, top: 35, duration: 35, delay: 0.8, xRange: 26, yRange: 31 },
+    { id: 16, size: 17, left: 95, top: 82, duration: 42, delay: 4.2, xRange: -35, yRange: 38 },
   ];
 
   // Uneven circular elements with varying opacity
   const unevenCircles = [
-    { id: 1, size: 25, left: 30, top: 20, duration: 40, delay: 0, opacity: 0.08, xRange: 18, yRange: 22 },
-    { id: 2, size: 35, left: 70, top: 65, duration: 38, delay: 3, opacity: 0.32, xRange: -20, yRange: 25 },
-    { id: 3, size: 20, left: 18, top: 55, duration: 42, delay: 1.5, opacity: 0.06, xRange: 22, yRange: -18 },
-    { id: 4, size: 30, left: 85, top: 35, duration: 36, delay: 4, opacity: 0.25, xRange: -19, yRange: 24 },
-    { id: 5, size: 28, left: 50, top: 80, duration: 44, delay: 2.5, opacity: 0.15, xRange: 21, yRange: -20 },
-    { id: 6, size: 22, left: 12, top: 25, duration: 39, delay: 5, opacity: 0.1, xRange: -23, yRange: 26 },
-    { id: 7, size: 32, left: 60, top: 10, duration: 41, delay: 1, opacity: 0.28, xRange: 17, yRange: 19 },
-    { id: 8, size: 24, left: 92, top: 70, duration: 37, delay: 3.5, opacity: 0.12, xRange: -21, yRange: -23 },
+    { id: 1, size: 25, left: 30, top: 20, duration: 40, delay: 0, opacity: 0.08, xRange: 38, yRange: 45 },
+    { id: 2, size: 35, left: 70, top: 65, duration: 38, delay: 3, opacity: 0.32, xRange: -42, yRange: 48 },
+    { id: 3, size: 20, left: 18, top: 55, duration: 42, delay: 1.5, opacity: 0.06, xRange: 45, yRange: -40 },
+    { id: 4, size: 30, left: 85, top: 35, duration: 36, delay: 4, opacity: 0.25, xRange: -40, yRange: 46 },
+    { id: 5, size: 28, left: 50, top: 80, duration: 44, delay: 2.5, opacity: 0.15, xRange: 43, yRange: -42 },
+    { id: 6, size: 22, left: 12, top: 25, duration: 39, delay: 5, opacity: 0.1, xRange: -46, yRange: 50 },
+    { id: 7, size: 32, left: 60, top: 10, duration: 41, delay: 1, opacity: 0.28, xRange: 37, yRange: 41 },
+    { id: 8, size: 24, left: 92, top: 70, duration: 37, delay: 3.5, opacity: 0.12, xRange: -44, yRange: -47 },
   ];
 
   return (
