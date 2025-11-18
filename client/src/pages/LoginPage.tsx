@@ -46,7 +46,7 @@ export default function LoginPage() {
         className="w-full max-w-3xl backdrop-blur-md bg-white/8 border border-white/15 rounded-2xl p-16 shadow-2xl"
       >
         <h1 className="text-4xl font-bold tracking-tight text-white text-center mb-3">GlucoNova</h1>
-        <p className="text-2xl font-semibold text-emerald-500 text-center mb-8">Login</p>
+        <p className="text-2xl font-semibold text-emerald-400 text-center mb-8">Login</p>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -56,7 +56,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-12 px-5 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 rounded-lg focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20 transition-all duration-300"
+              className="w-full h-12 px-5 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 rounded-lg focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all duration-300"
               placeholder="email@example.com"
               required
               data-testid="input-email"
@@ -70,7 +70,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-12 px-5 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 rounded-lg focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20 transition-all duration-300"
+              className="w-full h-12 px-5 bg-white/5 border border-white/10 text-white text-lg placeholder-gray-400 rounded-lg focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all duration-300"
               placeholder="Enter your password"
               required
               data-testid="input-password"
@@ -83,21 +83,21 @@ export default function LoginPage() {
                 id="remember"
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                className="border-white/20 bg-white/5 text-emerald-700 focus:ring-emerald-700 h-5 w-5"
+                className="border-white/20 bg-white/5 text-emerald-400 focus:ring-emerald-400 h-5 w-5"
                 data-testid="checkbox-remember"
               />
               <label htmlFor="remember" className="text-sm text-gray-200 cursor-pointer">
                 Remember me
               </label>
             </div>
-            <a href="#" className="text-sm text-emerald-500 hover:text-emerald-400 transition-colors">
+            <a href="#" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
               Forgot password?
             </a>
           </div>
 
           <Button 
             type="submit" 
-            className="w-full h-12 text-lg bg-gradient-to-r from-emerald-800 to-emerald-700 hover:from-emerald-700 hover:to-emerald-600 text-white font-semibold transition-all duration-300 shadow-lg hover:shadow-emerald-800/30" 
+            className="w-full h-12 text-lg bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-white font-semibold transition-all duration-300 shadow-lg hover:shadow-emerald-500/30" 
             disabled={isLoading} 
             data-testid="button-signin"
           >
@@ -107,7 +107,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-gray-200 mt-8">
           Don't have an account?{' '}
-          <a href="/role-selection" className="text-emerald-500 hover:text-emerald-400 transition-colors" data-testid="link-register">
+          <a href="/role-selection" className="text-emerald-400 hover:text-emerald-300 transition-colors" data-testid="link-register">
             Create one
           </a>
         </p>
