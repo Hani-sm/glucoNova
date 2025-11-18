@@ -21,31 +21,50 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
   // Blurred circles - positioned around card edges to look like going behind
   const blurredCircles = [
-    { id: 7, size: 90, left: 20, top: 15 },
-    { id: 8, size: 110, left: 75, top: 25 },
-    { id: 9, size: 85, left: 35, top: 70 },
-    { id: 10, size: 95, left: 70, top: 65 },
-    { id: 17, size: 80, left: 50, top: 10 },
-    { id: 18, size: 100, left: 25, top: 45 },
-    { id: 19, size: 75, left: 80, top: 50 },
-    { id: 20, size: 90, left: 45, top: 80 },
+    { id: 7, size: 50, left: 20, top: 15 },
+    { id: 8, size: 60, left: 75, top: 25 },
+    { id: 9, size: 45, left: 35, top: 70 },
+    { id: 10, size: 55, left: 70, top: 65 },
+    { id: 17, size: 40, left: 50, top: 10 },
+    { id: 18, size: 58, left: 25, top: 45 },
+    { id: 19, size: 42, left: 80, top: 50 },
+    { id: 20, size: 48, left: 45, top: 75 },
   ];
 
   // Traversing elements - move across screen, behind and in front of card
   const traversingElements = [
-    { id: 21, size: 60, startY: 20, direction: 'right' },
-    { id: 22, size: 70, startY: 45, direction: 'left' },
-    { id: 23, size: 55, startY: 65, direction: 'right' },
-    { id: 24, size: 65, startY: 35, direction: 'left' },
+    { id: 21, size: 38, startY: 20, direction: 'right' },
+    { id: 22, size: 42, startY: 45, direction: 'left' },
+    { id: 23, size: 35, startY: 65, direction: 'right' },
+    { id: 24, size: 40, startY: 35, direction: 'left' },
   ];
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden relative">
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-x-hidden relative">
       
-      {/* Subtle Wave Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-r from-emerald-500/5 to-cyan-500/5 rounded-t-full"></div>
-        <div className="absolute bottom-8 left-0 right-0 h-16 bg-gradient-to-r from-cyan-500/4 to-emerald-500/4 rounded-t-full"></div>
+      {/* Animated Light Waves */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div 
+          className="absolute top-0 left-0 right-0 h-96 opacity-30"
+          style={{
+            background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(16, 185, 129, 0.08), transparent)',
+            animation: 'wave1 15s ease-in-out infinite',
+          }}
+        />
+        <div 
+          className="absolute top-1/3 left-0 right-0 h-96 opacity-20"
+          style={{
+            background: 'radial-gradient(ellipse 70% 40% at 30% 50%, rgba(6, 182, 212, 0.06), transparent)',
+            animation: 'wave2 18s ease-in-out infinite',
+          }}
+        />
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-96 opacity-25"
+          style={{
+            background: 'radial-gradient(ellipse 75% 45% at 70% 100%, rgba(16, 185, 129, 0.07), transparent)',
+            animation: 'wave3 20s ease-in-out infinite',
+          }}
+        />
       </div>
 
       {/* Clear Floating Circles - Outside Card */}
@@ -59,7 +78,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               height: `${circle.size}px`,
               left: `${circle.left}%`,
               top: `${circle.top}%`,
-              animation: `floatSlow ${20 + circle.id * 2}s ease-in-out infinite`,
+              animation: `floatSlow ${12 + circle.id}s ease-in-out infinite`,
               animationDelay: `${circle.id * 0.5}s`,
             }}
           />
@@ -76,7 +95,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               width: `${element.size}px`,
               height: `${element.size}px`,
               top: `${element.startY}%`,
-              animation: `traverse${element.direction === 'right' ? 'Right' : 'Left'} ${25 + element.id}s linear infinite`,
+              animation: `traverse${element.direction === 'right' ? 'Right' : 'Left'} ${15 + element.id}s linear infinite`,
               animationDelay: `${element.id * 2}s`,
             }}
           />
@@ -97,7 +116,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   left: `${circle.left}%`,
                   top: `${circle.top}%`,
                   transform: 'translate(-50%, -50%)',
-                  animation: `floatSlow ${15 + circle.id * 2}s ease-in-out infinite`,
+                  animation: `floatSlow ${10 + circle.id}s ease-in-out infinite`,
                   animationDelay: `${circle.id * 0.3}s`,
                 }}
               />
@@ -202,6 +221,39 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
         .traversing-element {
           transition: filter 0.8s ease-in-out;
+        }
+
+        @keyframes wave1 {
+          0%, 100% { 
+            transform: translateY(0) scaleX(1);
+            opacity: 0.3;
+          }
+          50% { 
+            transform: translateY(-30px) scaleX(1.1);
+            opacity: 0.4;
+          }
+        }
+
+        @keyframes wave2 {
+          0%, 100% { 
+            transform: translateX(0) scaleY(1);
+            opacity: 0.2;
+          }
+          50% { 
+            transform: translateX(40px) scaleY(1.15);
+            opacity: 0.3;
+          }
+        }
+
+        @keyframes wave3 {
+          0%, 100% { 
+            transform: translateY(0) scaleX(1);
+            opacity: 0.25;
+          }
+          50% { 
+            transform: translateY(30px) scaleX(1.1);
+            opacity: 0.35;
+          }
         }
       `}</style>
     </div>
