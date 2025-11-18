@@ -52,12 +52,11 @@ export default function RegisterPage() {
 
   return (
     <PublicLayout>
-      <div className="w-full max-w-md">
-        <Card 
-          className="w-full p-8 backdrop-blur-sm bg-[#1e2a3a]/80 border border-slate-600/50 rounded-2xl shadow-xl"
-        >
-          <h1 className="text-3xl font-bold text-white text-center mb-1">GlucoNova</h1>
-          <p className="text-emerald-400 text-center mb-8">Create Account</p>
+      <Card 
+        className="relative w-full p-10 backdrop-blur-xl bg-[#1e2a3a]/50 border border-slate-500/30 rounded-2xl shadow-2xl"
+      >
+        <h1 className="text-4xl font-bold text-white text-center mb-1">GlucoNova</h1>
+        <p className="text-emerald-400 text-center mb-8">Create Account</p>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -162,8 +161,7 @@ export default function RegisterPage() {
         <p className="text-center text-xs text-white/40 mt-8">
           © 2025 GlucoNova. All rights reserved.
         </p>
-        </Card>
-      </div>
+      </Card>
     </PublicLayout>
   );
 }
