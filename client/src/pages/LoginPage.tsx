@@ -6,17 +6,38 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/hooks/use-toast';
 
 export default function LoginPage() {
   const [, navigate] = useLocation();
+  const { login } = useAuth();
+  const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log('Login attempted', { email, rememberMe });
-    navigate('/role-selection');
+    setIsLoading(true);
+    
+    try {
+      await login(email, password);
+      toast({
+        title: 'Login successful',
+        description: 'Welcome back to GlucoNova',
+      });
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast({
+        title: 'Login failed',
+        description: error.message || 'Invalid credentials',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -69,8 +90,8 @@ export default function LoginPage() {
             </a>
           </div>
 
-          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" data-testid="button-signin">
-            Sign In
+          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading} data-testid="button-signin">
+            {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
 

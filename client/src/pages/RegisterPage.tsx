@@ -5,18 +5,49 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/hooks/use-toast';
 
 export default function RegisterPage() {
   const [, navigate] = useLocation();
+  const { register } = useAuth();
+  const { toast } = useToast();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState<'patient' | 'provider'>('patient');
+  const [role, setRole] = useState<'patient' | 'doctor'>('patient');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log('Registration attempted', { email, role });
-    navigate('/role-selection');
+    
+    if (password !== confirmPassword) {
+      toast({
+        title: 'Passwords do not match',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      await register(name, email, password, role);
+      toast({
+        title: 'Registration successful',
+        description: 'Your account will be reviewed by our admin team',
+      });
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast({
+        title: 'Registration failed',
+        description: error.message || 'Please try again',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,6 +58,19 @@ export default function RegisterPage() {
         </h1>
         
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="name" className="text-foreground">Full Name</Label>
+            <Input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="mt-1"
+              required
+              data-testid="input-name"
+            />
+          </div>
+
           <div>
             <Label htmlFor="email" className="text-foreground">Email</Label>
             <Input
@@ -80,10 +124,10 @@ export default function RegisterPage() {
               </Button>
               <Button
                 type="button"
-                onClick={() => setRole('provider')}
-                className={role === 'provider' ? 'flex-1 bg-primary text-primary-foreground' : 'flex-1'}
-                variant={role === 'provider' ? 'default' : 'outline'}
-                data-testid="button-role-provider"
+                onClick={() => setRole('doctor')}
+                className={role === 'doctor' ? 'flex-1 bg-primary text-primary-foreground' : 'flex-1'}
+                variant={role === 'doctor' ? 'default' : 'outline'}
+                data-testid="button-role-doctor"
               >
                 Healthcare Provider
               </Button>
@@ -101,8 +145,8 @@ export default function RegisterPage() {
             </p>
           </Card>
 
-          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" data-testid="button-create-account">
-            Create Account
+          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading} data-testid="button-create-account">
+            {isLoading ? 'Creating Account...' : 'Create Account'}
           </Button>
         </form>
 
