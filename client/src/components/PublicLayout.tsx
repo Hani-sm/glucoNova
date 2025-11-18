@@ -89,13 +89,17 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             transform: translateY(0) translateX(0) translate(-50%, -50%); 
             opacity: 0.3; 
           }
-          33% { 
-            transform: translateY(-25px) translateX(15px) translate(-50%, -50%); 
+          25% { 
+            transform: translateY(-40px) translateX(30px) translate(-50%, -50%); 
             opacity: 0.5; 
           }
-          66% { 
-            transform: translateY(-15px) translateX(-20px) translate(-50%, -50%); 
+          50% { 
+            transform: translateY(-20px) translateX(-35px) translate(-50%, -50%); 
             opacity: 0.4; 
+          }
+          75% { 
+            transform: translateY(-50px) translateX(15px) translate(-50%, -50%); 
+            opacity: 0.45; 
           }
         }
       `}</style>
