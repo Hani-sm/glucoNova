@@ -3,6 +3,9 @@ import { z } from "zod";
 export const userRoles = ['patient', 'doctor', 'admin'] as const;
 export type UserRole = typeof userRoles[number];
 
+export const activityLevels = ['sedentary', 'light', 'moderate', 'active', 'very_active'] as const;
+export type ActivityLevel = typeof activityLevels[number];
+
 export interface User {
   _id: string;
   name: string;
@@ -79,7 +82,7 @@ export const healthDataSchema = z.object({
   glucose: z.number().min(0).max(1000),
   insulin: z.number().min(0).max(200),
   carbs: z.number().min(0).max(500),
-  activityLevel: z.string().optional(),
+  activityLevel: z.enum(activityLevels).optional(),
   notes: z.string().optional(),
 });
 
@@ -92,7 +95,24 @@ export const mealSchema = z.object({
   voiceRecorded: z.boolean().default(false),
 });
 
+export const medicalReportSchema = z.object({
+  patientId: z.string(),
+  description: z.string().optional(),
+});
+
+export const predictionSchema = z.object({
+  predictedInsulin: z.number().min(0),
+  confidence: z.number().min(0).max(1),
+  factors: z.object({
+    glucose: z.number(),
+    carbs: z.number(),
+    activityLevel: z.string(),
+  }),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type InsertHealthData = z.infer<typeof healthDataSchema>;
 export type InsertMeal = z.infer<typeof mealSchema>;
+export type InsertMedicalReport = z.infer<typeof medicalReportSchema>;
+export type InsertPrediction = z.infer<typeof predictionSchema>;

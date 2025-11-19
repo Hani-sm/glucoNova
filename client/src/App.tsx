@@ -10,6 +10,9 @@ import RoleSelectionPage from "@/pages/RoleSelectionPage";
 import DashboardPage from "@/pages/DashboardPage";
 import DoctorDashboard from "@/pages/DoctorDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
+import HealthDataPage from "@/pages/HealthDataPage";
+import MealLoggingPage from "@/pages/MealLoggingPage";
+import MedicalReportsPage from "@/pages/MedicalReportsPage";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component, allowedRoles, requireApproval = true, ...rest }: any) {
@@ -66,6 +69,33 @@ function Router() {
         {(params) => (
           <ProtectedRoute 
             component={user?.role === 'doctor' ? DoctorDashboard : user?.role === 'admin' ? AdminDashboard : DashboardPage}
+            {...params}
+          />
+        )}
+      </Route>
+      <Route path="/health-data">
+        {(params) => (
+          <ProtectedRoute 
+            component={HealthDataPage}
+            allowedRoles={['patient']}
+            {...params}
+          />
+        )}
+      </Route>
+      <Route path="/meals">
+        {(params) => (
+          <ProtectedRoute 
+            component={MealLoggingPage}
+            allowedRoles={['patient']}
+            {...params}
+          />
+        )}
+      </Route>
+      <Route path="/reports">
+        {(params) => (
+          <ProtectedRoute 
+            component={MedicalReportsPage}
+            allowedRoles={['patient', 'doctor']}
             {...params}
           />
         )}

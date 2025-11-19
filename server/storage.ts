@@ -1,7 +1,9 @@
-import { type User, type InsertUser, type HealthData, type InsertHealthData, type Meal, type InsertMeal } from "@shared/schema";
+import { type User, type InsertUser, type HealthData, type InsertHealthData, type Meal, type InsertMeal, type MedicalReport, type InsertMedicalReport, type Prediction, type InsertPrediction } from "@shared/schema";
 import { UserModel } from "./models/User";
 import { HealthDataModel } from "./models/HealthData";
 import { MealModel } from "./models/Meal";
+import { MedicalReportModel } from "./models/MedicalReport";
+import { PredictionModel } from "./models/Prediction";
 import { isMongoConnected } from "./db";
 import { randomUUID } from "crypto";
 
@@ -21,6 +23,14 @@ export interface IStorage {
   // Meal operations
   createMeal(userId: string, meal: InsertMeal): Promise<Meal>;
   getMealsByUser(userId: string, limit?: number): Promise<Meal[]>;
+  
+  // Medical report operations
+  getMedicalReportsByPatient(patientId: string): Promise<MedicalReport[]>;
+  
+  // Prediction operations
+  createPrediction(userId: string, prediction: InsertPrediction): Promise<Prediction>;
+  getPredictionsByUser(userId: string, limit?: number): Promise<Prediction[]>;
+  getLatestPrediction(userId: string): Promise<Prediction | null>;
 }
 
 export class MongoStorage implements IStorage {
@@ -85,12 +95,48 @@ export class MongoStorage implements IStorage {
       .lean();
     return meals.map(m => ({ ...m, _id: m._id.toString(), userId: userId } as Meal));
   }
+
+  async getMedicalReportsByPatient(patientId: string): Promise<MedicalReport[]> {
+    const reports = await MedicalReportModel.find({ patientId })
+      .sort({ uploadedAt: -1 })
+      .populate('uploadedBy', 'name email')
+      .lean();
+    return reports.map(r => ({
+      ...r,
+      _id: r._id.toString(),
+      userId: r.userId.toString(),
+      patientId: r.patientId.toString(),
+      uploadedBy: r.uploadedBy.toString(),
+    } as MedicalReport));
+  }
+
+  async createPrediction(userId: string, prediction: InsertPrediction): Promise<Prediction> {
+    const pred = await PredictionModel.create({ userId, ...prediction });
+    return { ...pred.toObject(), _id: pred._id.toString(), userId: userId } as Prediction;
+  }
+
+  async getPredictionsByUser(userId: string, limit: number = 50): Promise<Prediction[]> {
+    const predictions = await PredictionModel.find({ userId })
+      .sort({ timestamp: -1 })
+      .limit(limit)
+      .lean();
+    return predictions.map(p => ({ ...p, _id: p._id.toString(), userId: userId } as Prediction));
+  }
+
+  async getLatestPrediction(userId: string): Promise<Prediction | null> {
+    const prediction = await PredictionModel.findOne({ userId })
+      .sort({ timestamp: -1 })
+      .lean();
+    return prediction ? { ...prediction, _id: prediction._id.toString(), userId: userId } as Prediction : null;
+  }
 }
 
 class MemStorage implements IStorage {
   private users: Map<string, User> = new Map();
   private healthData: Map<string, HealthData[]> = new Map();
   private meals: Map<string, Meal[]> = new Map();
+  private medicalReports: Map<string, MedicalReport[]> = new Map();
+  private predictions: Map<string, Prediction[]> = new Map();
 
   async getUser(id: string): Promise<User | null> {
     return this.users.get(id) || null;
@@ -164,6 +210,34 @@ class MemStorage implements IStorage {
   async getMealsByUser(userId: string, limit: number = 50): Promise<Meal[]> {
     const meals = this.meals.get(userId) || [];
     return meals.slice(0, limit);
+  }
+
+  async getMedicalReportsByPatient(patientId: string): Promise<MedicalReport[]> {
+    const reports = this.medicalReports.get(patientId) || [];
+    return reports;
+  }
+
+  async createPrediction(userId: string, prediction: InsertPrediction): Promise<Prediction> {
+    const pred: Prediction = {
+      _id: randomUUID(),
+      userId,
+      ...prediction,
+      timestamp: new Date(),
+    };
+    const userPredictions = this.predictions.get(userId) || [];
+    userPredictions.unshift(pred);
+    this.predictions.set(userId, userPredictions);
+    return pred;
+  }
+
+  async getPredictionsByUser(userId: string, limit: number = 50): Promise<Prediction[]> {
+    const predictions = this.predictions.get(userId) || [];
+    return predictions.slice(0, limit);
+  }
+
+  async getLatestPrediction(userId: string): Promise<Prediction | null> {
+    const predictions = this.predictions.get(userId) || [];
+    return predictions[0] || null;
   }
 }
 

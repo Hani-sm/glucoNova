@@ -1,0 +1,267 @@
+import { useState } from 'react';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import AppSidebar from '@/components/AppSidebar';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { healthDataSchema, type InsertHealthData } from '@shared/schema';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import { Droplet, TrendingUp } from 'lucide-react';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+
+export default function HealthDataPage() {
+  const { toast } = useToast();
+  
+  const form = useForm<InsertHealthData>({
+    resolver: zodResolver(healthDataSchema),
+    defaultValues: {
+      glucose: 0,
+      insulin: 0,
+      carbs: 0,
+      activityLevel: 'moderate',
+      notes: '',
+    },
+  });
+
+  const createHealthDataMutation = useMutation({
+    mutationFn: async (data: InsertHealthData) => {
+      return apiRequest('/api/health-data', 'POST', data);
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Success',
+        description: 'Health data logged successfully',
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/health-data'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/health-data/latest'] });
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to log health data',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const { data: healthHistory } = useQuery({
+    queryKey: ['/api/health-data'],
+  });
+
+  const onSubmit = (data: InsertHealthData) => {
+    createHealthDataMutation.mutate(data);
+  };
+
+  const sidebarStyle = {
+    '--sidebar-width': '20rem',
+    '--sidebar-width-icon': '4rem',
+  };
+
+  return (
+    <SidebarProvider style={sidebarStyle as React.CSSProperties}>
+      <div className="flex h-screen w-full">
+        <AppSidebar />
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <header className="flex items-center justify-between p-4 border-b border-border">
+            <SidebarTrigger data-testid="button-sidebar-toggle" />
+          </header>
+          
+          <main className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold mb-1">Log Health Data</h1>
+              <p className="text-muted-foreground">Track your glucose, insulin, and carbohydrate intake</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <Droplet className="h-5 w-5 text-primary" />
+                  </div>
+                  <h2 className="text-xl font-bold">New Entry</h2>
+                </div>
+
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="glucose"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Glucose Level (mg/dL)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="Enter glucose level"
+                              {...field}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                              data-testid="input-glucose"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="insulin"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Insulin Dose (units)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              placeholder="Enter insulin dose"
+                              {...field}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                              data-testid="input-insulin"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="carbs"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Carbohydrates (grams)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="Enter carbs consumed"
+                              {...field}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                              data-testid="input-carbs"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="activityLevel"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Activity Level</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger data-testid="select-activity">
+                                <SelectValue placeholder="Select activity level" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="sedentary">Sedentary</SelectItem>
+                              <SelectItem value="light">Light</SelectItem>
+                              <SelectItem value="moderate">Moderate</SelectItem>
+                              <SelectItem value="active">Active</SelectItem>
+                              <SelectItem value="very_active">Very Active</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="notes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Notes (optional)</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Add any additional notes..."
+                              {...field}
+                              data-testid="input-notes"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={createHealthDataMutation.isPending}
+                      data-testid="button-submit"
+                    >
+                      {createHealthDataMutation.isPending ? 'Logging...' : 'Log Health Data'}
+                    </Button>
+                  </form>
+                </Form>
+              </Card>
+
+              <Card className="p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 text-primary" />
+                  </div>
+                  <h2 className="text-xl font-bold">Recent Entries</h2>
+                </div>
+
+                <div className="space-y-3">
+                  {healthHistory?.healthData?.slice(0, 5).map((entry: any) => (
+                    <div
+                      key={entry._id}
+                      className="p-4 rounded-lg bg-secondary/50 space-y-2"
+                      data-testid={`entry-${entry._id}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold">
+                          {new Date(entry.timestamp).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Glucose:</span>
+                          <span className="ml-1 font-semibold" data-testid={`text-glucose-${entry._id}`}>
+                            {entry.glucose} mg/dL
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Insulin:</span>
+                          <span className="ml-1 font-semibold" data-testid={`text-insulin-${entry._id}`}>
+                            {entry.insulin}U
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Carbs:</span>
+                          <span className="ml-1 font-semibold" data-testid={`text-carbs-${entry._id}`}>
+                            {entry.carbs}g
+                          </span>
+                        </div>
+                      </div>
+                      {entry.notes && (
+                        <p className="text-sm text-muted-foreground mt-2">{entry.notes}</p>
+                      )}
+                    </div>
+                  )) || (
+                    <p className="text-sm text-muted-foreground text-center py-8">
+                      No entries yet. Log your first health data!
+                    </p>
+                  )}
+                </div>
+              </Card>
+            </div>
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
+  );
+}
