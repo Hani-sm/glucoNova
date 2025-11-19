@@ -20,25 +20,25 @@ export default function RoleSelectionPage() {
         <p className="text-[1.75rem] font-bold text-emerald-400 text-center mb-2">Select Your Role</p>
         <p className="text-base text-gray-300 text-center mb-10">Choose how you'll use GlucoNova</p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-8 hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-10 hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
             onClick={() => handleRoleSelect('patient')}
             data-testid="card-role-patient"
           >
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className="h-16 w-16 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
-                <User className="h-8 w-8 text-emerald-400" />
+            <div className="flex flex-col items-center text-center space-y-5">
+              <div className="h-20 w-20 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
+                <User className="h-10 w-10 text-emerald-400" />
               </div>
               
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20">
-                  <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wide">Patient</span>
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+                  <span className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Patient</span>
                 </div>
-                <h3 className="text-xl font-bold text-white">Patient Account</h3>
+                <h3 className="text-2xl font-bold text-white">Patient Account</h3>
               </div>
               
-              <p className="text-sm text-gray-300 leading-relaxed">
+              <p className="text-base text-gray-300 leading-relaxed">
                 Manage your diabetes with AI-powered insights
               </p>
               
@@ -47,7 +47,7 @@ export default function RoleSelectionPage() {
                   e.stopPropagation();
                   handleRoleSelect('patient');
                 }}
-                className="w-full h-11 text-base bg-white/5 border border-white/10 text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/30 transition-all"
+                className="w-full h-12 text-lg bg-white/5 border border-white/10 text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/30 transition-all"
                 variant="outline"
                 data-testid="button-continue-patient"
               >
@@ -57,23 +57,23 @@ export default function RoleSelectionPage() {
           </Card>
 
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-8 hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-10 hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
             onClick={() => handleRoleSelect('doctor')}
             data-testid="card-role-doctor"
           >
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className="h-16 w-16 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
-                <Stethoscope className="h-8 w-8 text-emerald-400" />
+            <div className="flex flex-col items-center text-center space-y-5">
+              <div className="h-20 w-20 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
+                <Stethoscope className="h-10 w-10 text-emerald-400" />
               </div>
               
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20">
-                  <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wide">Provider</span>
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+                  <span className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Provider</span>
                 </div>
-                <h3 className="text-xl font-bold text-white">Healthcare Provider</h3>
+                <h3 className="text-2xl font-bold text-white">Healthcare Provider</h3>
               </div>
               
-              <p className="text-sm text-gray-300 leading-relaxed">
+              <p className="text-base text-gray-300 leading-relaxed">
                 Access patient records and provide remote care
               </p>
               
@@ -82,7 +82,7 @@ export default function RoleSelectionPage() {
                   e.stopPropagation();
                   handleRoleSelect('doctor');
                 }}
-                className="w-full h-11 text-base bg-white/5 border border-white/10 text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/30 transition-all"
+                className="w-full h-12 text-lg bg-white/5 border border-white/10 text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/30 transition-all"
                 variant="outline"
                 data-testid="button-continue-doctor"
               >
