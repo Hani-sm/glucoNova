@@ -20,25 +20,27 @@ export default function RoleSelectionPage() {
         <p className="text-[1.75rem] font-bold text-emerald-400 text-center mb-2">Select Your Role</p>
         <p className="text-base text-gray-300 text-center mb-10">Choose how you'll use GlucoNova</p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-[30px] my-10">
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-10 hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl py-10 px-[30px] min-h-[280px] max-w-[400px] w-full mx-auto hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
             onClick={() => handleRoleSelect('patient')}
             data-testid="card-role-patient"
           >
-            <div className="flex flex-col items-center text-center space-y-5">
-              <div className="h-20 w-20 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
-                <User className="h-10 w-10 text-emerald-400" />
+            <div className="flex flex-col items-center text-center h-full">
+              <div className="h-[140px] flex items-center justify-center mb-[25px]">
+                <div className="h-24 w-24 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
+                  <User className="h-12 w-12 text-emerald-400" />
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+              <div className="space-y-3 mb-[20px]">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-400/10 border border-emerald-400/20">
                   <span className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Patient</span>
                 </div>
-                <h3 className="text-2xl font-bold text-white">Patient Account</h3>
+                <h3 className="text-[1.5rem] font-bold text-white">Patient Account</h3>
               </div>
               
-              <p className="text-base text-gray-300 leading-relaxed">
+              <p className="text-[1.1rem] leading-[1.6] text-gray-300 mb-[30px]">
                 Manage your diabetes with AI-powered insights
               </p>
               
@@ -47,7 +49,7 @@ export default function RoleSelectionPage() {
                   e.stopPropagation();
                   handleRoleSelect('patient');
                 }}
-                className="w-full h-12 text-lg bg-white/5 border border-white/10 text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/30 transition-all"
+                className="w-full h-14 py-4 px-8 text-[1.1rem] bg-white/5 border border-white/10 text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/30 transition-all mt-auto"
                 variant="outline"
                 data-testid="button-continue-patient"
               >
@@ -57,23 +59,25 @@ export default function RoleSelectionPage() {
           </Card>
 
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-10 hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl py-10 px-[30px] min-h-[280px] max-w-[400px] w-full mx-auto hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
             onClick={() => handleRoleSelect('doctor')}
             data-testid="card-role-doctor"
           >
-            <div className="flex flex-col items-center text-center space-y-5">
-              <div className="h-20 w-20 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
-                <Stethoscope className="h-10 w-10 text-emerald-400" />
+            <div className="flex flex-col items-center text-center h-full">
+              <div className="h-[140px] flex items-center justify-center mb-[25px]">
+                <div className="h-24 w-24 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
+                  <Stethoscope className="h-12 w-12 text-emerald-400" />
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+              <div className="space-y-3 mb-[20px]">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-400/10 border border-emerald-400/20">
                   <span className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Provider</span>
                 </div>
-                <h3 className="text-2xl font-bold text-white">Healthcare Provider</h3>
+                <h3 className="text-[1.5rem] font-bold text-white">Healthcare Provider</h3>
               </div>
               
-              <p className="text-base text-gray-300 leading-relaxed">
+              <p className="text-[1.1rem] leading-[1.6] text-gray-300 mb-[30px]">
                 Access patient records and provide remote care
               </p>
               
@@ -82,7 +86,7 @@ export default function RoleSelectionPage() {
                   e.stopPropagation();
                   handleRoleSelect('doctor');
                 }}
-                className="w-full h-12 text-lg bg-white/5 border border-white/10 text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/30 transition-all"
+                className="w-full h-14 py-4 px-8 text-[1.1rem] bg-white/5 border border-white/10 text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/30 transition-all mt-auto"
                 variant="outline"
                 data-testid="button-continue-doctor"
               >
