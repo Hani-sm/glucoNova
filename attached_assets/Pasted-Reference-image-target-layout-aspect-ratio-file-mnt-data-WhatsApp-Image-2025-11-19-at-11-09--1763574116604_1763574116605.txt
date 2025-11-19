@@ -1,0 +1,100 @@
+Reference image (target layout & aspect ratio): file:///mnt/data/WhatsApp Image 2025-11-19 at 11.09.10 PM.jpeg
+Use this file as the single source of truth for proportions, spacing, and the wider desktop aspect.
+
+Goal: Keep the existing background exactly as it is in my current UI (colors, teal particles, wave lines, glow). Do not change the background. Only change the layout proportions: make the main content area wider like the reference image, enlarge central containers/cards and redistribute spacing to match the second screenshot.
+
+Global layout rules
+
+Fixed left sidebar width: 240px (sticky). Keep the dark navy glass style and left icons exactly as is.
+
+Top header height: 72px.
+
+Main content wrapper: centered, max width 1400px, full desktop width behavior (i.e., max-width: 1400px; margin: 0 auto; padding: 24px).
+
+Content grid: two columns — main column (1fr) + right column (360px). Use a gap of 28px between columns.
+
+On wide view, the main content column should appear visually ~2.6× the right column width (matching the reference).
+
+Specific container & component sizes (pixel-accurate guidance)
+
+Top stats row: each card width ~(main column width / 4) with height: 110px and border-radius: 12px.
+
+Glucose Trends chart container:
+
+Width: stretch full width of main column.
+
+Height: 360px.
+
+border-radius: 12px, subtle inner glass gradient and soft drop shadow.
+
+Right column widgets:
+
+Primary widget AI Insulin Prediction: width 360px, height 120px, strong CTA button (full width of widget minus 24px padding).
+
+Voice Logging card: width 360px, height 220px.
+
+Quick Actions row at bottom: each action card width approx (main column width / 2 - 16px), height 80–100px.
+
+Spacing & alignment
+
+Use consistent vertical rhythm: 24px between stacked sections, 16–28px horizontal gaps where appropriate.
+
+All cards inside main column should have equal horizontal padding (24px) and consistent internal spacing.
+
+Typography: H1 ~28–32px bold; card titles 16–18px semi-bold; body 13–15px.
+
+Visual style
+
+Keep the exact colors, teal highlights, glassmorphism blur/transparency levels, and particle placement from the current background. Do not alter hue or density of particles.
+
+Shadows: soft, very low-opacity shadows; inner-top highlight on cards to create glass depth.
+
+Keep icons and micro-animations (hover glow on cards) as is.
+
+First-time login walkthrough (required)
+
+When a user logs in for the first time, show a centered, accessible modal overlay (glass style, 640px wide, 460px tall) with a 4-step walkthrough progress bar across the top:
+
+Welcome — short message: “Welcome to GlucoNova — we’ll set up your account quickly.”
+
+Upload Health Records (PDF) — CTA: Upload PDF (primary button). Also show a smaller secondary CTA: Use sample / demo.
+
+If user clicks Upload: open file picker (accept .pdf), allow drag & drop, show file preview area with filename and Remove button.
+
+IMPORTANT: If user uses the provided button to upload a PDF, show an optional parser step: “We’ll extract key values — confirm or edit results.” Display parsed fields (Name, DOB, Weight, Height, Last A1c, Medications) in editable text inputs.
+
+Manual Entry — if user does not have a PDF or clicks “Enter details manually”, show a short form with the above fields (Name, DOB, Weight, Height, Typical Insulin, Target Range). Provide Skip option for minimal onboarding.
+
+Finish — show “Done” with CTA Go to Dashboard.
+
+The walkthrough modal should be skippable (Skip for now), but if skipped show a non-intrusive top-banner reminding them to complete setup (with Resume Setup CTA).
+
+Save user choice in local storage / profile so it does not show again after completion.
+
+UX details for onboarding
+
+File upload button should display a small help tooltip: “We’ll extract values from standard clinic summaries (PDFs).”
+
+If parsed fields are present, prefill the Dashboard widgets (e.g., Glucose Trends, Profile data).
+
+If parse fails, show a gentle message: “Couldn’t auto-extract — please enter details manually.”
+
+All inputs must validate basic formats (DOB, numeric fields).
+
+Responsive & accessibility
+
+On smaller screens, convert to single column: left sidebar collapses to icon-only; main content becomes full width and right column stacks below.
+
+All buttons and inputs meet AA contrast and are keyboard navigable; modal focus trap while open.
+
+Implementation hints for generator (optional, apply if supported)
+
+Use grid: grid-template-columns: 1fr 360px; max-width: 1400px; gap: 28px;
+
+Chart container: height: 360px; border-radius: 12px; padding: 20px;
+
+Sidebar: width: 240px;
+
+Modal onboarding: width: 640px; height: 460px; border-radius: 12px; padding: 28px;
+
+Do not change the background or particles. Only change container widths, grid, spacing and the onboarding modal described above so the output matches proportions and spacing of the reference image.
