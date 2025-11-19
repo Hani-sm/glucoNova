@@ -73,10 +73,10 @@ export default function DashboardPage() {
 
   const generatePredictionMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('/api/predictions/insulin', {
+      const response = await apiRequest('/api/predictions/insulin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
       });
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/predictions/latest'] });
