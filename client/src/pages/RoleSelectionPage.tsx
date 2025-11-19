@@ -14,15 +14,15 @@ export default function RoleSelectionPage() {
   return (
     <PublicLayout>
       <Card 
-        className="w-full max-w-[960px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-12 py-12 shadow-2xl"
+        className="w-full max-w-[1200px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-16 py-12 shadow-2xl"
       >
         <h1 className="text-[2.75rem] font-extrabold tracking-tight text-white text-center mb-3">GlucoNova</h1>
         <p className="text-[1.75rem] font-bold text-emerald-400 text-center mb-2">Select Your Role</p>
         <p className="text-base text-gray-300 text-center mb-10">Choose how you'll use GlucoNova</p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-10 max-w-[760px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-10 max-w-[1000px] mx-auto">
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-8 pt-12 pb-10 w-full min-h-[340px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-10 pt-12 pb-10 w-full min-h-[320px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
             onClick={() => handleRoleSelect('patient')}
             data-testid="card-role-patient"
           >
@@ -38,7 +38,7 @@ export default function RoleSelectionPage() {
               
               <h3 className="text-[1.5rem] font-bold text-white">Patient Account</h3>
               
-              <p className="text-sm text-gray-300 leading-relaxed">
+              <p className="text-base text-gray-300 leading-relaxed">
                 Manage your diabetes with AI-powered insights
               </p>
               
@@ -51,7 +51,7 @@ export default function RoleSelectionPage() {
           </Card>
 
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-8 pt-12 pb-10 w-full min-h-[340px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-10 pt-12 pb-10 w-full min-h-[320px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
             onClick={() => handleRoleSelect('doctor')}
             data-testid="card-role-doctor"
           >
@@ -67,7 +67,7 @@ export default function RoleSelectionPage() {
               
               <h3 className="text-[1.5rem] font-bold text-white">Healthcare Provider</h3>
               
-              <p className="text-sm text-gray-300 leading-relaxed">
+              <p className="text-base text-gray-300 leading-relaxed">
                 Access patient records and provide remote care
               </p>
               
