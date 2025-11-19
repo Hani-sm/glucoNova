@@ -26,18 +26,19 @@ export default function LoginPage() {
     
     try {
       await login(email, password);
+      
       toast({
         title: 'Login successful',
         description: 'Welcome back to GlucoNova',
       });
-      navigate('/dashboard');
+      
+      window.location.href = '/dashboard';
     } catch (error: any) {
       toast({
         title: 'Login failed',
         description: error.message || 'Invalid credentials',
         variant: 'destructive',
       });
-    } finally {
       setIsLoading(false);
     }
   };
