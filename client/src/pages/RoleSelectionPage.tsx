@@ -107,11 +107,11 @@ export default function RoleSelectionPage() {
       {/* Content - No max-width constraint */}
       <div className="relative z-10 flex items-center justify-center min-h-screen px-6 py-8">
         <div 
-          className="w-full max-w-[1500px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-20 py-16 shadow-2xl"
+          className="w-full max-w-5xl backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-12 py-10 shadow-2xl"
           data-testid="container-role-selection"
         >
           {/* Header Section */}
-          <div className="text-center mb-14">
+          <div className="text-center mb-10">
             <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">
               GlucoNova
             </h1>
@@ -124,11 +124,11 @@ export default function RoleSelectionPage() {
           </div>
 
           {/* Two Role Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12 justify-items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 justify-items-center">
             {/* Patient Card */}
             <div
               onClick={() => handleRoleSelect('patient')}
-              className="group relative rounded-2xl p-10 cursor-pointer transition-all duration-500 hover:scale-[1.02]"
+              className="group relative rounded-2xl p-8 cursor-pointer transition-all duration-500 hover:scale-[1.02]"
               style={{
                 background: 'rgba(20, 30, 45, 0.5)',
                 border: '1px solid rgba(45, 212, 191, 0.2)',
@@ -193,7 +193,7 @@ export default function RoleSelectionPage() {
             {/* Healthcare Provider Card */}
             <div
               onClick={() => handleRoleSelect('doctor')}
-              className="group relative rounded-2xl p-10 cursor-pointer transition-all duration-500 hover:scale-[1.02]"
+              className="group relative rounded-2xl p-8 cursor-pointer transition-all duration-500 hover:scale-[1.02]"
               style={{
                 background: 'rgba(20, 30, 45, 0.5)',
                 border: '1px solid rgba(45, 212, 191, 0.2)',
