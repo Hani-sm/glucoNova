@@ -1,0 +1,260 @@
+Fix GlucoNova Login Page Card Size, Font, and Input Styling
+text
+URGENT: FIX GLUCONOVA LOGIN PAGE - CORRECT CARD SIZE, FONT SCALING, AND INPUT FIELD DIMENSIONS
+
+CURRENT VISUAL ISSUES:
+1. ❌ Card size too large/small - not properly proportioned
+2. ❌ Font sizes incorrect - hierarchy broken
+3. ❌ Input fields wrong size - too small/large
+4. ❌ Spacing between elements inconsistent
+5. ❌ Overall layout not matching professional medical design
+
+EXACT DIMENSIONS AND SIZING REQUIRED:
+
+1. LOGIN CARD SPECIFICATIONS:
+```css
+.login-card {
+  width: 100%;
+  max-width: 420px; /* Fixed optimal width */
+  min-height: auto; /* Remove fixed height */
+  padding: 48px 40px; /* Perfect professional spacing */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px; /* Softer, modern corners */
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  margin: 20px; /* Mobile safety margin */
+}
+EXACT FONT SIZES AND HIERARCHY:
+
+css
+/* MAIN HEADER - "GlucoNova" */
+.logo {
+  font-size: 2.75rem; /* Prominent but not overwhelming */
+  font-weight: 800; /* Extra bold for brand presence */
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-align: center;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px; /* Tighter tracking for elegance */
+}
+
+/* SUBHEADER - "Login" */
+.subtitle {
+  font-size: 1.75rem; /* Clear hierarchy below main header */
+  font-weight: 700;
+  color: #10b981;
+  text-align: center;
+  margin-bottom: 40px; /* Ample space before form */
+}
+
+/* FORM LABELS */
+.form-label {
+  font-size: 1rem; /* Readable but not dominant */
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* INPUT FIELD TEXT */
+.form-input {
+  font-size: 1.05rem; /* Comfortable reading size */
+  color: #f8fafc;
+  /* ... other styles */
+}
+
+/* BUTTON TEXT */
+.signin-btn {
+  font-size: 1.1rem; /* Slightly larger for importance */
+  font-weight: 700;
+  /* ... other styles */
+}
+
+/* LINK AND FOOTER TEXT */
+.forgot-link, .register-text {
+  font-size: 0.95rem; /* Secondary information */
+}
+
+.footer {
+  font-size: 0.85rem; /* Small but readable */
+}
+INPUT FIELD DIMENSIONS - PERFECT PROPORTIONS:
+
+css
+.form-input {
+  width: 100%;
+  height: 56px; /* Optimal touch target height */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px; /* Matches card radius */
+  padding: 0 20px; /* Comfortable horizontal spacing */
+  font-size: 1.05rem;
+  color: #f8fafc;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  transform: translateY(-1px);
+}
+
+.form-input::placeholder {
+  color: #94a3b8;
+  font-size: 1rem;
+}
+BUTTON PERFECT SIZING:
+
+css
+.signin-btn {
+  width: 100%;
+  height: 56px; /* Matches input field height */
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 12px; /* Consistent with inputs */
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 24px;
+}
+
+.signin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.35);
+}
+PRECISE SPACING SYSTEM:
+
+css
+/* VERTICAL SPACING - 8px grid system */
+.form-group {
+  margin-bottom: 28px; /* Consistent spacing between fields */
+}
+
+.form-options {
+  margin: 24px 0; /* Balanced spacing around options */
+}
+
+.register-section {
+  margin-top: 28px; /* Space above registration */
+}
+
+.footer {
+  margin-top: 36px; /* Clear separation from content */
+}
+
+/* HORIZONTAL SPACING */
+.login-container {
+  padding: 24px; /* Safe area on mobile */
+}
+
+.form-options {
+  gap: 20px; /* Space between remember me and forgot password */
+}
+CHECKBOX PROPER SIZING:
+
+css
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.checkbox:checked {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.checkbox-label {
+  font-size: 0.95rem;
+  color: #cbd5e1;
+}
+RESPONSIVE BREAKPOINTS FOR PERFECT SCALING:
+
+css
+/* Mobile First Approach */
+.login-card {
+  max-width: 420px;
+  padding: 48px 40px;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .login-card {
+    max-width: 440px;
+    padding: 52px 44px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .login-card {
+    max-width: 460px;
+    padding: 56px 48px;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1280px) {
+  .login-card {
+    max-width: 480px;
+    padding: 60px 52px;
+  }
+}
+CONTAINER OPTIMIZATION:
+
+css
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+}
+
+/* Ensure card never touches edges */
+@media (max-width: 480px) {
+  .login-card {
+    margin: 0;
+    border-radius: 20px; /* Slightly smaller on very small screens */
+  }
+}
+IMMEDIATE FIXES REQUIRED:
+
+✅ Set card max-width to 420px (optimal reading width)
+
+✅ Adjust font sizes to proper hierarchy (2.75rem logo, 1.75rem subtitle)
+
+✅ Fix input field height to 56px (perfect touch target)
+
+✅ Standardize border radius to 12px (inputs) and 24px (card)
+
+✅ Implement consistent spacing system (8px multiples)
+
+✅ Ensure responsive scaling across all devices
+
+✅ Maintain glassmorphism and emerald green theme
+
+✅ Verify all proportions create balanced, professional layout
+
+FINAL VISUAL CHECK:
+
+Card should feel substantial but not overwhelming
+
+Text should be perfectly readable at arm's length
+
+Input fields should be comfortable to tap on mobile
+
+All elements should feel cohesive and professionally spaced
+
+Overall appearance: premium medical application
+
