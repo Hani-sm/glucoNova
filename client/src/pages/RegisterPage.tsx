@@ -75,7 +75,7 @@ export default function RegisterPage() {
   return (
     <PublicLayout>
       <Card 
-        className="w-full max-w-[480px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-10 py-12 shadow-2xl"
+        className="w-full max-w-[540px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-12 py-12 shadow-2xl"
       >
         <h1 className="text-[2.75rem] font-extrabold tracking-tight text-white text-center mb-3">GlucoNova</h1>
         <p className="text-[1.75rem] font-bold text-emerald-400 text-center mb-10">Create Account</p>
