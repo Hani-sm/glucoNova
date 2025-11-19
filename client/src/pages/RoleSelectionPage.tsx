@@ -107,11 +107,13 @@ export default function RoleSelectionPage() {
       {/* Content - No max-width constraint */}
       <div className="relative z-10 flex items-center justify-center min-h-screen px-6 py-8">
         <div 
-          className="w-full max-w-[1500px] rounded-3xl px-20 py-16 backdrop-blur-xl shadow-2xl"
+          className="w-full max-w-[1500px] rounded-3xl px-20 py-16 shadow-2xl"
           style={{
-            background: 'rgba(15, 25, 35, 0.6)',
-            border: '1px solid rgba(45, 212, 191, 0.2)',
-            boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)'
+            background: 'rgba(255, 255, 255, 0.05)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.18)',
+            boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 0 20px rgba(255, 255, 255, 0.05), 0 0 80px rgba(45, 212, 191, 0.1)'
           }}
           data-testid="container-role-selection"
         >
