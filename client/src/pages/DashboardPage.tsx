@@ -79,7 +79,7 @@ export default function DashboardPage() {
   };
 
   const sidebarStyle = {
-    '--sidebar-width': '20rem',
+    '--sidebar-width': '240px',
     '--sidebar-width-icon': '4rem',
   };
 
@@ -88,11 +88,12 @@ export default function DashboardPage() {
       <div className="flex h-screen w-full">
         <AppSidebar />
         <div className="flex flex-col flex-1 overflow-hidden">
-          <header className="flex items-center justify-between p-4 border-b border-border">
+          <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
             <SidebarTrigger data-testid="button-sidebar-toggle" />
           </header>
           
-          <main className="flex-1 overflow-y-auto p-6 space-y-6">
+          <main className="flex-1 overflow-y-auto">
+            <div className="max-w-[1400px] mx-auto" style={{ padding: '24px' }}>
             <div>
               <h1 className="text-3xl font-bold mb-1">Welcome back, {user?.name || 'User'}</h1>
               <p className="text-muted-foreground">Here's your health overview for today</p>
@@ -104,109 +105,125 @@ export default function DashboardPage() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <MetricCard
-                    title="Glucose"
-                    value={latestGlucose > 0 ? latestGlucose.toString() : '--'}
-                    unit="mg/dL"
-                    status={latestGlucose > 0 ? getGlucoseStatus(latestGlucose) : 'No Data'}
-                    icon={Droplet}
-                  />
-                  <MetricCard
-                    title="Time in Range"
-                    value={`${timeInRange}%`}
-                    unit=""
-                    status={timeInRange >= 70 ? 'Excellent' : timeInRange >= 50 ? 'Good' : 'Needs Improvement'}
-                    icon={Target}
-                  />
-                  <MetricCard
-                    title="Carbs Today"
-                    value={totalCarbs > 0 ? `${totalCarbs}g` : '--'}
-                    unit=""
-                    status={totalCarbs > 0 ? 'Tracked' : 'No Data'}
-                    icon={Utensils}
-                  />
-                  <MetricCard
-                    title="Active Insulin"
-                    value={latestInsulin > 0 ? `${latestInsulin}U` : '--'}
-                    unit=""
-                    status={latestInsulin > 0 ? 'Active' : 'No Data'}
-                    icon={Syringe}
-                  />
-                </div>
+                {/* Main Content Grid: 1fr + 360px */}
+                <div className="grid gap-7" style={{ gridTemplateColumns: '1fr 360px' }}>
+                  {/* Left Column - Main Content */}
+                  <div className="space-y-6">
+                    {/* Top Stats Row - 4 cards across */}
+                    <div className="grid grid-cols-4 gap-4">
+                      <MetricCard
+                        title="Glucose"
+                        value={latestGlucose > 0 ? latestGlucose.toString() : '--'}
+                        unit="mg/dL"
+                        status={latestGlucose > 0 ? getGlucoseStatus(latestGlucose) : 'No Data'}
+                        icon={Droplet}
+                      />
+                      <MetricCard
+                        title="Time in Range"
+                        value={`${timeInRange}%`}
+                        unit=""
+                        status={timeInRange >= 70 ? 'Excellent' : timeInRange >= 50 ? 'Good' : 'Needs Improvement'}
+                        icon={Target}
+                      />
+                      <MetricCard
+                        title="Carbs Today"
+                        value={totalCarbs > 0 ? `${totalCarbs}g` : '--'}
+                        unit=""
+                        status={totalCarbs > 0 ? 'Tracked' : 'No Data'}
+                        icon={Utensils}
+                      />
+                      <MetricCard
+                        title="Active Insulin"
+                        value={latestInsulin > 0 ? `${latestInsulin}U` : '--'}
+                        unit=""
+                        status={latestInsulin > 0 ? 'Active' : 'No Data'}
+                        icon={Syringe}
+                      />
+                    </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="lg:col-span-2">
+                    {/* Glucose Trends Chart */}
                     <GlucoseTrendChart />
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <Card data-testid="card-insulin-prediction" className="relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-emerald-400/10 pointer-events-none" />
-                      <CardHeader className="relative">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Sparkles className="h-5 w-5 text-emerald-400" />
-                            <CardTitle className="text-lg">AI Insulin Prediction</CardTitle>
+
+                    {/* Quick Actions at bottom */}
+                    <div>
+                      <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
+                      <div className="grid grid-cols-2 gap-4">
+                        <Link href="/health-data">
+                          <div className="cursor-pointer">
+                            <QuickActionCard
+                              icon={Heart}
+                              title="Blood Sugar Tracking"
+                              description="Log and monitor your glucose levels"
+                            />
                           </div>
+                        </Link>
+                        <Link href="/meals">
+                          <div className="cursor-pointer">
+                            <QuickActionCard
+                              icon={Utensils}
+                              title="Meal Logging"
+                              description="Track your nutrition and carbs"
+                            />
+                          </div>
+                        </Link>
+                        <Link href="/reports">
+                          <div className="cursor-pointer">
+                            <QuickActionCard
+                              icon={FileText}
+                              title="Health Reports"
+                              description="View and download your reports"
+                            />
+                          </div>
+                        </Link>
+                        <div className="cursor-pointer">
+                          <QuickActionCard
+                            icon={MessageCircle}
+                            title="Doctor Communication"
+                            description="Message your healthcare provider"
+                          />
                         </div>
-                        <CardDescription>
-                          Get personalized insulin recommendations
-                        </CardDescription>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column - 360px wide */}
+                  <div className="space-y-4">
+                    <Card data-testid="card-insulin-prediction" className="relative overflow-hidden" style={{ height: '120px', borderRadius: '12px' }}>
+                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-emerald-400/10 pointer-events-none" />
+                      <CardHeader className="relative pb-2 pt-3 px-4">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Sparkles className="h-4 w-4 text-emerald-400" />
+                          <CardTitle className="text-base">AI Insulin Prediction</CardTitle>
+                        </div>
                       </CardHeader>
-                      <CardContent className="relative space-y-4">
-                        {isLoadingPrediction ? (
-                          <p className="text-sm text-muted-foreground">Loading prediction...</p>
-                        ) : latestPrediction?.prediction ? (
-                          <div className="space-y-3">
-                            <div className="flex items-baseline gap-2">
-                              <span className="text-3xl font-bold text-emerald-400">
-                                {latestPrediction.prediction.predictedInsulin.toFixed(1)}
-                              </span>
-                              <span className="text-sm text-muted-foreground">units</span>
-                            </div>
-                            <div className="space-y-1">
-                              <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Confidence</span>
-                                <span className="font-medium">
-                                  {(latestPrediction.prediction.confidence * 100).toFixed(0)}%
+                      <CardContent className="relative px-4 pb-3">
+                        <div className="flex items-center justify-between">
+                          {isLoadingPrediction ? (
+                            <p className="text-xs text-muted-foreground">Loading...</p>
+                          ) : latestPrediction?.prediction ? (
+                            <>
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-2xl font-bold text-emerald-400">
+                                  {latestPrediction.prediction.predictedInsulin.toFixed(1)}
                                 </span>
+                                <span className="text-xs text-muted-foreground">units</span>
                               </div>
-                              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-emerald-400"
-                                  style={{ width: `${latestPrediction.prediction.confidence * 100}%` }}
-                                />
-                              </div>
-                            </div>
-                            {latestPrediction.prediction.factors && latestPrediction.prediction.factors.length > 0 && (
-                              <div className="space-y-2">
-                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                                  Contributing Factors
-                                </p>
-                                <ul className="space-y-1">
-                                  {latestPrediction.prediction.factors.slice(0, 3).map((factor: string, index: number) => (
-                                    <li key={index} className="text-xs text-muted-foreground flex items-start gap-2">
-                                      <span className="text-emerald-400 mt-0.5">•</span>
-                                      <span className="flex-1">{factor}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <p className="text-sm text-muted-foreground">
-                            No prediction available yet. Generate your first prediction!
-                          </p>
-                        )}
+                              <span className="text-xs text-muted-foreground">
+                                {(latestPrediction.prediction.confidence * 100).toFixed(0)}% confidence
+                              </span>
+                            </>
+                          ) : (
+                            <p className="text-xs text-muted-foreground">No data</p>
+                          )}
+                        </div>
                         <Button
                           data-testid="button-generate-prediction"
                           onClick={() => generatePredictionMutation.mutate()}
                           disabled={generatePredictionMutation.isPending}
-                          className="w-full"
+                          className="w-full mt-2"
+                          size="sm"
                         >
-                          {generatePredictionMutation.isPending ? 'Generating...' : 'Generate New Prediction'}
+                          {generatePredictionMutation.isPending ? 'Generating...' : 'Generate Prediction'}
                         </Button>
                       </CardContent>
                     </Card>
@@ -218,48 +235,9 @@ export default function DashboardPage() {
                     <ProgressCard />
                   </div>
                 </div>
-
-                <div>
-                  <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Link href="/health-data">
-                      <div className="cursor-pointer">
-                        <QuickActionCard
-                          icon={Heart}
-                          title="Blood Sugar Tracking"
-                          description="Log and monitor your glucose levels"
-                        />
-                      </div>
-                    </Link>
-                    <Link href="/meals">
-                      <div className="cursor-pointer">
-                        <QuickActionCard
-                          icon={Utensils}
-                          title="Meal Logging"
-                          description="Track your nutrition and carbs"
-                        />
-                      </div>
-                    </Link>
-                    <Link href="/reports">
-                      <div className="cursor-pointer">
-                        <QuickActionCard
-                          icon={FileText}
-                          title="Health Reports"
-                          description="View and download your reports"
-                        />
-                      </div>
-                    </Link>
-                    <div className="cursor-pointer">
-                      <QuickActionCard
-                        icon={MessageCircle}
-                        title="Doctor Communication"
-                        description="Message your healthcare provider"
-                      />
-                    </div>
-                  </div>
-                </div>
               </>
             )}
+            </div>
           </main>
         </div>
       </div>
