@@ -197,7 +197,7 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Small Floating Dots - Above waves (reduced opacity) */}
+        {/* Small Floating Dots - Above waves (reduced opacity with glow) */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
           {floatingDots.map((dot) => (
             <div
@@ -210,12 +210,13 @@ export default function DashboardPage() {
                 top: `${dot.top}%`,
                 animation: `floatDot${dot.id} ${dot.duration}s ease-in-out infinite`,
                 animationDelay: `${dot.delay}s`,
+                boxShadow: '0 0 20px 8px rgba(33, 200, 155, 0.4), 0 0 40px 15px rgba(33, 200, 155, 0.2), 0 0 60px 25px rgba(33, 200, 155, 0.1)',
               }}
             />
           ))}
         </div>
 
-        {/* Uneven Circular Elements - Above waves */}
+        {/* Uneven Circular Elements - Above waves with radiation glow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
           {unevenCircles.map((circle) => (
             <div
@@ -229,12 +230,13 @@ export default function DashboardPage() {
                 opacity: circle.opacity,
                 animation: `floatCircle${circle.id} ${circle.duration}s ease-in-out infinite`,
                 animationDelay: `${circle.delay}s`,
+                boxShadow: '0 0 30px 12px rgba(33, 200, 155, 0.5), 0 0 60px 25px rgba(33, 200, 155, 0.3), 0 0 90px 40px rgba(33, 200, 155, 0.15)',
               }}
             />
           ))}
         </div>
 
-        {/* Floating Medical Icons - White with low opacity */}
+        {/* Floating Medical Icons - White with low opacity and glow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
           {medicalIcons.map((item) => {
             const Icon = item.Icon;
@@ -248,6 +250,7 @@ export default function DashboardPage() {
                   opacity: 0.12,
                   animation: `floatIcon${item.id} ${item.duration}s ease-in-out infinite`,
                   animationDelay: `${item.delay}s`,
+                  filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.4)) drop-shadow(0 0 30px rgba(255, 255, 255, 0.2))',
                 }}
               >
                 <Icon className="w-6 h-6" />
