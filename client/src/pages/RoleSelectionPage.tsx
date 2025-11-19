@@ -107,14 +107,7 @@ export default function RoleSelectionPage() {
       {/* Content - No max-width constraint */}
       <div className="relative z-10 flex items-center justify-center min-h-screen px-6 py-8">
         <div 
-          className="w-full max-w-[1500px] rounded-3xl px-20 py-16 shadow-2xl"
-          style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.18)',
-            boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 0 20px rgba(255, 255, 255, 0.05), 0 0 80px rgba(45, 212, 191, 0.1)'
-          }}
+          className="w-full max-w-[1500px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-20 py-16 shadow-2xl"
           data-testid="container-role-selection"
         >
           {/* Header Section */}
@@ -189,7 +182,7 @@ export default function RoleSelectionPage() {
 
                 {/* CTA */}
                 <p 
-                  className="text-sm font-semibold transition-all duration-300 group-hover:translate-x-2"
+                  className="text-sm font-semibold transition-all duration-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-2"
                   style={{ color: '#2dd4bf' }}
                 >
                   Click to continue as Patient →
@@ -254,7 +247,7 @@ export default function RoleSelectionPage() {
 
                 {/* CTA */}
                 <p 
-                  className="text-sm font-semibold transition-all duration-300 group-hover:translate-x-2"
+                  className="text-sm font-semibold transition-all duration-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-2"
                   style={{ color: '#2dd4bf' }}
                 >
                   Click to continue as Provider →
