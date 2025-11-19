@@ -22,11 +22,11 @@ export default function RoleSelectionPage() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 justify-center gap-6 my-10">
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-12 py-12 basis-[352px] max-w-[352px] min-h-[344px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-12 pt-14 pb-12 w-[360px] min-h-[360px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
             onClick={() => handleRoleSelect('patient')}
             data-testid="card-role-patient"
           >
-            <div className="flex flex-col items-start text-left h-full gap-4">
+            <div className="flex flex-col items-start text-left h-full gap-5">
               <div className="flex flex-row items-center gap-3">
                 <div className="h-14 w-14 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
                   <User className="h-7 w-7 text-emerald-400" />
@@ -36,24 +36,24 @@ export default function RoleSelectionPage() {
                 </div>
               </div>
               
-              <h3 className="text-xl font-bold text-white">Patient Account</h3>
+              <h3 className="text-[1.625rem] font-bold text-white">Patient Account</h3>
               
-              <p className="text-sm text-gray-300 leading-relaxed">
+              <p className="text-base text-gray-300 leading-relaxed">
                 Manage your diabetes with AI-powered insights
               </p>
               
-              <p className="text-sm text-emerald-400 font-medium mt-auto">
+              <p className="text-[0.95rem] text-emerald-400 font-semibold mt-auto">
                 Click to continue as Patient
               </p>
             </div>
           </Card>
 
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-12 py-12 basis-[352px] max-w-[352px] min-h-[344px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-12 pt-14 pb-12 w-[360px] min-h-[360px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
             onClick={() => handleRoleSelect('doctor')}
             data-testid="card-role-doctor"
           >
-            <div className="flex flex-col items-start text-left h-full gap-4">
+            <div className="flex flex-col items-start text-left h-full gap-5">
               <div className="flex flex-row items-center gap-3">
                 <div className="h-14 w-14 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
                   <Stethoscope className="h-7 w-7 text-emerald-400" />
@@ -63,13 +63,13 @@ export default function RoleSelectionPage() {
                 </div>
               </div>
               
-              <h3 className="text-xl font-bold text-white">Healthcare Provider</h3>
+              <h3 className="text-[1.625rem] font-bold text-white">Healthcare Provider</h3>
               
-              <p className="text-sm text-gray-300 leading-relaxed">
+              <p className="text-base text-gray-300 leading-relaxed">
                 Access patient records and provide remote care
               </p>
               
-              <p className="text-sm text-emerald-400 font-medium mt-auto">
+              <p className="text-[0.95rem] text-emerald-400 font-semibold mt-auto">
                 Click to continue as Provider
               </p>
             </div>
