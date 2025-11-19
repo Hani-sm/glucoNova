@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/AppSidebar';
 import MetricCard from '@/components/MetricCard';
@@ -5,6 +6,8 @@ import GlucoseTrendChart from '@/components/GlucoseTrendChart';
 import VoiceAssistantCard from '@/components/VoiceAssistantCard';
 import ProgressCard from '@/components/ProgressCard';
 import QuickActionCard from '@/components/QuickActionCard';
+import OnboardingModal from '@/components/OnboardingModal';
+import OnboardingBanner from '@/components/OnboardingBanner';
 import { Droplet, Target, Utensils, Syringe, Heart, Pill, MessageCircle, FileText } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -18,6 +21,43 @@ import { Sparkles } from 'lucide-react';
 export default function DashboardPage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
+
+  useEffect(() => {
+    const onboardingCompleted = localStorage.getItem('onboardingCompleted');
+    const onboardingSkipped = localStorage.getItem('onboardingSkipped');
+    
+    if (!onboardingCompleted && !onboardingSkipped) {
+      setShowOnboarding(true);
+    } else if (!onboardingCompleted && onboardingSkipped === 'true') {
+      setShowBanner(true);
+    }
+  }, []);
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    setShowBanner(false);
+    toast({
+      title: 'Setup Complete!',
+      description: 'Your profile has been configured successfully',
+    });
+  };
+
+  const handleOnboardingSkip = () => {
+    setShowOnboarding(false);
+    setShowBanner(true);
+  };
+
+  const handleResumeSetup = () => {
+    localStorage.removeItem('onboardingSkipped');
+    setShowBanner(false);
+    setShowOnboarding(true);
+  };
+
+  const handleDismissBanner = () => {
+    setShowBanner(false);
+  };
 
   const { data: healthData, isLoading: isLoadingHealth } = useQuery({
     queryKey: ['/api/health-data'],
@@ -88,6 +128,12 @@ export default function DashboardPage() {
       <div className="flex h-screen w-full">
         <AppSidebar />
         <div className="flex flex-col flex-1 overflow-hidden">
+          {showBanner && (
+            <OnboardingBanner 
+              onResume={handleResumeSetup}
+              onDismiss={handleDismissBanner}
+            />
+          )}
           <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
             <SidebarTrigger data-testid="button-sidebar-toggle" />
           </header>
@@ -241,6 +287,13 @@ export default function DashboardPage() {
           </main>
         </div>
       </div>
+
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        onComplete={handleOnboardingComplete}
+        onSkip={handleOnboardingSkip}
+      />
     </SidebarProvider>
   );
 }
