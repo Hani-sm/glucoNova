@@ -16,40 +16,40 @@ export default function RoleSelectionPage() {
   return (
     <PublicLayout>
       <Card 
-        className="w-full max-w-[1600px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-16 py-4 shadow-2xl"
+        className="w-full max-w-[1600px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-16 py-8 shadow-2xl"
       >
-        <h1 className="text-[1.85rem] font-extrabold tracking-tight text-white text-center mb-1">GlucoNova</h1>
-        <p className="text-[1.2rem] font-bold text-emerald-400 text-center mb-0.5">Select Your Role</p>
-        <p className="text-sm text-gray-300 text-center mb-3 leading-relaxed">Choose how you'll use GlucoNova</p>
+        <h1 className="text-[2.5rem] font-extrabold tracking-tight text-white text-center mb-2">GlucoNova</h1>
+        <p className="text-[1.6rem] font-bold text-emerald-400 text-center mb-1">Select Your Role</p>
+        <p className="text-lg text-gray-300 text-center mb-8 leading-relaxed">Choose how you'll use GlucoNova</p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-6">
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-5 w-full hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group hover:scale-105"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-10 w-full hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group hover:scale-105"
             onClick={() => handleRoleSelect('patient')}
             onMouseEnter={() => setHoveredRole('patient')}
             onMouseLeave={() => setHoveredRole(null)}
             data-testid="card-role-patient"
           >
-            <div className="flex flex-col items-start text-left h-full gap-3">
-              <div className="flex flex-row items-center gap-2.5">
-                <div className="h-11 w-11 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
-                  <User className="h-5 w-5 text-emerald-400" />
+            <div className="flex flex-col items-start text-left h-full gap-6">
+              <div className="flex flex-row items-center gap-4">
+                <div className="h-16 w-16 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
+                  <User className="h-8 w-8 text-emerald-400" />
                 </div>
-                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
-                  <span className="text-[0.7rem] font-semibold text-emerald-400 uppercase tracking-wide">Patient</span>
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+                  <span className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Patient</span>
                 </div>
               </div>
               
-              <h3 className="text-[1.3rem] font-bold text-white leading-tight">Patient Account</h3>
+              <h3 className="text-[1.75rem] font-bold text-white leading-tight">Patient Account</h3>
               
-              <p className="text-[0.85rem] text-gray-300 leading-[1.35]">
+              <p className="text-[1.05rem] text-gray-300 leading-7">
                 Manage your diabetes with AI-powered insights, track your health data, and receive personalized recommendations
               </p>
               
-              <div className="flex items-center gap-2 mt-auto h-4">
+              <div className="flex items-center gap-2 mt-auto h-6">
                 {hoveredRole === 'patient' ? (
-                  <p className="text-[0.7rem] text-emerald-400 font-semibold flex items-center gap-1.5 animate-in fade-in slide-in-from-left-2 duration-200">
-                    <ArrowRight className="h-2.5 w-2.5" />
+                  <p className="text-sm text-emerald-400 font-semibold flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-200">
+                    <ArrowRight className="h-4 w-4" />
                     Click to continue as Patient
                   </p>
                 ) : null}
@@ -58,32 +58,32 @@ export default function RoleSelectionPage() {
           </Card>
 
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-5 w-full hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group hover:scale-105"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-10 w-full hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group hover:scale-105"
             onClick={() => handleRoleSelect('doctor')}
             onMouseEnter={() => setHoveredRole('doctor')}
             onMouseLeave={() => setHoveredRole(null)}
             data-testid="card-role-doctor"
           >
-            <div className="flex flex-col items-start text-left h-full gap-3">
-              <div className="flex flex-row items-center gap-2.5">
-                <div className="h-11 w-11 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
-                  <Stethoscope className="h-5 w-5 text-emerald-400" />
+            <div className="flex flex-col items-start text-left h-full gap-6">
+              <div className="flex flex-row items-center gap-4">
+                <div className="h-16 w-16 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
+                  <Stethoscope className="h-8 w-8 text-emerald-400" />
                 </div>
-                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
-                  <span className="text-[0.7rem] font-semibold text-emerald-400 uppercase tracking-wide">Provider</span>
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-400/10 border border-emerald-400/20">
+                  <span className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Provider</span>
                 </div>
               </div>
               
-              <h3 className="text-[1.3rem] font-bold text-white leading-tight">Healthcare Provider</h3>
+              <h3 className="text-[1.75rem] font-bold text-white leading-tight">Healthcare Provider</h3>
               
-              <p className="text-[0.85rem] text-gray-300 leading-[1.35]">
+              <p className="text-[1.05rem] text-gray-300 leading-7">
                 Access patient records, review health data, and provide remote care with comprehensive monitoring tools
               </p>
               
-              <div className="flex items-center gap-2 mt-auto h-4">
+              <div className="flex items-center gap-2 mt-auto h-6">
                 {hoveredRole === 'doctor' ? (
-                  <p className="text-[0.7rem] text-emerald-400 font-semibold flex items-center gap-1.5 animate-in fade-in slide-in-from-left-2 duration-200">
-                    <ArrowRight className="h-2.5 w-2.5" />
+                  <p className="text-sm text-emerald-400 font-semibold flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-200">
+                    <ArrowRight className="h-4 w-4" />
                     Click to continue as Provider
                   </p>
                 ) : null}
@@ -92,17 +92,17 @@ export default function RoleSelectionPage() {
           </Card>
         </div>
 
-        <div className="flex items-center justify-center gap-2 mt-1.5">
+        <div className="flex items-center justify-center gap-2 mt-4">
           <Link 
             href="/login" 
-            className="text-[0.85rem] text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
+            className="text-base text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-2"
             data-testid="link-back-to-login"
           >
             ← Back to Login
           </Link>
         </div>
 
-        <p className="text-center text-[0.75rem] text-white/60 mt-2">
+        <p className="text-center text-sm text-white/60 mt-3">
           © 2025 GlucoNova. All rights reserved.
         </p>
       </Card>
