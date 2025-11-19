@@ -143,16 +143,16 @@ export default function DashboardPage() {
     { id: 16, size: 17, left: 95, top: 82, duration: 24, delay: 4.2, xRange: -35, yRange: 38 },
   ];
 
-  // Uneven circular elements with varying opacity (reduced)
+  // Uneven circular elements with varying opacity (reduced size and opacity with blur)
   const unevenCircles = [
-    { id: 1, size: 25, left: 30, top: 20, duration: 20, delay: 0, opacity: 0.04, xRange: 38, yRange: 45 },
-    { id: 2, size: 35, left: 70, top: 65, duration: 19, delay: 3, opacity: 0.15, xRange: -42, yRange: 48 },
-    { id: 3, size: 20, left: 18, top: 55, duration: 22, delay: 1.5, opacity: 0.03, xRange: 45, yRange: -40 },
-    { id: 4, size: 30, left: 85, top: 35, duration: 18, delay: 4, opacity: 0.12, xRange: -40, yRange: 46 },
-    { id: 5, size: 28, left: 50, top: 80, duration: 24, delay: 2.5, opacity: 0.08, xRange: 43, yRange: -42 },
-    { id: 6, size: 22, left: 12, top: 25, duration: 21, delay: 5, opacity: 0.05, xRange: -46, yRange: 50 },
-    { id: 7, size: 32, left: 60, top: 10, duration: 23, delay: 1, opacity: 0.14, xRange: 37, yRange: 41 },
-    { id: 8, size: 24, left: 92, top: 70, duration: 19, delay: 3.5, opacity: 0.06, xRange: -44, yRange: -47 },
+    { id: 1, size: 18, left: 30, top: 20, duration: 20, delay: 0, opacity: 0.025, xRange: 38, yRange: 45 },
+    { id: 2, size: 25, left: 70, top: 65, duration: 19, delay: 3, opacity: 0.08, xRange: -42, yRange: 48 },
+    { id: 3, size: 15, left: 18, top: 55, duration: 22, delay: 1.5, opacity: 0.02, xRange: 45, yRange: -40 },
+    { id: 4, size: 22, left: 85, top: 35, duration: 18, delay: 4, opacity: 0.06, xRange: -40, yRange: 46 },
+    { id: 5, size: 20, left: 50, top: 80, duration: 24, delay: 2.5, opacity: 0.045, xRange: 43, yRange: -42 },
+    { id: 6, size: 16, left: 12, top: 25, duration: 21, delay: 5, opacity: 0.03, xRange: -46, yRange: 50 },
+    { id: 7, size: 24, left: 60, top: 10, duration: 23, delay: 1, opacity: 0.07, xRange: 37, yRange: 41 },
+    { id: 8, size: 17, left: 92, top: 70, duration: 19, delay: 3.5, opacity: 0.035, xRange: -44, yRange: -47 },
   ];
 
   // Floating medical icons (white with low opacity)
@@ -216,7 +216,7 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Uneven Circular Elements - Above waves with radiation glow */}
+        {/* Uneven Circular Elements - Above waves with radiation glow and blur */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
           {unevenCircles.map((circle) => (
             <div
@@ -231,6 +231,7 @@ export default function DashboardPage() {
                 animation: `floatCircle${circle.id} ${circle.duration}s ease-in-out infinite`,
                 animationDelay: `${circle.delay}s`,
                 boxShadow: '0 0 30px 12px rgba(33, 200, 155, 0.5), 0 0 60px 25px rgba(33, 200, 155, 0.3), 0 0 90px 40px rgba(33, 200, 155, 0.15)',
+                filter: 'blur(3px)',
               }}
             />
           ))}
