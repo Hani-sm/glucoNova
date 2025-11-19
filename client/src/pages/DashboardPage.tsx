@@ -123,36 +123,36 @@ export default function DashboardPage() {
     '--sidebar-width-icon': '4rem',
   };
 
-  // Floating emerald dots - noticeable movement
+  // Floating colorful dots - variety of medical/health colors
   const floatingDots = [
-    { id: 1, size: 12, left: 15, top: 10, duration: 18, delay: 0, xRange: 28, yRange: 35 },
-    { id: 2, size: 14, left: 85, top: 15, duration: 22, delay: 2, xRange: -32, yRange: 38 },
-    { id: 3, size: 16, left: 10, top: 70, duration: 20, delay: 4, xRange: 35, yRange: -30 },
-    { id: 4, size: 13, left: 88, top: 75, duration: 24, delay: 1, xRange: -26, yRange: 33 },
-    { id: 5, size: 15, left: 5, top: 50, duration: 19, delay: 3, xRange: 30, yRange: -36 },
-    { id: 6, size: 14, left: 92, top: 45, duration: 21, delay: 5, xRange: -29, yRange: 34 },
-    { id: 7, size: 12, left: 20, top: 30, duration: 23, delay: 0.5, xRange: 33, yRange: 40 },
-    { id: 8, size: 17, left: 78, top: 25, duration: 17, delay: 2.5, xRange: -34, yRange: -32 },
-    { id: 9, size: 13, left: 12, top: 85, duration: 25, delay: 1.5, xRange: 27, yRange: 35 },
-    { id: 10, size: 15, left: 90, top: 60, duration: 20, delay: 3.5, xRange: -31, yRange: 37 },
-    { id: 11, size: 14, left: 25, top: 88, duration: 22, delay: 4.5, xRange: 32, yRange: -35 },
-    { id: 12, size: 16, left: 82, top: 90, duration: 19, delay: 2.2, xRange: -28, yRange: 33 },
-    { id: 13, size: 18, left: 40, top: 18, duration: 21, delay: 1.8, xRange: 30, yRange: 34 },
-    { id: 14, size: 13, left: 65, top: 55, duration: 23, delay: 3.2, xRange: -33, yRange: -36 },
-    { id: 15, size: 15, left: 8, top: 35, duration: 18, delay: 0.8, xRange: 26, yRange: 31 },
-    { id: 16, size: 17, left: 95, top: 82, duration: 24, delay: 4.2, xRange: -35, yRange: 38 },
+    { id: 1, size: 12, left: 15, top: 10, duration: 18, delay: 0, xRange: 28, yRange: 35, color: 'rgba(33, 200, 155, 0.3)' }, // Teal
+    { id: 2, size: 14, left: 85, top: 15, duration: 22, delay: 2, xRange: -32, yRange: 38, color: 'rgba(96, 165, 250, 0.3)' }, // Soft Blue
+    { id: 3, size: 16, left: 10, top: 70, duration: 20, delay: 4, xRange: 35, yRange: -30, color: 'rgba(167, 139, 250, 0.3)' }, // Purple
+    { id: 4, size: 13, left: 88, top: 75, duration: 24, delay: 1, xRange: -26, yRange: 33, color: 'rgba(251, 146, 60, 0.3)' }, // Warm Orange
+    { id: 5, size: 15, left: 5, top: 50, duration: 19, delay: 3, xRange: 30, yRange: -36, color: 'rgba(129, 140, 248, 0.3)' }, // Indigo
+    { id: 6, size: 14, left: 92, top: 45, duration: 21, delay: 5, xRange: -29, yRange: 34, color: 'rgba(34, 197, 94, 0.3)' }, // Green
+    { id: 7, size: 12, left: 20, top: 30, duration: 23, delay: 0.5, xRange: 33, yRange: 40, color: 'rgba(59, 130, 246, 0.3)' }, // Blue
+    { id: 8, size: 17, left: 78, top: 25, duration: 17, delay: 2.5, xRange: -34, yRange: -32, color: 'rgba(236, 72, 153, 0.3)' }, // Pink
+    { id: 9, size: 13, left: 12, top: 85, duration: 25, delay: 1.5, xRange: 27, yRange: 35, color: 'rgba(147, 197, 253, 0.3)' }, // Light Blue
+    { id: 10, size: 15, left: 90, top: 60, duration: 20, delay: 3.5, xRange: -31, yRange: 37, color: 'rgba(196, 181, 253, 0.3)' }, // Lavender
+    { id: 11, size: 14, left: 25, top: 88, duration: 22, delay: 4.5, xRange: 32, yRange: -35, color: 'rgba(45, 212, 191, 0.3)' }, // Cyan
+    { id: 12, size: 16, left: 82, top: 90, duration: 19, delay: 2.2, xRange: -28, yRange: 33, color: 'rgba(253, 186, 116, 0.3)' }, // Peach
+    { id: 13, size: 18, left: 40, top: 18, duration: 21, delay: 1.8, xRange: 30, yRange: 34, color: 'rgba(99, 102, 241, 0.3)' }, // Violet
+    { id: 14, size: 13, left: 65, top: 55, duration: 23, delay: 3.2, xRange: -33, yRange: -36, color: 'rgba(74, 222, 128, 0.3)' }, // Lime
+    { id: 15, size: 15, left: 8, top: 35, duration: 18, delay: 0.8, xRange: 26, yRange: 31, color: 'rgba(56, 189, 248, 0.3)' }, // Sky Blue
+    { id: 16, size: 17, left: 95, top: 82, duration: 24, delay: 4.2, xRange: -35, yRange: 38, color: 'rgba(244, 114, 182, 0.3)' }, // Rose
   ];
 
-  // Uneven circular elements with varying opacity (reduced size and opacity with blur)
+  // Uneven circular elements with varying colors (reduced size and opacity with blur)
   const unevenCircles = [
-    { id: 1, size: 18, left: 30, top: 20, duration: 20, delay: 0, opacity: 0.025, xRange: 38, yRange: 45 },
-    { id: 2, size: 25, left: 70, top: 65, duration: 19, delay: 3, opacity: 0.08, xRange: -42, yRange: 48 },
-    { id: 3, size: 15, left: 18, top: 55, duration: 22, delay: 1.5, opacity: 0.02, xRange: 45, yRange: -40 },
-    { id: 4, size: 22, left: 85, top: 35, duration: 18, delay: 4, opacity: 0.06, xRange: -40, yRange: 46 },
-    { id: 5, size: 20, left: 50, top: 80, duration: 24, delay: 2.5, opacity: 0.045, xRange: 43, yRange: -42 },
-    { id: 6, size: 16, left: 12, top: 25, duration: 21, delay: 5, opacity: 0.03, xRange: -46, yRange: 50 },
-    { id: 7, size: 24, left: 60, top: 10, duration: 23, delay: 1, opacity: 0.07, xRange: 37, yRange: 41 },
-    { id: 8, size: 17, left: 92, top: 70, duration: 19, delay: 3.5, opacity: 0.035, xRange: -44, yRange: -47 },
+    { id: 1, size: 18, left: 30, top: 20, duration: 20, delay: 0, opacity: 0.025, xRange: 38, yRange: 45, color: 'rgba(96, 165, 250, 0.08)' }, // Blue
+    { id: 2, size: 25, left: 70, top: 65, duration: 19, delay: 3, opacity: 0.08, xRange: -42, yRange: 48, color: 'rgba(167, 139, 250, 0.12)' }, // Purple
+    { id: 3, size: 15, left: 18, top: 55, duration: 22, delay: 1.5, opacity: 0.02, xRange: 45, yRange: -40, color: 'rgba(45, 212, 191, 0.06)' }, // Cyan
+    { id: 4, size: 22, left: 85, top: 35, duration: 18, delay: 4, opacity: 0.06, xRange: -40, yRange: 46, color: 'rgba(251, 146, 60, 0.1)' }, // Orange
+    { id: 5, size: 20, left: 50, top: 80, duration: 24, delay: 2.5, opacity: 0.045, xRange: 43, yRange: -42, color: 'rgba(129, 140, 248, 0.08)' }, // Indigo
+    { id: 6, size: 16, left: 12, top: 25, duration: 21, delay: 5, opacity: 0.03, xRange: -46, yRange: 50, color: 'rgba(34, 197, 94, 0.07)' }, // Green
+    { id: 7, size: 24, left: 60, top: 10, duration: 23, delay: 1, opacity: 0.07, xRange: 37, yRange: 41, color: 'rgba(147, 197, 253, 0.11)' }, // Light Blue
+    { id: 8, size: 17, left: 92, top: 70, duration: 19, delay: 3.5, opacity: 0.035, xRange: -44, yRange: -47, color: 'rgba(244, 114, 182, 0.07)' }, // Pink
   ];
 
   // Floating medical icons (white with low opacity)
@@ -172,65 +172,67 @@ export default function DashboardPage() {
     <SidebarProvider style={sidebarStyle as React.CSSProperties}>
       <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden">
         
-        {/* Animated Light Waves - Behind everything */}
+        {/* Animated Colorful Light Waves - Behind everything */}
         <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
           <div 
             className="absolute top-0 left-0 right-0 h-96 opacity-30"
             style={{
-              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(33, 200, 155, 0.08), transparent)',
+              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(96, 165, 250, 0.08), transparent)',
               animation: 'wave1 15s ease-in-out infinite',
             }}
           />
           <div 
             className="absolute top-1/3 left-0 right-0 h-96 opacity-20"
             style={{
-              background: 'radial-gradient(ellipse 70% 40% at 30% 50%, rgba(33, 200, 155, 0.06), transparent)',
+              background: 'radial-gradient(ellipse 70% 40% at 30% 50%, rgba(167, 139, 250, 0.06), transparent)',
               animation: 'wave2 18s ease-in-out infinite',
             }}
           />
           <div 
             className="absolute bottom-0 left-0 right-0 h-96 opacity-25"
             style={{
-              background: 'radial-gradient(ellipse 75% 45% at 70% 100%, rgba(33, 200, 155, 0.07), transparent)',
+              background: 'radial-gradient(ellipse 75% 45% at 70% 100%, rgba(45, 212, 191, 0.07), transparent)',
               animation: 'wave3 20s ease-in-out infinite',
             }}
           />
         </div>
 
-        {/* Small Floating Dots - Above waves (reduced opacity with glow) */}
+        {/* Small Floating Dots - Above waves (colorful with glow) */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
           {floatingDots.map((dot) => (
             <div
               key={dot.id}
-              className="absolute rounded-full bg-primary/30"
+              className="absolute rounded-full"
               style={{
                 width: `${dot.size}px`,
                 height: `${dot.size}px`,
                 left: `${dot.left}%`,
                 top: `${dot.top}%`,
+                backgroundColor: dot.color,
                 animation: `floatDot${dot.id} ${dot.duration}s ease-in-out infinite`,
                 animationDelay: `${dot.delay}s`,
-                boxShadow: '0 0 20px 8px rgba(33, 200, 155, 0.4), 0 0 40px 15px rgba(33, 200, 155, 0.2), 0 0 60px 25px rgba(33, 200, 155, 0.1)',
+                boxShadow: `0 0 20px 8px ${dot.color.replace('0.3', '0.4')}, 0 0 40px 15px ${dot.color.replace('0.3', '0.2')}, 0 0 60px 25px ${dot.color.replace('0.3', '0.1')}`,
               }}
             />
           ))}
         </div>
 
-        {/* Uneven Circular Elements - Above waves with radiation glow and blur */}
+        {/* Uneven Circular Elements - Above waves with colorful radiation glow and blur */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
           {unevenCircles.map((circle) => (
             <div
               key={`circle-${circle.id}`}
-              className="absolute rounded-full bg-primary"
+              className="absolute rounded-full"
               style={{
                 width: `${circle.size}px`,
                 height: `${circle.size}px`,
                 left: `${circle.left}%`,
                 top: `${circle.top}%`,
+                backgroundColor: circle.color,
                 opacity: circle.opacity,
                 animation: `floatCircle${circle.id} ${circle.duration}s ease-in-out infinite`,
                 animationDelay: `${circle.delay}s`,
-                boxShadow: '0 0 30px 12px rgba(33, 200, 155, 0.5), 0 0 60px 25px rgba(33, 200, 155, 0.3), 0 0 90px 40px rgba(33, 200, 155, 0.15)',
+                boxShadow: `0 0 30px 12px ${circle.color.replace(/0\.\d+\)/, '0.5)')}, 0 0 60px 25px ${circle.color.replace(/0\.\d+\)/, '0.3)')}, 0 0 90px 40px ${circle.color.replace(/0\.\d+\)/, '0.15)')}`,
                 filter: 'blur(3px)',
               }}
             />
@@ -289,7 +291,7 @@ export default function DashboardPage() {
                 <div className="grid gap-7" style={{ gridTemplateColumns: '1fr 360px' }}>
                   {/* Left Column - Main Content */}
                   <div className="space-y-6">
-                    {/* Top Stats Row - 4 cards across */}
+                    {/* Top Stats Row - 4 cards across with colorful variety */}
                     <div className="grid grid-cols-4 gap-4">
                       <MetricCard
                         title="Glucose"
@@ -297,6 +299,9 @@ export default function DashboardPage() {
                         unit="mg/dL"
                         status={latestGlucose > 0 ? getGlucoseStatus(latestGlucose) : 'No Data'}
                         icon={Droplet}
+                        iconColor="#60A5FA"
+                        badgeBgColor="rgba(96, 165, 250, 0.2)"
+                        badgeTextColor="#60A5FA"
                       />
                       <MetricCard
                         title="Time in Range"
@@ -304,6 +309,9 @@ export default function DashboardPage() {
                         unit=""
                         status={timeInRange >= 70 ? 'Excellent' : timeInRange >= 50 ? 'Good' : 'Needs Improvement'}
                         icon={Target}
+                        iconColor="#A78BFA"
+                        badgeBgColor="rgba(167, 139, 250, 0.2)"
+                        badgeTextColor="#A78BFA"
                       />
                       <MetricCard
                         title="Carbs Today"
@@ -311,6 +319,9 @@ export default function DashboardPage() {
                         unit=""
                         status={totalCarbs > 0 ? 'Tracked' : 'No Data'}
                         icon={Utensils}
+                        iconColor="#FB923C"
+                        badgeBgColor="rgba(251, 146, 60, 0.2)"
+                        badgeTextColor="#FB923C"
                       />
                       <MetricCard
                         title="Active Insulin"
@@ -318,13 +329,16 @@ export default function DashboardPage() {
                         unit=""
                         status={latestInsulin > 0 ? 'Active' : 'No Data'}
                         icon={Syringe}
+                        iconColor="#2DD4BF"
+                        badgeBgColor="rgba(45, 212, 191, 0.2)"
+                        badgeTextColor="#2DD4BF"
                       />
                     </div>
 
                     {/* Glucose Trends Chart */}
                     <GlucoseTrendChart />
 
-                    {/* Quick Actions at bottom */}
+                    {/* Quick Actions at bottom with colorful variety */}
                     <div>
                       <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
                       <div className="grid grid-cols-2 gap-4">
@@ -334,6 +348,8 @@ export default function DashboardPage() {
                               icon={Heart}
                               title="Blood Sugar Tracking"
                               description="Log and monitor your glucose levels"
+                              iconBgColor="rgba(244, 114, 182, 0.2)"
+                              iconColor="#F472B6"
                             />
                           </div>
                         </Link>
@@ -343,6 +359,8 @@ export default function DashboardPage() {
                               icon={Utensils}
                               title="Meal Logging"
                               description="Track your nutrition and carbs"
+                              iconBgColor="rgba(251, 146, 60, 0.2)"
+                              iconColor="#FB923C"
                             />
                           </div>
                         </Link>

@@ -9,6 +9,9 @@ interface MetricCardProps {
   status: string;
   icon: LucideIcon;
   statusVariant?: 'default' | 'secondary' | 'destructive';
+  iconColor?: string;
+  badgeBgColor?: string;
+  badgeTextColor?: string;
 }
 
 export default function MetricCard({ 
@@ -17,7 +20,10 @@ export default function MetricCard({
   unit, 
   status, 
   icon: Icon,
-  statusVariant = 'default'
+  statusVariant = 'default',
+  iconColor = '#21C89B',
+  badgeBgColor = 'rgba(33, 200, 155, 0.2)',
+  badgeTextColor = '#21C89B'
 }: MetricCardProps) {
   return (
     <Card 
@@ -27,7 +33,7 @@ export default function MetricCard({
     >
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground font-medium">{title}</p>
-        <Icon className="h-5 w-5 text-primary" />
+        <Icon className="h-5 w-5" style={{ color: iconColor }} />
       </div>
       <div className="flex items-baseline gap-1.5">
         <h3 className="text-3xl font-bold text-foreground leading-none">{value}</h3>
@@ -35,7 +41,8 @@ export default function MetricCard({
       </div>
       <Badge 
         variant={statusVariant} 
-        className="bg-primary/20 text-primary text-xs px-2 py-0.5 w-fit"
+        className="text-xs px-2 py-0.5 w-fit"
+        style={{ backgroundColor: badgeBgColor, color: badgeTextColor }}
         data-testid={`badge-status-${title.toLowerCase().replace(' ', '-')}`}
       >
         {status}
