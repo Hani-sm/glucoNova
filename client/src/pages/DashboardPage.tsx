@@ -143,16 +143,16 @@ export default function DashboardPage() {
     { id: 16, size: 17, left: 95, top: 82, duration: 24, delay: 4.2, xRange: -35, yRange: 38, color: 'rgba(244, 114, 182, 0.3)' }, // Rose
   ];
 
-  // Uneven circular elements with varying colors (reduced size and opacity with blur)
+  // Uneven circular elements with emerald green (reduced size and opacity with blur)
   const unevenCircles = [
-    { id: 1, size: 18, left: 30, top: 20, duration: 20, delay: 0, opacity: 0.025, xRange: 38, yRange: 45, color: 'rgba(96, 165, 250, 0.08)' }, // Blue
-    { id: 2, size: 25, left: 70, top: 65, duration: 19, delay: 3, opacity: 0.08, xRange: -42, yRange: 48, color: 'rgba(167, 139, 250, 0.12)' }, // Purple
-    { id: 3, size: 15, left: 18, top: 55, duration: 22, delay: 1.5, opacity: 0.02, xRange: 45, yRange: -40, color: 'rgba(45, 212, 191, 0.06)' }, // Cyan
-    { id: 4, size: 22, left: 85, top: 35, duration: 18, delay: 4, opacity: 0.06, xRange: -40, yRange: 46, color: 'rgba(251, 146, 60, 0.1)' }, // Orange
-    { id: 5, size: 20, left: 50, top: 80, duration: 24, delay: 2.5, opacity: 0.045, xRange: 43, yRange: -42, color: 'rgba(129, 140, 248, 0.08)' }, // Indigo
-    { id: 6, size: 16, left: 12, top: 25, duration: 21, delay: 5, opacity: 0.03, xRange: -46, yRange: 50, color: 'rgba(34, 197, 94, 0.07)' }, // Green
-    { id: 7, size: 24, left: 60, top: 10, duration: 23, delay: 1, opacity: 0.07, xRange: 37, yRange: 41, color: 'rgba(147, 197, 253, 0.11)' }, // Light Blue
-    { id: 8, size: 17, left: 92, top: 70, duration: 19, delay: 3.5, opacity: 0.035, xRange: -44, yRange: -47, color: 'rgba(244, 114, 182, 0.07)' }, // Pink
+    { id: 1, size: 18, left: 30, top: 20, duration: 20, delay: 0, opacity: 0.025, xRange: 38, yRange: 45, color: 'rgba(33, 200, 155, 0.08)' }, // Emerald
+    { id: 2, size: 25, left: 70, top: 65, duration: 19, delay: 3, opacity: 0.08, xRange: -42, yRange: 48, color: 'rgba(33, 200, 155, 0.12)' }, // Emerald
+    { id: 3, size: 15, left: 18, top: 55, duration: 22, delay: 1.5, opacity: 0.02, xRange: 45, yRange: -40, color: 'rgba(33, 200, 155, 0.06)' }, // Emerald
+    { id: 4, size: 22, left: 85, top: 35, duration: 18, delay: 4, opacity: 0.06, xRange: -40, yRange: 46, color: 'rgba(33, 200, 155, 0.1)' }, // Emerald
+    { id: 5, size: 20, left: 50, top: 80, duration: 24, delay: 2.5, opacity: 0.045, xRange: 43, yRange: -42, color: 'rgba(33, 200, 155, 0.08)' }, // Emerald
+    { id: 6, size: 16, left: 12, top: 25, duration: 21, delay: 5, opacity: 0.03, xRange: -46, yRange: 50, color: 'rgba(33, 200, 155, 0.07)' }, // Emerald
+    { id: 7, size: 24, left: 60, top: 10, duration: 23, delay: 1, opacity: 0.07, xRange: 37, yRange: 41, color: 'rgba(33, 200, 155, 0.11)' }, // Emerald
+    { id: 8, size: 17, left: 92, top: 70, duration: 19, delay: 3.5, opacity: 0.035, xRange: -44, yRange: -47, color: 'rgba(33, 200, 155, 0.07)' }, // Emerald
   ];
 
   // Floating medical icons (white with low opacity)
