@@ -16,13 +16,13 @@ export default function RoleSelectionPage() {
   return (
     <PublicLayout>
       <Card 
-        className="w-full max-w-[1040px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-12 py-12 shadow-2xl"
+        className="w-full max-w-[1200px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-12 py-8 shadow-2xl"
       >
-        <h1 className="text-[2.25rem] font-extrabold tracking-tight text-white text-center mb-3">GlucoNova</h1>
-        <p className="text-[1.4rem] font-bold text-emerald-400 text-center mb-2">Select Your Role</p>
-        <p className="text-[1.05rem] text-gray-300 text-center mb-10 leading-relaxed">Choose how you'll use GlucoNova</p>
+        <h1 className="text-[2.25rem] font-extrabold tracking-tight text-white text-center mb-2">GlucoNova</h1>
+        <p className="text-[1.4rem] font-bold text-emerald-400 text-center mb-1">Select Your Role</p>
+        <p className="text-[1.05rem] text-gray-300 text-center mb-6 leading-relaxed">Choose how you'll use GlucoNova</p>
         
-        <div className="flex flex-wrap justify-center gap-8 my-8">
+        <div className="flex flex-wrap justify-center gap-8 mb-6">
           <Card 
             className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-10 lg:p-12 w-full max-w-[440px] min-h-[320px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group hover:scale-105"
             onClick={() => handleRoleSelect('patient')}
@@ -92,7 +92,7 @@ export default function RoleSelectionPage() {
           </Card>
         </div>
 
-        <div className="flex items-center justify-center gap-2 mt-4">
+        <div className="flex items-center justify-center gap-2 mt-2">
           <Link 
             href="/login" 
             className="text-[0.95rem] text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
@@ -102,7 +102,7 @@ export default function RoleSelectionPage() {
           </Link>
         </div>
 
-        <p className="text-center text-[0.85rem] text-white/60 mt-6">
+        <p className="text-center text-[0.85rem] text-white/60 mt-3">
           © 2025 GlucoNova. All rights reserved.
         </p>
       </Card>
