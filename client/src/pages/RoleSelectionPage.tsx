@@ -20,56 +20,56 @@ export default function RoleSelectionPage() {
         <p className="text-[1.75rem] font-bold text-emerald-400 text-center mb-2">Select Your Role</p>
         <p className="text-base text-gray-300 text-center mb-10">Choose how you'll use GlucoNova</p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 my-10">
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-12 py-6 w-full hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-10 py-10 w-full min-h-[280px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
             onClick={() => handleRoleSelect('patient')}
             data-testid="card-role-patient"
           >
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className="flex flex-col items-center gap-3">
-                <div className="h-20 w-20 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
-                  <User className="h-10 w-10 text-emerald-400" />
+            <div className="flex flex-col items-center text-center h-full">
+              <div className="flex flex-row items-center gap-3 mb-6">
+                <div className="h-16 w-16 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
+                  <User className="h-8 w-8 text-emerald-400" />
                 </div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20">
                   <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wide">Patient</span>
                 </div>
               </div>
               
-              <h3 className="text-[22px] font-bold text-white">Patient Account</h3>
+              <h3 className="text-xl font-bold text-white mb-4">Patient Account</h3>
               
-              <p className="text-sm text-gray-300 leading-relaxed">
+              <p className="text-sm text-gray-300 leading-relaxed mb-6">
                 Manage your diabetes with AI-powered insights
               </p>
               
-              <p className="text-sm text-emerald-400 font-medium">
+              <p className="text-sm text-emerald-400 font-medium mt-auto">
                 Click to continue as Patient
               </p>
             </div>
           </Card>
 
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-12 py-6 w-full hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-10 py-10 w-full min-h-[280px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group"
             onClick={() => handleRoleSelect('doctor')}
             data-testid="card-role-doctor"
           >
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className="flex flex-col items-center gap-3">
-                <div className="h-20 w-20 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
-                  <Stethoscope className="h-10 w-10 text-emerald-400" />
+            <div className="flex flex-col items-center text-center h-full">
+              <div className="flex flex-row items-center gap-3 mb-6">
+                <div className="h-16 w-16 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
+                  <Stethoscope className="h-8 w-8 text-emerald-400" />
                 </div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20">
                   <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wide">Provider</span>
                 </div>
               </div>
               
-              <h3 className="text-[22px] font-bold text-white">Healthcare Provider</h3>
+              <h3 className="text-xl font-bold text-white mb-4">Healthcare Provider</h3>
               
-              <p className="text-sm text-gray-300 leading-relaxed">
+              <p className="text-sm text-gray-300 leading-relaxed mb-6">
                 Access patient records and provide remote care
               </p>
               
-              <p className="text-sm text-emerald-400 font-medium">
+              <p className="text-sm text-emerald-400 font-medium mt-auto">
                 Click to continue as Provider
               </p>
             </div>
