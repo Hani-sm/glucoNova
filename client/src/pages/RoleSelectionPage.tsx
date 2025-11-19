@@ -1,4 +1,4 @@
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import PublicLayout from '@/components/PublicLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -93,13 +93,13 @@ export default function RoleSelectionPage() {
         </div>
 
         <div className="flex items-center justify-center gap-2">
-          <a 
+          <Link 
             href="/login" 
             className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
             data-testid="link-back-to-login"
           >
             ← Back to Login
-          </a>
+          </Link>
         </div>
 
         <p className="text-center text-sm text-white/60 mt-6">

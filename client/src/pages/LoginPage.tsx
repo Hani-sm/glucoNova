@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import PublicLayout from '@/components/PublicLayout';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -107,9 +107,9 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-gray-200 mt-8">
           Don't have an account?{' '}
-          <a href="/role-selection" className="text-emerald-400 hover:text-emerald-300 transition-colors" data-testid="link-register">
+          <Link href="/role-selection" className="text-emerald-400 hover:text-emerald-300 transition-colors" data-testid="link-register">
             Create one
-          </a>
+          </Link>
         </p>
 
         <p className="text-center text-sm text-white/60 mt-6">
