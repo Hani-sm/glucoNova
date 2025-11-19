@@ -1,3 +1,5 @@
+import { pgTable, serial, text, varchar, timestamp, boolean, integer, decimal, json } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const userRoles = ['patient', 'doctor', 'admin'] as const;
@@ -6,6 +8,141 @@ export type UserRole = typeof userRoles[number];
 export const activityLevels = ['sedentary', 'light', 'moderate', 'active', 'very_active'] as const;
 export type ActivityLevel = typeof activityLevels[number];
 
+// ==================== DRIZZLE TABLES ====================
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  password: varchar("password", { length: 255 }).notNull(),
+  role: varchar("role", { length: 50 }).$type<UserRole>().notNull(),
+  isApproved: boolean("is_approved").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const healthData = pgTable("health_data", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  glucose: integer("glucose").notNull(),
+  insulin: integer("insulin").notNull(),
+  carbs: integer("carbs").notNull(),
+  activityLevel: varchar("activity_level", { length: 50 }).$type<ActivityLevel>(),
+  notes: text("notes"),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+export const meals = pgTable("meals", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  name: varchar("name", { length: 255 }).notNull(),
+  carbs: integer("carbs").notNull(),
+  protein: integer("protein"),
+  fat: integer("fat"),
+  calories: integer("calories"),
+  voiceRecorded: boolean("voice_recorded").notNull().default(false),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+export const medicalReports = pgTable("medical_reports", {
+  id: serial("id").primaryKey(),
+  patientId: integer("patient_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  fileName: varchar("file_name", { length: 255 }).notNull(),
+  fileUrl: varchar("file_url", { length: 500 }).notNull(),
+  fileType: varchar("file_type", { length: 100 }).notNull(),
+  fileSize: integer("file_size").notNull(),
+  uploadedBy: integer("uploaded_by").notNull().references(() => users.id),
+  description: text("description"),
+  uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
+});
+
+export const predictions = pgTable("predictions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  predictedInsulin: integer("predicted_insulin").notNull(),
+  confidence: integer("confidence").notNull(),
+  factors: json("factors").$type<{
+    glucose: number;
+    carbs: number;
+    activityLevel: string;
+  }>().notNull(),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+// ==================== DRIZZLE-ZOD INSERT SCHEMAS ====================
+
+export const insertUserSchema = createInsertSchema(users, {
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  role: z.enum(userRoles),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export const insertHealthDataSchema = createInsertSchema(healthData, {
+  glucose: z.coerce.number().min(0).max(1000),
+  insulin: z.coerce.number().min(0).max(200),
+  carbs: z.coerce.number().min(0).max(500),
+  activityLevel: z.enum(activityLevels).optional(),
+  notes: z.string().optional(),
+}).omit({
+  id: true,
+  userId: true,
+  timestamp: true,
+});
+
+export const insertMealSchema = createInsertSchema(meals, {
+  name: z.string().min(1, "Meal name is required"),
+  carbs: z.coerce.number().min(0),
+  protein: z.coerce.number().min(0).optional(),
+  fat: z.coerce.number().min(0).optional(),
+  calories: z.coerce.number().min(0).optional(),
+  voiceRecorded: z.boolean().default(false),
+}).omit({
+  id: true,
+  userId: true,
+  timestamp: true,
+});
+
+export const insertMedicalReportSchema = createInsertSchema(medicalReports, {
+  patientId: z.coerce.number(),
+  description: z.string().optional(),
+}).omit({
+  id: true,
+  userId: true,
+  fileName: true,
+  fileUrl: true,
+  fileType: true,
+  fileSize: true,
+  uploadedBy: true,
+  uploadedAt: true,
+});
+
+export const insertPredictionSchema = createInsertSchema(predictions, {
+  predictedInsulin: z.coerce.number().min(0),
+  confidence: z.coerce.number().min(0).max(1),
+  factors: z.object({
+    glucose: z.number(),
+    carbs: z.number(),
+    activityLevel: z.string(),
+  }),
+}).omit({
+  id: true,
+  userId: true,
+  timestamp: true,
+});
+
+// ==================== TYPE EXPORTS ====================
+
+// API types (with _id as string for backward compatibility)
 export interface User {
   _id: string;
   name: string;
@@ -24,8 +161,8 @@ export interface HealthData {
   insulin: number;
   carbs: number;
   activityLevel?: string;
-  timestamp: Date;
   notes?: string;
+  timestamp: Date;
 }
 
 export interface Meal {
@@ -36,21 +173,20 @@ export interface Meal {
   protein?: number;
   fat?: number;
   calories?: number;
-  timestamp: Date;
   voiceRecorded: boolean;
+  timestamp: Date;
 }
 
 export interface MedicalReport {
   _id: string;
-  userId: string;
   patientId: string;
   fileName: string;
   fileUrl: string;
   fileType: string;
   fileSize: number;
   uploadedBy: string;
-  uploadedAt: Date;
   description?: string;
+  uploadedAt: Date;
 }
 
 export interface Prediction {
@@ -66,53 +202,13 @@ export interface Prediction {
   timestamp: Date;
 }
 
-export const insertUserSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(userRoles),
-});
-
-export const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
-});
-
-export const healthDataSchema = z.object({
-  glucose: z.number().min(0).max(1000),
-  insulin: z.number().min(0).max(200),
-  carbs: z.number().min(0).max(500),
-  activityLevel: z.enum(activityLevels).optional(),
-  notes: z.string().optional(),
-});
-
-export const mealSchema = z.object({
-  name: z.string().min(1, "Meal name is required"),
-  carbs: z.number().min(0),
-  protein: z.number().min(0).optional(),
-  fat: z.number().min(0).optional(),
-  calories: z.number().min(0).optional(),
-  voiceRecorded: z.boolean().default(false),
-});
-
-export const medicalReportSchema = z.object({
-  patientId: z.string(),
-  description: z.string().optional(),
-});
-
-export const predictionSchema = z.object({
-  predictedInsulin: z.number().min(0),
-  confidence: z.number().min(0).max(1),
-  factors: z.object({
-    glucose: z.number(),
-    carbs: z.number(),
-    activityLevel: z.string(),
-  }),
-});
-
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
-export type InsertHealthData = z.infer<typeof healthDataSchema>;
-export type InsertMeal = z.infer<typeof mealSchema>;
-export type InsertMedicalReport = z.infer<typeof medicalReportSchema>;
-export type InsertPrediction = z.infer<typeof predictionSchema>;
+export type InsertHealthData = z.infer<typeof insertHealthDataSchema>;
+export type InsertMeal = z.infer<typeof insertMealSchema>;
+export type InsertMedicalReport = z.infer<typeof insertMedicalReportSchema>;
+export type InsertPrediction = z.infer<typeof insertPredictionSchema>;
+
+// Legacy schema names for backward compatibility
+export const healthDataSchema = insertHealthDataSchema;
+export const mealSchema = insertMealSchema;

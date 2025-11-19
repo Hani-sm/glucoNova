@@ -1,32 +1,21 @@
-import mongoose from 'mongoose';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
+import * as schema from '@shared/schema';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gluconova';
-
-let isConnected = false;
-
-export async function connectDB() {
-  try {
-    await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
-    });
-    isConnected = true;
-    console.log('✅ MongoDB connected successfully');
-  } catch (error) {
-    console.warn('⚠️  MongoDB not available, using in-memory storage');
-    isConnected = false;
-  }
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL environment variable is required');
 }
 
-export function isMongoConnected(): boolean {
-  return isConnected;
-}
-
-mongoose.connection.on('disconnected', () => {
-  isConnected = false;
-  console.log('MongoDB disconnected');
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
 });
 
-mongoose.connection.on('error', (err) => {
-  console.error('MongoDB error:', err);
-  isConnected = false;
+export const db = drizzle(pool, { schema });
+
+pool.on('error', (err) => {
+  console.error('PostgreSQL error:', err);
+});
+
+pool.on('connect', () => {
+  console.log('✅ PostgreSQL connected successfully');
 });

@@ -6,7 +6,6 @@ import { storage } from "./storage";
 import { authMiddleware, roleMiddleware, approvalMiddleware, authWithApproval, generateToken, type AuthRequest } from "./middleware/auth";
 import { hashPassword, comparePassword } from "./utils/password";
 import { insertUserSchema, loginSchema, healthDataSchema, mealSchema } from "@shared/schema";
-import { MedicalReportModel } from "./models/MedicalReport";
 
 const upload = multer({
   dest: 'uploads/',
@@ -253,16 +252,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: 'Access denied' });
       }
 
-      const report = await MedicalReportModel.create({
-        userId: req.user!.userId,
-        patientId: patientId || req.user!.userId,
-        fileName: req.file.originalname,
-        fileUrl: req.file.path,
-        fileType: req.file.mimetype,
-        fileSize: req.file.size,
-        uploadedBy: req.user!.userId,
-        description,
-      });
+      const report = await storage.createMedicalReport(
+        patientId || req.user!.userId,
+        req.user!.userId,
+        {
+          fileName: req.file.originalname,
+          fileUrl: req.file.path,
+          fileType: req.file.mimetype,
+          fileSize: req.file.size,
+          description,
+        }
+      );
 
       res.status(201).json({ 
         message: 'Report uploaded successfully',
@@ -286,10 +286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: 'Access denied' });
       }
 
-      const reports = await MedicalReportModel.find({ patientId })
-        .sort({ uploadedAt: -1 })
-        .populate('uploadedBy', 'name email')
-        .lean();
+      const reports = await storage.getMedicalReportsByPatient(patientId);
 
       res.json({ reports });
     } catch (error: any) {

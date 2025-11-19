@@ -1,11 +1,21 @@
-import { type User, type InsertUser, type HealthData, type InsertHealthData, type Meal, type InsertMeal, type MedicalReport, type InsertMedicalReport, type Prediction, type InsertPrediction } from "@shared/schema";
-import { UserModel } from "./models/User";
-import { HealthDataModel } from "./models/HealthData";
-import { MealModel } from "./models/Meal";
-import { MedicalReportModel } from "./models/MedicalReport";
-import { PredictionModel } from "./models/Prediction";
-import { isMongoConnected } from "./db";
-import { randomUUID } from "crypto";
+import {  type User,
+  type InsertUser,
+  type HealthData,
+  type InsertHealthData,
+  type Meal,
+  type InsertMeal,
+  type MedicalReport,
+  type InsertMedicalReport,
+  type Prediction,
+  type InsertPrediction,
+  users,
+  healthData,
+  meals,
+  medicalReports,
+  predictions,
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -26,6 +36,13 @@ export interface IStorage {
   
   // Medical report operations
   getMedicalReportsByPatient(patientId: string): Promise<MedicalReport[]>;
+  createMedicalReport(patientId: string, uploaderId: string, report: {
+    fileName: string;
+    fileUrl: string;
+    fileType: string;
+    fileSize: number;
+    description?: string;
+  }): Promise<MedicalReport>;
   
   // Prediction operations
   createPrediction(userId: string, prediction: InsertPrediction): Promise<Prediction>;
@@ -33,212 +50,368 @@ export interface IStorage {
   getLatestPrediction(userId: string): Promise<Prediction | null>;
 }
 
-export class MongoStorage implements IStorage {
-  async getUser(id: string): Promise<User | null> {
-    const user = await UserModel.findById(id).lean();
-    return user ? { ...user, _id: user._id.toString() } as User : null;
-  }
-
-  async getUserByEmail(email: string): Promise<User | null> {
-    const user = await UserModel.findOne({ email }).lean();
-    return user ? { ...user, _id: user._id.toString() } as User : null;
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const user = await UserModel.create(insertUser);
-    return { ...user.toObject(), _id: user._id.toString() } as User;
-  }
-
-  async updateUserApproval(id: string, isApproved: boolean): Promise<User | null> {
-    const user = await UserModel.findByIdAndUpdate(
-      id,
-      { isApproved },
-      { new: true }
-    ).lean();
-    return user ? { ...user, _id: user._id.toString() } as User : null;
-  }
-
-  async getAllUsers(): Promise<User[]> {
-    const users = await UserModel.find().lean();
-    return users.map(user => ({ ...user, _id: user._id.toString() } as User));
-  }
-
-  async createHealthData(userId: string, data: InsertHealthData): Promise<HealthData> {
-    const healthData = await HealthDataModel.create({ userId, ...data });
-    return { ...healthData.toObject(), _id: healthData._id.toString(), userId: userId } as HealthData;
-  }
-
-  async getHealthDataByUser(userId: string, limit: number = 50): Promise<HealthData[]> {
-    const data = await HealthDataModel.find({ userId })
-      .sort({ timestamp: -1 })
-      .limit(limit)
-      .lean();
-    return data.map(d => ({ ...d, _id: d._id.toString(), userId: userId } as HealthData));
-  }
-
-  async getLatestHealthData(userId: string): Promise<HealthData | null> {
-    const data = await HealthDataModel.findOne({ userId })
-      .sort({ timestamp: -1 })
-      .lean();
-    return data ? { ...data, _id: data._id.toString(), userId: userId } as HealthData : null;
-  }
-
-  async createMeal(userId: string, meal: InsertMeal): Promise<Meal> {
-    const mealData = await MealModel.create({ userId, ...meal });
-    return { ...mealData.toObject(), _id: mealData._id.toString(), userId: userId } as Meal;
-  }
-
-  async getMealsByUser(userId: string, limit: number = 50): Promise<Meal[]> {
-    const meals = await MealModel.find({ userId })
-      .sort({ timestamp: -1 })
-      .limit(limit)
-      .lean();
-    return meals.map(m => ({ ...m, _id: m._id.toString(), userId: userId } as Meal));
-  }
-
-  async getMedicalReportsByPatient(patientId: string): Promise<MedicalReport[]> {
-    const reports = await MedicalReportModel.find({ patientId })
-      .sort({ uploadedAt: -1 })
-      .populate('uploadedBy', 'name email')
-      .lean();
-    return reports.map(r => ({
-      ...r,
-      _id: r._id.toString(),
-      userId: r.userId.toString(),
-      patientId: r.patientId.toString(),
-      uploadedBy: r.uploadedBy.toString(),
-    } as MedicalReport));
-  }
-
-  async createPrediction(userId: string, prediction: InsertPrediction): Promise<Prediction> {
-    const pred = await PredictionModel.create({ userId, ...prediction });
-    return { ...pred.toObject(), _id: pred._id.toString(), userId: userId } as Prediction;
-  }
-
-  async getPredictionsByUser(userId: string, limit: number = 50): Promise<Prediction[]> {
-    const predictions = await PredictionModel.find({ userId })
-      .sort({ timestamp: -1 })
-      .limit(limit)
-      .lean();
-    return predictions.map(p => ({ ...p, _id: p._id.toString(), userId: userId } as Prediction));
-  }
-
-  async getLatestPrediction(userId: string): Promise<Prediction | null> {
-    const prediction = await PredictionModel.findOne({ userId })
-      .sort({ timestamp: -1 })
-      .lean();
-    return prediction ? { ...prediction, _id: prediction._id.toString(), userId: userId } as Prediction : null;
-  }
+// Helper function to coerce nullable values
+function toNumber(val: number | null): number | undefined {
+  return val === null ? undefined : val;
 }
 
-class MemStorage implements IStorage {
-  private users: Map<string, User> = new Map();
-  private healthData: Map<string, HealthData[]> = new Map();
-  private meals: Map<string, Meal[]> = new Map();
-  private medicalReports: Map<string, MedicalReport[]> = new Map();
-  private predictions: Map<string, Prediction[]> = new Map();
-
+export class DrizzleStorage implements IStorage {
+  // ==================== USER OPERATIONS ====================
+  
   async getUser(id: string): Promise<User | null> {
-    return this.users.get(id) || null;
+    const userId = parseInt(id);
+    if (isNaN(userId)) return null;
+    
+    const result = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    if (result.length === 0) return null;
+    
+    const user = result[0];
+    return {
+      _id: user.id.toString(),
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      role: user.role,
+      isApproved: user.isApproved,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
-    return Array.from(this.users.values()).find(u => u.email === email) || null;
+    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    if (result.length === 0) return null;
+    
+    const user = result[0];
+    return {
+      _id: user.id.toString(),
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      role: user.role,
+      isApproved: user.isApproved,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = {
-      _id: id,
+    const isApproved = insertUser.role === 'admin';
+    
+    const result = await db.insert(users).values({
       ...insertUser,
-      isApproved: insertUser.role === 'admin',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      isApproved,
+    }).returning();
+    
+    const user = result[0];
+    return {
+      _id: user.id.toString(),
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      role: user.role,
+      isApproved: user.isApproved,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
-    this.users.set(id, user);
-    return user;
   }
 
   async updateUserApproval(id: string, isApproved: boolean): Promise<User | null> {
-    const user = this.users.get(id);
-    if (!user) return null;
-    user.isApproved = isApproved;
-    user.updatedAt = new Date();
-    return user;
+    const userId = parseInt(id);
+    if (isNaN(userId)) return null;
+    
+    const result = await db.update(users)
+      .set({ isApproved, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (result.length === 0) return null;
+    
+    const user = result[0];
+    return {
+      _id: user.id.toString(),
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      role: user.role,
+      isApproved: user.isApproved,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 
   async getAllUsers(): Promise<User[]> {
-    return Array.from(this.users.values());
+    const result = await db.select().from(users);
+    
+    return result.map(user => ({
+      _id: user.id.toString(),
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      role: user.role,
+      isApproved: user.isApproved,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    }));
   }
 
+  // ==================== HEALTH DATA OPERATIONS ====================
+  
   async createHealthData(userId: string, data: InsertHealthData): Promise<HealthData> {
-    const healthData: HealthData = {
-      _id: randomUUID(),
-      userId,
-      ...data,
-      timestamp: new Date(),
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) throw new Error('Invalid user ID');
+    
+    const result = await db.insert(healthData).values({
+      userId: userIdNum,
+      glucose: Math.round(data.glucose),
+      insulin: Math.round(data.insulin),
+      carbs: Math.round(data.carbs),
+      activityLevel: data.activityLevel,
+      notes: data.notes,
+    }).returning();
+    
+    const record = result[0];
+    return {
+      _id: record.id.toString(),
+      userId: userId,
+      glucose: record.glucose,
+      insulin: record.insulin,
+      carbs: record.carbs,
+      activityLevel: record.activityLevel || undefined,
+      notes: record.notes || undefined,
+      timestamp: record.timestamp,
     };
-    const userHealthData = this.healthData.get(userId) || [];
-    userHealthData.unshift(healthData);
-    this.healthData.set(userId, userHealthData);
-    return healthData;
   }
 
   async getHealthDataByUser(userId: string, limit: number = 50): Promise<HealthData[]> {
-    const data = this.healthData.get(userId) || [];
-    return data.slice(0, limit);
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) return [];
+    
+    const result = await db.select()
+      .from(healthData)
+      .where(eq(healthData.userId, userIdNum))
+      .orderBy(desc(healthData.timestamp))
+      .limit(limit);
+    
+    return result.map(record => ({
+      _id: record.id.toString(),
+      userId: userId,
+      glucose: record.glucose,
+      insulin: record.insulin,
+      carbs: record.carbs,
+      activityLevel: record.activityLevel || undefined,
+      notes: record.notes || undefined,
+      timestamp: record.timestamp,
+    }));
   }
 
   async getLatestHealthData(userId: string): Promise<HealthData | null> {
-    const data = this.healthData.get(userId) || [];
-    return data[0] || null;
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) return null;
+    
+    const result = await db.select()
+      .from(healthData)
+      .where(eq(healthData.userId, userIdNum))
+      .orderBy(desc(healthData.timestamp))
+      .limit(1);
+    
+    if (result.length === 0) return null;
+    
+    const record = result[0];
+    return {
+      _id: record.id.toString(),
+      userId: userId,
+      glucose: record.glucose,
+      insulin: record.insulin,
+      carbs: record.carbs,
+      activityLevel: record.activityLevel || undefined,
+      notes: record.notes || undefined,
+      timestamp: record.timestamp,
+    };
   }
 
+  // ==================== MEAL OPERATIONS ====================
+  
   async createMeal(userId: string, meal: InsertMeal): Promise<Meal> {
-    const mealData: Meal = {
-      _id: randomUUID(),
-      userId,
-      ...meal,
-      timestamp: new Date(),
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) throw new Error('Invalid user ID');
+    
+    const result = await db.insert(meals).values({
+      userId: userIdNum,
+      name: meal.name,
+      carbs: Math.round(meal.carbs),
+      protein: meal.protein == null ? null : Math.round(meal.protein),
+      fat: meal.fat == null ? null : Math.round(meal.fat),
+      calories: meal.calories ?? null,
+      voiceRecorded: meal.voiceRecorded,
+    }).returning();
+    
+    const record = result[0];
+    return {
+      _id: record.id.toString(),
+      userId: userId,
+      name: record.name,
+      carbs: record.carbs,
+      protein: record.protein ?? undefined,
+      fat: record.fat ?? undefined,
+      calories: record.calories ?? undefined,
+      voiceRecorded: record.voiceRecorded,
+      timestamp: record.timestamp,
     };
-    const userMeals = this.meals.get(userId) || [];
-    userMeals.unshift(mealData);
-    this.meals.set(userId, userMeals);
-    return mealData;
   }
 
   async getMealsByUser(userId: string, limit: number = 50): Promise<Meal[]> {
-    const meals = this.meals.get(userId) || [];
-    return meals.slice(0, limit);
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) return [];
+    
+    const result = await db.select()
+      .from(meals)
+      .where(eq(meals.userId, userIdNum))
+      .orderBy(desc(meals.timestamp))
+      .limit(limit);
+    
+    return result.map(record => ({
+      _id: record.id.toString(),
+      userId: userId,
+      name: record.name,
+      carbs: record.carbs,
+      protein: record.protein ?? undefined,
+      fat: record.fat ?? undefined,
+      calories: record.calories ?? undefined,
+      voiceRecorded: record.voiceRecorded,
+      timestamp: record.timestamp,
+    }));
   }
 
+  // ==================== MEDICAL REPORT OPERATIONS ====================
+  
   async getMedicalReportsByPatient(patientId: string): Promise<MedicalReport[]> {
-    const reports = this.medicalReports.get(patientId) || [];
-    return reports;
+    const patientIdNum = parseInt(patientId);
+    if (isNaN(patientIdNum)) return [];
+    
+    const result = await db.select()
+      .from(medicalReports)
+      .where(eq(medicalReports.patientId, patientIdNum))
+      .orderBy(desc(medicalReports.uploadedAt));
+    
+    return result.map(record => ({
+      _id: record.id.toString(),
+      patientId: record.patientId.toString(),
+      fileName: record.fileName,
+      fileUrl: record.fileUrl,
+      fileType: record.fileType,
+      fileSize: record.fileSize,
+      uploadedBy: record.uploadedBy.toString(),
+      description: record.description || undefined,
+      uploadedAt: record.uploadedAt,
+    }));
   }
 
-  async createPrediction(userId: string, prediction: InsertPrediction): Promise<Prediction> {
-    const pred: Prediction = {
-      _id: randomUUID(),
-      userId,
-      ...prediction,
-      timestamp: new Date(),
+  async createMedicalReport(patientId: string, uploaderId: string, report: {
+    fileName: string;
+    fileUrl: string;
+    fileType: string;
+    fileSize: number;
+    description?: string;
+  }): Promise<MedicalReport> {
+    const patientIdNum = parseInt(patientId);
+    const uploaderIdNum = parseInt(uploaderId);
+    
+    if (isNaN(patientIdNum) || isNaN(uploaderIdNum)) {
+      throw new Error('Invalid patient ID or uploader ID');
+    }
+    
+    const result = await db.insert(medicalReports).values({
+      patientId: patientIdNum,
+      fileName: report.fileName,
+      fileUrl: report.fileUrl,
+      fileType: report.fileType,
+      fileSize: report.fileSize,
+      uploadedBy: uploaderIdNum,
+      description: report.description,
+    }).returning();
+    
+    const record = result[0];
+    return {
+      _id: record.id.toString(),
+      patientId: record.patientId.toString(),
+      fileName: record.fileName,
+      fileUrl: record.fileUrl,
+      fileType: record.fileType,
+      fileSize: record.fileSize,
+      uploadedBy: record.uploadedBy.toString(),
+      description: record.description || undefined,
+      uploadedAt: record.uploadedAt,
     };
-    const userPredictions = this.predictions.get(userId) || [];
-    userPredictions.unshift(pred);
-    this.predictions.set(userId, userPredictions);
-    return pred;
+  }
+
+  // ==================== PREDICTION OPERATIONS ====================
+  
+  async createPrediction(userId: string, prediction: InsertPrediction): Promise<Prediction> {
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) throw new Error('Invalid user ID');
+    
+    const result = await db.insert(predictions).values({
+      userId: userIdNum,
+      predictedInsulin: Math.round(prediction.predictedInsulin),
+      confidence: Math.round(prediction.confidence * 100),
+      factors: prediction.factors,
+    }).returning();
+    
+    const record = result[0];
+    return {
+      _id: record.id.toString(),
+      userId: userId,
+      predictedInsulin: record.predictedInsulin,
+      confidence: record.confidence / 100,
+      factors: record.factors,
+      timestamp: record.timestamp,
+    };
   }
 
   async getPredictionsByUser(userId: string, limit: number = 50): Promise<Prediction[]> {
-    const predictions = this.predictions.get(userId) || [];
-    return predictions.slice(0, limit);
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) return [];
+    
+    const result = await db.select()
+      .from(predictions)
+      .where(eq(predictions.userId, userIdNum))
+      .orderBy(desc(predictions.timestamp))
+      .limit(limit);
+    
+    return result.map(record => ({
+      _id: record.id.toString(),
+      userId: userId,
+      predictedInsulin: record.predictedInsulin,
+      confidence: record.confidence / 100,
+      factors: record.factors,
+      timestamp: record.timestamp,
+    }));
   }
 
   async getLatestPrediction(userId: string): Promise<Prediction | null> {
-    const predictions = this.predictions.get(userId) || [];
-    return predictions[0] || null;
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) return null;
+    
+    const result = await db.select()
+      .from(predictions)
+      .where(eq(predictions.userId, userIdNum))
+      .orderBy(desc(predictions.timestamp))
+      .limit(1);
+    
+    if (result.length === 0) return null;
+    
+    const record = result[0];
+    return {
+      _id: record.id.toString(),
+      userId: userId,
+      predictedInsulin: record.predictedInsulin,
+      confidence: record.confidence / 100,
+      factors: record.factors,
+      timestamp: record.timestamp,
+    };
   }
 }
 
-export const storage = isMongoConnected() ? new MongoStorage() : new MemStorage();
+// Export the storage instance
+export const storage = new DrizzleStorage();
