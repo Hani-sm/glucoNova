@@ -21,20 +21,22 @@ Preferred communication style: Simple, everyday language.
 
 **Design System:**
 - shadcn/ui component library with customized "new-york" style preset
-- Dark-themed interface with navy gradients (#040815 to #071627)
-- Glassmorphism effects with backdrop blur on cards and modals
-- Bright emerald/teal (rgb(52, 211, 153) / #34d399 / emerald-400) as primary accent color
-- Button gradients use emerald-500 to emerald-400 with emerald-300 hover states
-- Floating animated elements and wave gradients in bright emerald tones
+- Dark-themed interface with coal-colored background (neutral-900/zinc-900)
+- Glassmorphism effects: rgba(255, 255, 255, 0.03) background, 1px white/10% border, backdrop-blur-xl, inner glow, soft drop shadows
+- Teal professional accent (#21C89B / HSL 164, 72%, 46%) for primary actions, icons, and highlights
+- Hover microinteractions: subtle scale (1.02) + teal glow shadow (0 0 20px rgba(33, 200, 155, 0.3))
+- Centralized utility classes: `glass-card` for glassmorphism, `card-interactive` for hover effects
 - Responsive layout with sidebar navigation for desktop, collapsible for mobile
 
-**Color Palette:**
-- Primary text/links: emerald-400 (HSL 158 64% 52%) with emerald-300 hover
-- Backgrounds: emerald-400/10 and emerald-400/20 for subtle accents
-- Borders: emerald-400/20 and emerald-400/30
-- Focus states: emerald-400 with emerald-400/20 rings
-- CSS theme variables: primary, sidebar-primary, ring, and accent all use bright emerald (158 64% 52%)
-- Chart colors: Bright emerald range (158 64% 44-60% lightness)
+**Color Palette (Fully Tokenized System):**
+- Primary accent: #21C89B (HSL 164, 72%, 46%) - used via `text-primary`, `bg-primary`, `border-primary` tokens
+- Muted text: #9AA8A6 (HSL 171, 7%, 63%) - used via `text-muted-foreground` token
+- Near-white headings: #EAF6F3 (HSL 165, 43%, 94%) - used via `text-foreground` token
+- Secondary backgrounds: rgba(255, 255, 255, 0.05) - used via `bg-secondary` token
+- Borders: rgba(255, 255, 255, 0.1) - used via `border-border`, `border-input` tokens
+- All colors flow through CSS custom properties (--primary, --foreground, --muted-foreground, etc.)
+- No hard-coded Tailwind color utilities allowed; all colors reference theme tokens for consistency
+- Chart colors: Teal stroke using hsl(var(--primary)) with translucent gradient fill
 
 **State Management:**
 - React Context API for authentication state (AuthProvider)
