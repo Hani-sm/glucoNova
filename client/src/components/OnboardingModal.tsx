@@ -161,7 +161,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
     return true;
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     // Validate before moving from step 2 (parser) or step 3 (manual) to step 4
     if ((step === 2 && showParser) || step === 3) {
       if (!validateData()) {
@@ -172,9 +172,43 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
     if (step < 4) {
       setStep(step + 1);
     } else {
-      localStorage.setItem('onboardingCompleted', 'true');
-      localStorage.setItem('healthData', JSON.stringify(healthData));
-      onComplete();
+      try {
+        // Save initial health data to the database
+        const response = await fetch('/api/health-data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify({
+            glucose: 100, // Default starting value
+            insulin: parseFloat(healthData.typicalInsulin) || 0,
+            carbs: 0,
+            activityLevel: 'moderate',
+            notes: `Initial profile: Weight ${healthData.weight}kg, Height ${healthData.height}cm, Last A1c ${healthData.lastA1c}, Medications: ${healthData.medications}`,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save initial health data');
+        }
+
+        localStorage.setItem('onboardingCompleted', 'true');
+        localStorage.setItem('healthData', JSON.stringify(healthData));
+        
+        toast({
+          title: 'Profile created successfully',
+          description: 'Your health data has been saved',
+        });
+        
+        onComplete();
+      } catch (error) {
+        toast({
+          title: 'Error saving profile',
+          description: 'Please try again or contact support',
+          variant: 'destructive',
+        });
+      }
     }
   };
 
