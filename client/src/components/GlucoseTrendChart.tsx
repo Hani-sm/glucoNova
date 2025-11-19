@@ -45,11 +45,11 @@ export default function GlucoseTrendChart() {
 
   return (
     <Card 
-      className="p-6 card-interactive glass-card" 
+      className="p-5 card-interactive glass-card flex flex-col" 
       style={{ height: '360px' }} 
       data-testid="card-glucose-trends"
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5">
         <h2 className="text-lg font-bold text-foreground">Glucose Trends</h2>
         <div className="flex gap-1 bg-secondary rounded-lg p-1">
           {timeRanges.map((range) => (
@@ -70,7 +70,7 @@ export default function GlucoseTrendChart() {
         </div>
       </div>
 
-      <div style={{ height: '240px' }} className="mb-3">
+      <div className="flex-1 mb-4">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={mockData[selectedRange]}>
             <defs>
@@ -79,16 +79,20 @@ export default function GlucoseTrendChart() {
                 <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="time" 
               stroke="hsl(var(--muted-foreground))"
               fontSize={12}
+              tickLine={false}
+              axisLine={{ stroke: 'hsl(var(--border))' }}
             />
             <YAxis 
               stroke="hsl(var(--muted-foreground))"
               fontSize={12}
               domain={[60, 150]}
+              tickLine={false}
+              axisLine={{ stroke: 'hsl(var(--border))' }}
             />
             <Tooltip 
               contentStyle={{ 
@@ -110,12 +114,12 @@ export default function GlucoseTrendChart() {
         </ResponsiveContainer>
       </div>
 
-      <div className="flex items-center justify-between bg-secondary/50 rounded-lg p-3">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Current Status</span>
-          <span className="font-semibold text-lg">98 mg/dL</span>
+      <div className="flex items-center justify-between bg-secondary/50 rounded-lg px-4 py-3">
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-muted-foreground font-medium">Current Status</span>
+          <span className="font-bold text-xl text-foreground">98 mg/dL</span>
         </div>
-        <Badge className="bg-primary/20 text-primary" data-testid="badge-status">
+        <Badge className="bg-primary/20 text-primary px-3 py-1" data-testid="badge-status">
           Within Target
         </Badge>
       </div>

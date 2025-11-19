@@ -234,44 +234,46 @@ export default function DashboardPage() {
 
                   {/* Right Column - 360px wide */}
                   <div className="space-y-4">
-                    <Card data-testid="card-insulin-prediction" className="relative overflow-hidden" style={{ height: '120px', borderRadius: '12px' }}>
-                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-emerald-400/10 pointer-events-none" />
-                      <CardHeader className="relative pb-2 pt-3 px-4">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Sparkles className="h-4 w-4 text-emerald-400" />
-                          <CardTitle className="text-base">AI Insulin Prediction</CardTitle>
+                    <Card 
+                      data-testid="card-insulin-prediction" 
+                      className="p-5 card-interactive glass-card flex flex-col justify-between relative overflow-hidden" 
+                      style={{ height: '120px', borderRadius: '12px' }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 pointer-events-none" />
+                      <div className="flex items-center justify-between relative z-10">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="h-5 w-5 text-primary" />
+                          <h3 className="font-bold text-base text-foreground">AI Insulin Prediction</h3>
                         </div>
-                      </CardHeader>
-                      <CardContent className="relative px-4 pb-3">
-                        <div className="flex items-center justify-between">
-                          {isLoadingPrediction ? (
-                            <p className="text-xs text-muted-foreground">Loading...</p>
-                          ) : latestPrediction?.prediction ? (
-                            <>
-                              <div className="flex items-baseline gap-1">
-                                <span className="text-2xl font-bold text-emerald-400">
-                                  {latestPrediction.prediction.predictedInsulin.toFixed(1)}
-                                </span>
-                                <span className="text-xs text-muted-foreground">units</span>
-                              </div>
-                              <span className="text-xs text-muted-foreground">
-                                {(latestPrediction.prediction.confidence * 100).toFixed(0)}% confidence
+                      </div>
+                      <div className="flex items-center justify-between relative z-10">
+                        {isLoadingPrediction ? (
+                          <p className="text-sm text-muted-foreground">Loading...</p>
+                        ) : latestPrediction?.prediction ? (
+                          <>
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-3xl font-bold text-primary leading-none">
+                                {latestPrediction.prediction.predictedInsulin.toFixed(1)}
                               </span>
-                            </>
-                          ) : (
-                            <p className="text-xs text-muted-foreground">No data</p>
-                          )}
-                        </div>
-                        <Button
-                          data-testid="button-generate-prediction"
-                          onClick={() => generatePredictionMutation.mutate()}
-                          disabled={generatePredictionMutation.isPending}
-                          className="w-full mt-2"
-                          size="sm"
-                        >
-                          {generatePredictionMutation.isPending ? 'Generating...' : 'Generate Prediction'}
-                        </Button>
-                      </CardContent>
+                              <span className="text-sm text-muted-foreground">units</span>
+                            </div>
+                            <span className="text-sm text-muted-foreground font-medium">
+                              {(latestPrediction.prediction.confidence * 100).toFixed(0)}% conf.
+                            </span>
+                          </>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">No data</p>
+                        )}
+                      </div>
+                      <Button
+                        data-testid="button-generate-prediction"
+                        onClick={() => generatePredictionMutation.mutate()}
+                        disabled={generatePredictionMutation.isPending}
+                        className="w-full bg-primary text-primary-foreground relative z-10"
+                        size="sm"
+                      >
+                        {generatePredictionMutation.isPending ? 'Generating...' : 'Generate Prediction'}
+                      </Button>
                     </Card>
                     <VoiceAssistantCard
                       title="Voice Food Logging"

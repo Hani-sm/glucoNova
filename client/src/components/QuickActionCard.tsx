@@ -10,17 +10,17 @@ interface QuickActionCardProps {
 export default function QuickActionCard({ icon: Icon, title, description }: QuickActionCardProps) {
   return (
     <Card 
-      className="p-4 card-interactive glass-card cursor-pointer" 
+      className="p-5 card-interactive glass-card cursor-pointer" 
       onClick={() => console.log(`${title} clicked`)}
       data-testid={`card-action-${title.toLowerCase().replace(' ', '-')}`}
     >
-      <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-          <Icon className="h-5 w-5 text-primary" />
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+          <Icon className="h-6 w-6 text-primary" />
         </div>
-        <div>
-          <h4 className="font-semibold mb-1 text-foreground">{title}</h4>
-          <p className="text-sm text-muted-foreground">{description}</p>
+        <div className="flex-1">
+          <h4 className="font-bold text-base text-foreground mb-1">{title}</h4>
+          <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
         </div>
       </div>
     </Card>
