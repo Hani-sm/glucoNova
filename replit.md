@@ -58,6 +58,29 @@ Preferred communication style: Simple, everyday language.
   2. `/register?role=patient|doctor` - User enters credentials (role pre-selected via URL parameter)
   3. `/login` - User logs in after successful registration
 
+**First-Time User Onboarding:**
+- 640×460px glassmorphic modal with 4-step progress flow
+- Step 1: Welcome message with "Get Started" CTA
+- Step 2: PDF upload (drag-and-drop, browse), Demo Data option, or Manual Entry selection
+- Step 3: Manual entry form with validation (if selected from Step 2)
+- Step 4: Completion confirmation
+- **Validation Requirements**: Name, DOB, Weight (>0 kg), Height (>0 cm) enforced before progression
+- **Skip Functionality**: Users can skip onboarding; persistent banner reminds them to complete setup
+- **State Persistence**: localStorage keys 'onboardingCompleted' and 'onboardingSkipped'
+- **Accessibility**: Dialog includes VisuallyHidden title and description for screen readers
+- **Modal Control**: Cannot be dismissed by overlay/ESC - only via "Skip" button or completion
+
+**Dashboard Layout (Pixel-Perfect Specifications):**
+- Container: max-width 1400px, centered, 24px padding
+- Grid: Two columns (1fr + 360px) with 28px gap
+- Header: 72px height, 24px horizontal padding
+- Component Heights:
+  - MetricCard (glucose, insulin, carbs, activity): 110px
+  - GlucoseTrendChart: 360px with 12px border-radius
+  - AI Insulin Prediction card: 120px
+  - Voice Assistant card: 220px
+  - Progress/Quick Action cards: flexible height
+
 ### Backend Architecture
 
 **Technology Stack:**
