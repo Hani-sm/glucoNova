@@ -373,7 +373,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==================== FILE UPLOAD ROUTES ====================
   
-  app.post('/api/reports/upload', authWithApproval, upload.single('file'), async (req: AuthRequest, res) => {
+  app.post('/api/reports/upload', authWithApproval, upload.single('file'), async (req: AuthRequest, res: any) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
@@ -411,7 +411,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/reports', authWithApproval, async (req: AuthRequest, res) => {
+  app.get('/api/reports', authWithApproval, async (req: AuthRequest, res: any) => {
     try {
       const patientId = req.query.patientId as string || req.user!.userId;
       

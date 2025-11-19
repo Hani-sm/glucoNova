@@ -61,11 +61,7 @@ export const predictions = pgTable("predictions", {
   userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
   predictedInsulin: integer("predicted_insulin").notNull(),
   confidence: integer("confidence").notNull(),
-  factors: json("factors").$type<{
-    glucose: number;
-    carbs: number;
-    activityLevel: string;
-  }>().notNull(),
+  factors: json("factors").$type<string[]>().notNull(),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
 });
 
@@ -117,7 +113,6 @@ export const insertMedicalReportSchema = createInsertSchema(medicalReports, {
   description: z.string().optional(),
 }).omit({
   id: true,
-  userId: true,
   fileName: true,
   fileUrl: true,
   fileType: true,
@@ -129,11 +124,7 @@ export const insertMedicalReportSchema = createInsertSchema(medicalReports, {
 export const insertPredictionSchema = createInsertSchema(predictions, {
   predictedInsulin: z.coerce.number().min(0),
   confidence: z.coerce.number().min(0).max(1),
-  factors: z.object({
-    glucose: z.number(),
-    carbs: z.number(),
-    activityLevel: z.string(),
-  }),
+  factors: z.array(z.string()),
 }).omit({
   id: true,
   userId: true,
@@ -194,11 +185,7 @@ export interface Prediction {
   userId: string;
   predictedInsulin: number;
   confidence: number;
-  factors: {
-    glucose: number;
-    carbs: number;
-    activityLevel: string;
-  };
+  factors: string[];
   timestamp: Date;
 }
 
