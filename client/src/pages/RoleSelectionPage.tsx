@@ -13,7 +13,7 @@ export default function RoleSelectionPage() {
   return (
     <PublicLayout>
       <Card 
-        className="w-full max-w-[900px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-16 py-14 shadow-2xl"
+        className="w-full max-w-[1100px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-16 py-14 shadow-2xl"
       >
         <h1 className="text-[2.5rem] font-extrabold tracking-tight text-white text-center mb-4">GlucoNova</h1>
         <p className="text-[1.6rem] font-bold text-emerald-400 text-center mb-2">Select Your Role</p>
