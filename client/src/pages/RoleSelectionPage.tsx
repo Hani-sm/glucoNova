@@ -1,5 +1,4 @@
 import { useLocation, Link } from 'wouter';
-import PublicLayout from '@/components/PublicLayout';
 import { User, Stethoscope } from 'lucide-react';
 
 export default function RoleSelectionPage() {
@@ -10,9 +9,86 @@ export default function RoleSelectionPage() {
   };
 
   return (
-    <PublicLayout>
+    <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-6" style={{
+      background: 'linear-gradient(135deg, #0a1628 0%, #1a2332 50%, #0f1923 100%)'
+    }}>
+      {/* Animated Floating Teal Particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: `${Math.random() * 120 + 60}px`,
+              height: `${Math.random() * 120 + 60}px`,
+              background: `radial-gradient(circle, rgba(45, 212, 191, ${Math.random() * 0.15 + 0.05}) 0%, transparent 70%)`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `float ${Math.random() * 20 + 15}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 5}s`,
+              filter: 'blur(40px)'
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Wave Pattern Background - Full Width */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: '#2dd4bf', stopOpacity: 0.3 }} />
+              <stop offset="100%" style={{ stopColor: '#14b8a6', stopOpacity: 0.1 }} />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,100 Q250,50 500,100 T1000,100 T1500,100 T2000,100 L2000,0 L0,0 Z"
+            fill="url(#waveGradient)"
+            opacity="0.15"
+          >
+            <animate
+              attributeName="d"
+              dur="20s"
+              repeatCount="indefinite"
+              values="M0,100 Q250,50 500,100 T1000,100 T1500,100 T2000,100 L2000,0 L0,0 Z;
+                      M0,100 Q250,150 500,100 T1000,100 T1500,100 T2000,100 L2000,0 L0,0 Z;
+                      M0,100 Q250,50 500,100 T1000,100 T1500,100 T2000,100 L2000,0 L0,0 Z"
+            />
+          </path>
+          <path
+            d="M0,200 Q300,150 600,200 T1200,200 T1800,200 T2400,200 L2400,0 L0,0 Z"
+            fill="url(#waveGradient)"
+            opacity="0.1"
+          >
+            <animate
+              attributeName="d"
+              dur="25s"
+              repeatCount="indefinite"
+              values="M0,200 Q300,150 600,200 T1200,200 T1800,200 T2400,200 L2400,0 L0,0 Z;
+                      M0,200 Q300,250 600,200 T1200,200 T1800,200 T2400,200 L2400,0 L0,0 Z;
+                      M0,200 Q300,150 600,200 T1200,200 T1800,200 T2400,200 L2400,0 L0,0 Z"
+            />
+          </path>
+          <path
+            d="M0,300 Q400,250 800,300 T1600,300 T2400,300 T3200,300 L3200,0 L0,0 Z"
+            fill="url(#waveGradient)"
+            opacity="0.08"
+          >
+            <animate
+              attributeName="d"
+              dur="30s"
+              repeatCount="indefinite"
+              values="M0,300 Q400,250 800,300 T1600,300 T2400,300 T3200,300 L3200,0 L0,0 Z;
+                      M0,300 Q400,350 800,300 T1600,300 T2400,300 T3200,300 L3200,0 L0,0 Z;
+                      M0,300 Q400,250 800,300 T1600,300 T2400,300 T3200,300 L3200,0 L0,0 Z"
+            />
+          </path>
+        </svg>
+      </div>
+
+      {/* Main Glassmorphic Card */}
       <div 
-        className="w-full max-w-[1100px] mx-auto rounded-3xl p-14 backdrop-blur-xl shadow-2xl"
+        className="relative w-full max-w-[1100px] rounded-3xl p-14 backdrop-blur-xl shadow-2xl"
         style={{
           background: 'rgba(15, 25, 35, 0.6)',
           border: '1px solid rgba(45, 212, 191, 0.2)',
@@ -179,6 +255,23 @@ export default function RoleSelectionPage() {
           </Link>
         </div>
       </div>
-    </PublicLayout>
+
+      <style>{`
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0) translateX(0);
+          }
+          25% {
+            transform: translateY(-30px) translateX(20px);
+          }
+          50% {
+            transform: translateY(-10px) translateX(-20px);
+          }
+          75% {
+            transform: translateY(-40px) translateX(10px);
+          }
+        }
+      `}</style>
+    </div>
   );
 }
