@@ -21,8 +21,11 @@ function ProgressItem({ label, value, detail }: ProgressItemProps) {
 
 export default function ProgressCard() {
   return (
-    <Card className="p-6" data-testid="card-progress">
-      <h3 className="font-semibold mb-4">Goals & Streaks</h3>
+    <Card 
+      className="p-6 card-interactive glass-card" 
+      data-testid="card-progress"
+    >
+      <h3 className="font-semibold mb-4 text-foreground">Goals & Streaks</h3>
       <ProgressItem label="Days in Range" value={100} detail="3 Days – 100%" />
       <ProgressItem label="Weekly Logging" value={85} detail="85%" />
       <ProgressItem label="Activity Goal" value={70} detail="70%" />

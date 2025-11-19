@@ -10,7 +10,7 @@ interface QuickActionCardProps {
 export default function QuickActionCard({ icon: Icon, title, description }: QuickActionCardProps) {
   return (
     <Card 
-      className="p-4 hover-elevate cursor-pointer" 
+      className="p-4 card-interactive glass-card cursor-pointer" 
       onClick={() => console.log(`${title} clicked`)}
       data-testid={`card-action-${title.toLowerCase().replace(' ', '-')}`}
     >
@@ -19,7 +19,7 @@ export default function QuickActionCard({ icon: Icon, title, description }: Quic
           <Icon className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h4 className="font-semibold mb-1">{title}</h4>
+          <h4 className="font-semibold mb-1 text-foreground">{title}</h4>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
       </div>

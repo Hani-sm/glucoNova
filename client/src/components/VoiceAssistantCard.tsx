@@ -24,16 +24,19 @@ export default function VoiceAssistantCard({
   };
 
   return (
-    <Card className="p-4 flex flex-col" style={{ height: '220px', borderRadius: '12px' }} data-testid="card-voice-assistant">
-      <h3 className="font-semibold mb-3 text-base">{title}</h3>
+    <Card 
+      className="p-6 card-interactive glass-card flex flex-col" 
+      style={{ height: '220px' }} 
+      data-testid="card-voice-assistant"
+    >
+      <h3 className="font-semibold mb-3 text-base text-foreground">{title}</h3>
       <div className="flex flex-col items-center gap-3 flex-1 justify-center">
         <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
           <Mic className="h-8 w-8 text-primary" />
         </div>
         <p className="text-xs text-muted-foreground text-center">{subtitle}</p>
         <Button 
-          className={buttonVariant === 'default' ? 'bg-[#f97316] hover:bg-[#f97316]/90 text-white' : ''}
-          variant={buttonVariant}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
           onClick={handleVoiceInput}
           data-testid="button-voice-record"
           size="sm"

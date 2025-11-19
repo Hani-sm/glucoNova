@@ -190,8 +190,13 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
   return (
     <Dialog open={isOpen}>
       <DialogContent 
-        className="backdrop-blur-md bg-white/8 border border-white/15"
-        style={{ width: '640px', height: '460px', maxWidth: '90vw', borderRadius: '12px', padding: '28px' }}
+        className="glass-card"
+        style={{ 
+          width: '640px', 
+          height: '460px', 
+          maxWidth: '90vw', 
+          padding: '28px'
+        }}
         data-testid="dialog-onboarding"
       >
         <VisuallyHidden>
@@ -202,12 +207,12 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         {/* Progress Bar */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-white">Step {step} of 4</span>
+            <span className="text-sm font-medium text-foreground">Step {step} of 4</span>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={handleSkip}
-              className="text-xs text-gray-400 hover:text-white"
+              className="text-xs text-muted-foreground hover:text-foreground"
               data-testid="button-skip"
             >
               Skip for now
@@ -219,16 +224,16 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         {/* Step 1: Welcome */}
         {step === 1 && (
           <div className="flex flex-col items-center justify-center flex-1 text-center">
-            <div className="w-16 h-16 rounded-full bg-emerald-400/20 flex items-center justify-center mb-4">
-              <Check className="w-8 h-8 text-emerald-400" />
+            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+              <Check className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-3">Welcome to GlucoNova</h2>
-            <p className="text-gray-400 mb-8 max-w-md">
+            <h2 className="text-2xl font-bold mb-3 text-foreground">Welcome to GlucoNova</h2>
+            <p className="text-muted-foreground mb-8 max-w-md">
               We'll set up your account quickly. This will help us provide personalized health insights and AI-powered recommendations.
             </p>
             <Button 
               onClick={handleNextStep}
-              className="bg-emerald-400 hover:bg-emerald-500 text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
               data-testid="button-next-step"
             >
               Get Started
@@ -239,12 +244,12 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         {/* Step 2: Upload Health Records */}
         {step === 2 && !showParser && (
           <div className="flex flex-col flex-1">
-            <h2 className="text-xl font-bold text-white mb-2">Upload Health Records</h2>
-            <p className="text-sm text-gray-400 mb-4">Upload a PDF of your health summary to auto-extract your information</p>
+            <h2 className="text-xl font-bold mb-2 text-foreground">Upload Health Records</h2>
+            <p className="text-sm text-muted-foreground mb-4">Upload a PDF of your health summary to auto-extract your information</p>
             
             <div
               className={`flex-1 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-colors ${
-                isDragging ? 'border-emerald-400 bg-emerald-400/10' : 'border-white/20'
+                isDragging ? 'border-primary bg-primary/10' : 'border-border'
               }`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -253,10 +258,10 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
             >
               {uploadedFile ? (
                 <div className="flex items-center gap-3">
-                  <FileText className="w-8 h-8 text-emerald-400" />
+                  <FileText className="w-8 h-8 text-primary" />
                   <div>
-                    <p className="text-sm font-medium text-white">{uploadedFile.name}</p>
-                    <p className="text-xs text-gray-400">{(uploadedFile.size / 1024).toFixed(1)} KB</p>
+                    <p className="text-sm font-medium text-foreground">{uploadedFile.name}</p>
+                    <p className="text-xs text-muted-foreground">{(uploadedFile.size / 1024).toFixed(1)} KB</p>
                   </div>
                   <Button
                     variant="ghost"
@@ -269,9 +274,9 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                 </div>
               ) : (
                 <>
-                  <Upload className="w-12 h-12 text-gray-400 mb-3" />
-                  <p className="text-sm text-white mb-2">Drag and drop your PDF here</p>
-                  <p className="text-xs text-gray-400 mb-4">or</p>
+                  <Upload className="w-12 h-12 text-muted-foreground mb-3" />
+                  <p className="text-sm text-foreground mb-2">Drag and drop your PDF here</p>
+                  <p className="text-xs text-muted-foreground mb-4">or</p>
                   <label htmlFor="file-upload">
                     <Button variant="outline" size="sm" asChild data-testid="button-browse">
                       <span>Browse Files</span>
@@ -312,78 +317,78 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         {/* Step 2: Parser Results */}
         {step === 2 && showParser && (
           <div className="flex flex-col flex-1">
-            <h2 className="text-xl font-bold text-white mb-2">Confirm Your Information</h2>
-            <p className="text-sm text-gray-400 mb-4">Review and edit the extracted data</p>
+            <h2 className="text-xl font-bold mb-2 text-foreground">Confirm Your Information</h2>
+            <p className="text-sm text-muted-foreground mb-4">Review and edit the extracted data</p>
             
             <div className="flex-1 overflow-y-auto space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1">Name</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">Name</Label>
                   <Input
                     value={healthData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                    className="h-9 bg-secondary border-input text-foreground text-sm"
                     data-testid="input-name"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1">Date of Birth</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">Date of Birth</Label>
                   <Input
                     type="date"
                     value={healthData.dob}
                     onChange={(e) => handleInputChange('dob', e.target.value)}
-                    className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                    className="h-9 bg-secondary border-input text-foreground text-sm"
                     data-testid="input-dob"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1">Weight (kg)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">Weight (kg)</Label>
                   <Input
                     type="number"
                     value={healthData.weight}
                     onChange={(e) => handleInputChange('weight', e.target.value)}
-                    className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                    className="h-9 bg-secondary border-input text-foreground text-sm"
                     data-testid="input-weight"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1">Height (cm)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">Height (cm)</Label>
                   <Input
                     type="number"
                     value={healthData.height}
                     onChange={(e) => handleInputChange('height', e.target.value)}
-                    className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                    className="h-9 bg-secondary border-input text-foreground text-sm"
                     data-testid="input-height"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1">Last A1c (%)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">Last A1c (%)</Label>
                   <Input
                     type="number"
                     step="0.1"
                     value={healthData.lastA1c}
                     onChange={(e) => handleInputChange('lastA1c', e.target.value)}
-                    className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                    className="h-9 bg-secondary border-input text-foreground text-sm"
                     data-testid="input-a1c"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1">Typical Insulin (U)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">Typical Insulin (U)</Label>
                   <Input
                     type="number"
                     value={healthData.typicalInsulin}
                     onChange={(e) => handleInputChange('typicalInsulin', e.target.value)}
-                    className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                    className="h-9 bg-secondary border-input text-foreground text-sm"
                     data-testid="input-insulin"
                   />
                 </div>
               </div>
               <div>
-                <Label className="text-xs text-gray-400 mb-1">Medications</Label>
+                <Label className="text-xs text-muted-foreground mb-1">Medications</Label>
                 <Input
                   value={healthData.medications}
                   onChange={(e) => handleInputChange('medications', e.target.value)}
-                  className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                  className="h-9 bg-secondary border-input text-foreground text-sm"
                   data-testid="input-medications"
                 />
               </div>
@@ -391,7 +396,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
 
             <Button
               onClick={handleNextStep}
-              className="bg-emerald-400 hover:bg-emerald-500 text-white mt-4"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground mt-4"
               data-testid="button-confirm"
             >
               Confirm & Continue
@@ -402,67 +407,67 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         {/* Step 3: Manual Entry */}
         {step === 3 && (
           <div className="flex flex-col flex-1">
-            <h2 className="text-xl font-bold text-white mb-2">Enter Your Details</h2>
-            <p className="text-sm text-gray-400 mb-4">Fill in your health information manually</p>
+            <h2 className="text-xl font-bold mb-2 text-foreground">Enter Your Details</h2>
+            <p className="text-sm text-muted-foreground mb-4">Fill in your health information manually</p>
             
             <div className="flex-1 overflow-y-auto space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1">Name</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">Name</Label>
                   <Input
                     value={healthData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                    className="h-9 bg-secondary border-input text-foreground text-sm"
                     data-testid="input-manual-name"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1">Date of Birth</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">Date of Birth</Label>
                   <Input
                     type="date"
                     value={healthData.dob}
                     onChange={(e) => handleInputChange('dob', e.target.value)}
-                    className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                    className="h-9 bg-secondary border-input text-foreground text-sm"
                     data-testid="input-manual-dob"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1">Weight (kg)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">Weight (kg)</Label>
                   <Input
                     type="number"
                     value={healthData.weight}
                     onChange={(e) => handleInputChange('weight', e.target.value)}
-                    className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                    className="h-9 bg-secondary border-input text-foreground text-sm"
                     data-testid="input-manual-weight"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1">Height (cm)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">Height (cm)</Label>
                   <Input
                     type="number"
                     value={healthData.height}
                     onChange={(e) => handleInputChange('height', e.target.value)}
-                    className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                    className="h-9 bg-secondary border-input text-foreground text-sm"
                     data-testid="input-manual-height"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1">Typical Insulin (U)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">Typical Insulin (U)</Label>
                   <Input
                     type="number"
                     value={healthData.typicalInsulin}
                     onChange={(e) => handleInputChange('typicalInsulin', e.target.value)}
-                    className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                    className="h-9 bg-secondary border-input text-foreground text-sm"
                     placeholder="Daily units"
                     data-testid="input-manual-insulin"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-400 mb-1">Target Range</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">Target Range</Label>
                   <Input
                     value={healthData.targetRange}
                     onChange={(e) => handleInputChange('targetRange', e.target.value)}
-                    className="h-9 bg-white/5 border-white/10 text-white text-sm"
+                    className="h-9 bg-secondary border-input text-foreground text-sm"
                     placeholder="e.g., 70-180"
                     data-testid="input-manual-range"
                   />
@@ -472,7 +477,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
 
             <Button
               onClick={handleNextStep}
-              className="bg-emerald-400 hover:bg-emerald-500 text-white mt-4"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground mt-4"
               data-testid="button-next-manual"
             >
               Continue
@@ -483,16 +488,16 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         {/* Step 4: Finish */}
         {step === 4 && (
           <div className="flex flex-col items-center justify-center flex-1 text-center">
-            <div className="w-16 h-16 rounded-full bg-emerald-400/20 flex items-center justify-center mb-4">
-              <Check className="w-8 h-8 text-emerald-400" />
+            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+              <Check className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-3">All Set!</h2>
-            <p className="text-gray-400 mb-8 max-w-md">
+            <h2 className="text-2xl font-bold mb-3 text-foreground">All Set!</h2>
+            <p className="text-muted-foreground mb-8 max-w-md">
               Your account is ready. You can now access personalized health insights and AI-powered insulin predictions.
             </p>
             <Button 
               onClick={handleNextStep}
-              className="bg-emerald-400 hover:bg-emerald-500 text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
               data-testid="button-go-dashboard"
             >
               Go to Dashboard

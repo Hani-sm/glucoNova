@@ -44,9 +44,13 @@ export default function GlucoseTrendChart() {
   const [selectedRange, setSelectedRange] = useState<TimeRange>('24h');
 
   return (
-    <Card className="p-5" style={{ height: '360px', borderRadius: '12px' }} data-testid="card-glucose-trends">
+    <Card 
+      className="p-6 card-interactive glass-card" 
+      style={{ height: '360px' }} 
+      data-testid="card-glucose-trends"
+    >
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold">Glucose Trends</h2>
+        <h2 className="text-lg font-bold text-foreground">Glucose Trends</h2>
         <div className="flex gap-1 bg-secondary rounded-lg p-1">
           {timeRanges.map((range) => (
             <Button

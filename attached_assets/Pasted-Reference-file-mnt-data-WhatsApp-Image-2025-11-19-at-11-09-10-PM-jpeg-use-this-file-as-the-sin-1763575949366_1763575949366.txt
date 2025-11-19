@@ -1,0 +1,65 @@
+Reference: file:///mnt/data/WhatsApp Image 2025-11-19 at 11.09.10 PM.jpeg — use this file as the single source of truth for proportions, spacing, colors and the background.
+
+Goal: Recreate the GlucoNova patient dashboard exactly as in the reference (desktop view). Keep the background (dark navy, teal particles, wave-lines and glow) unchanged. Match the wider desktop aspect, card sizes, spacing, and visual weight from the reference. Produce a high-fidelity, production-ready dashboard layout (HTML/CSS or React + Tailwind if possible).
+
+Layout constraints:
+
+Page width: center main content with max-width: 1400px; margin: 0 auto; padding: 24px.
+
+Left sidebar: fixed width 240px, full height, glass style, icons + labels stacked.
+
+Header: fixed 72px height. Title centered-left, profile pill on the right.
+
+Main grid: two columns — main column (1fr) + right column (360px), gap: 28px.
+
+Card sizes & positions (match reference):
+
+Top metrics row (inside main column): four equal cards, each height: 110px, rounded corners (12px).
+
+Glucose Trends chart card: full width of main column, height: 360px, rounded corners 12px. Smooth line chart with teal stroke and translucent area fill.
+
+Right column widgets: widths fixed at 360px. Example heights: AI widget 120px, Voice Log 220px, Goals 160px.
+
+Quick Actions: full-width cards below chart spanning main column, each ~80–100px tall.
+
+Visual tokens (exact look):
+
+Background: do not change — match reference exactly.
+
+Primary card background: semi-opaque glass rgba(10,18,21,0.62) with backdrop-blur.
+
+Accent teal: #21C89B (icons, chart line, progress bars).
+
+Muted text: #9AA8A6. Headings near-white: #EAF6F3.
+
+Border radius: 12px–14px on cards. Subtle inner highlight and soft shadow for depth.
+
+Chart & data behavior:
+
+Smooth spline line with dots at points, dotted horizontal grid lines, x-axis times from 12 AM → 12 AM, y-axis 60–150 mg/dL. Use a gradient under the line (teal → transparent).
+
+Top stat cards: include small icon, large metric (e.g., 112 mg/dL), and a small pill (e.g. “In Range”, “No Data”). If no data show --.
+
+Microinteractions & accessibility:
+
+Card hover: subtle scale + soft teal glow. Focusable with visible focus ring. Modal/controls accessible by keyboard.
+
+Buttons: primary CTA teal with subtle shadow and keyboard focus outline.
+
+Responsive rules:
+
+Desktop: two-column grid as specified.
+
+Tablet/mobile: collapse to single column; sidebar collapses to icon-only or becomes a hamburger.
+
+Deliverables expected:
+
+A high-fidelity HTML/CSS or React + Tailwind layout that visually matches the reference (desktop).
+
+Tailwind class suggestions for grid and card sizes (example: max-w-[1400px] mx-auto px-6 grid grid-cols-[1fr_360px] gap-7, sidebar w-[240px], chart h-[360px]).
+
+Mocked data for top-stat cards, chart points and progress bars so the generator can render the same look.
+
+Optional (if supported): include a mock onboarding tooltip or modal stub (non-intrusive) that can be toggled for demo purposes — but do not alter the dashboard default state.
+
+Hard constraint reminder: Do not change the background image/particles/waves — only match layout widths, card sizes, spacing and details to reproduce the same dashboard design as in the referenced file.
