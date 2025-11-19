@@ -16,21 +16,21 @@ export default function RoleSelectionPage() {
   return (
     <PublicLayout>
       <Card 
-        className="w-full max-w-[1400px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-16 py-10 shadow-2xl"
+        className="w-full max-w-[1040px] backdrop-blur-md bg-white/8 border border-white/15 rounded-3xl px-12 py-12 shadow-2xl"
       >
-        <h1 className="text-[2.5rem] font-extrabold tracking-tight text-white text-center mb-2">GlucoNova</h1>
-        <p className="text-[1.5rem] font-bold text-emerald-400 text-center mb-1">Select Your Role</p>
-        <p className="text-base text-gray-300 text-center mb-8">Choose how you'll use GlucoNova</p>
+        <h1 className="text-[2.25rem] font-extrabold tracking-tight text-white text-center mb-3">GlucoNova</h1>
+        <p className="text-[1.4rem] font-bold text-emerald-400 text-center mb-2">Select Your Role</p>
+        <p className="text-[1.05rem] text-gray-300 text-center mb-10 leading-relaxed">Choose how you'll use GlucoNova</p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 my-8 max-w-[1200px] mx-auto">
+        <div className="flex flex-wrap justify-center gap-8 my-8">
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-12 pt-14 pb-12 w-full min-h-[360px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group hover:scale-105"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-10 lg:p-12 w-full max-w-[440px] min-h-[320px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group hover:scale-105"
             onClick={() => handleRoleSelect('patient')}
             onMouseEnter={() => setHoveredRole('patient')}
             onMouseLeave={() => setHoveredRole(null)}
             data-testid="card-role-patient"
           >
-            <div className="flex flex-col items-start text-left h-full gap-6">
+            <div className="flex flex-col items-start text-left h-full gap-8">
               <div className="flex flex-row items-center gap-4">
                 <div className="h-16 w-16 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
                   <User className="h-8 w-8 text-emerald-400" />
@@ -40,9 +40,9 @@ export default function RoleSelectionPage() {
                 </div>
               </div>
               
-              <h3 className="text-[1.65rem] font-bold text-white">Patient Account</h3>
+              <h3 className="text-[1.75rem] font-bold text-white leading-tight">Patient Account</h3>
               
-              <p className="text-base text-gray-300 leading-relaxed">
+              <p className="text-[1.05rem] text-gray-300 leading-7">
                 Manage your diabetes with AI-powered insights, track your health data, and receive personalized recommendations
               </p>
               
@@ -58,13 +58,13 @@ export default function RoleSelectionPage() {
           </Card>
 
           <Card 
-            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl px-12 pt-14 pb-12 w-full min-h-[360px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group hover:scale-105"
+            className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-10 lg:p-12 w-full max-w-[440px] min-h-[320px] hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 group hover:scale-105"
             onClick={() => handleRoleSelect('doctor')}
             onMouseEnter={() => setHoveredRole('doctor')}
             onMouseLeave={() => setHoveredRole(null)}
             data-testid="card-role-doctor"
           >
-            <div className="flex flex-col items-start text-left h-full gap-6">
+            <div className="flex flex-col items-start text-left h-full gap-8">
               <div className="flex flex-row items-center gap-4">
                 <div className="h-16 w-16 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center group-hover:bg-emerald-400/20 transition-colors">
                   <Stethoscope className="h-8 w-8 text-emerald-400" />
@@ -74,9 +74,9 @@ export default function RoleSelectionPage() {
                 </div>
               </div>
               
-              <h3 className="text-[1.65rem] font-bold text-white">Healthcare Provider</h3>
+              <h3 className="text-[1.75rem] font-bold text-white leading-tight">Healthcare Provider</h3>
               
-              <p className="text-base text-gray-300 leading-relaxed">
+              <p className="text-[1.05rem] text-gray-300 leading-7">
                 Access patient records, review health data, and provide remote care with comprehensive monitoring tools
               </p>
               
