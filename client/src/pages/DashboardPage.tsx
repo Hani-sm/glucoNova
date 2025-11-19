@@ -8,7 +8,7 @@ import ProgressCard from '@/components/ProgressCard';
 import QuickActionCard from '@/components/QuickActionCard';
 import OnboardingModal from '@/components/OnboardingModal';
 import OnboardingBanner from '@/components/OnboardingBanner';
-import { Droplet, Target, Utensils, Syringe, Heart, Pill, MessageCircle, FileText } from 'lucide-react';
+import { Droplet, Target, Utensils, Syringe, Heart, Pill, MessageCircle, FileText, Activity, Stethoscope, Thermometer, TestTube, Clipboard } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Link } from 'wouter';
@@ -143,16 +143,29 @@ export default function DashboardPage() {
     { id: 16, size: 17, left: 95, top: 82, duration: 24, delay: 4.2, xRange: -35, yRange: 38 },
   ];
 
-  // Uneven circular elements with varying opacity
+  // Uneven circular elements with varying opacity (reduced)
   const unevenCircles = [
-    { id: 1, size: 25, left: 30, top: 20, duration: 20, delay: 0, opacity: 0.08, xRange: 38, yRange: 45 },
-    { id: 2, size: 35, left: 70, top: 65, duration: 19, delay: 3, opacity: 0.32, xRange: -42, yRange: 48 },
-    { id: 3, size: 20, left: 18, top: 55, duration: 22, delay: 1.5, opacity: 0.06, xRange: 45, yRange: -40 },
-    { id: 4, size: 30, left: 85, top: 35, duration: 18, delay: 4, opacity: 0.25, xRange: -40, yRange: 46 },
-    { id: 5, size: 28, left: 50, top: 80, duration: 24, delay: 2.5, opacity: 0.15, xRange: 43, yRange: -42 },
-    { id: 6, size: 22, left: 12, top: 25, duration: 21, delay: 5, opacity: 0.1, xRange: -46, yRange: 50 },
-    { id: 7, size: 32, left: 60, top: 10, duration: 23, delay: 1, opacity: 0.28, xRange: 37, yRange: 41 },
-    { id: 8, size: 24, left: 92, top: 70, duration: 19, delay: 3.5, opacity: 0.12, xRange: -44, yRange: -47 },
+    { id: 1, size: 25, left: 30, top: 20, duration: 20, delay: 0, opacity: 0.04, xRange: 38, yRange: 45 },
+    { id: 2, size: 35, left: 70, top: 65, duration: 19, delay: 3, opacity: 0.15, xRange: -42, yRange: 48 },
+    { id: 3, size: 20, left: 18, top: 55, duration: 22, delay: 1.5, opacity: 0.03, xRange: 45, yRange: -40 },
+    { id: 4, size: 30, left: 85, top: 35, duration: 18, delay: 4, opacity: 0.12, xRange: -40, yRange: 46 },
+    { id: 5, size: 28, left: 50, top: 80, duration: 24, delay: 2.5, opacity: 0.08, xRange: 43, yRange: -42 },
+    { id: 6, size: 22, left: 12, top: 25, duration: 21, delay: 5, opacity: 0.05, xRange: -46, yRange: 50 },
+    { id: 7, size: 32, left: 60, top: 10, duration: 23, delay: 1, opacity: 0.14, xRange: 37, yRange: 41 },
+    { id: 8, size: 24, left: 92, top: 70, duration: 19, delay: 3.5, opacity: 0.06, xRange: -44, yRange: -47 },
+  ];
+
+  // Floating medical icons (white with low opacity)
+  const medicalIcons = [
+    { id: 1, Icon: Pill, left: 12, top: 15, duration: 22, delay: 0, xRange: 30, yRange: 40, rotation: 15 },
+    { id: 2, Icon: Syringe, left: 82, top: 25, duration: 25, delay: 2, xRange: -35, yRange: 38, rotation: -20 },
+    { id: 3, Icon: Heart, left: 25, top: 60, duration: 20, delay: 4, xRange: 32, yRange: -35, rotation: 10 },
+    { id: 4, Icon: Activity, left: 70, top: 80, duration: 23, delay: 1.5, xRange: -28, yRange: 42, rotation: -15 },
+    { id: 5, Icon: Droplet, left: 45, top: 35, duration: 21, delay: 3.5, xRange: 30, yRange: 35, rotation: 12 },
+    { id: 6, Icon: Stethoscope, left: 88, top: 55, duration: 24, delay: 5, xRange: -33, yRange: -40, rotation: -18 },
+    { id: 7, Icon: Thermometer, left: 18, top: 78, duration: 19, delay: 2.5, xRange: 35, yRange: 37, rotation: 8 },
+    { id: 8, Icon: TestTube, left: 55, top: 12, duration: 26, delay: 1, xRange: -30, yRange: 45, rotation: -12 },
+    { id: 9, Icon: Clipboard, left: 35, top: 88, duration: 20, delay: 4.5, xRange: 28, yRange: -38, rotation: 16 },
   ];
 
   return (
@@ -184,12 +197,12 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Small Floating Dots - Above waves */}
+        {/* Small Floating Dots - Above waves (reduced opacity) */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
           {floatingDots.map((dot) => (
             <div
               key={dot.id}
-              className="absolute rounded-full bg-primary/50"
+              className="absolute rounded-full bg-primary/30"
               style={{
                 width: `${dot.size}px`,
                 height: `${dot.size}px`,
@@ -219,6 +232,28 @@ export default function DashboardPage() {
               }}
             />
           ))}
+        </div>
+
+        {/* Floating Medical Icons - White with low opacity */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
+          {medicalIcons.map((item) => {
+            const Icon = item.Icon;
+            return (
+              <div
+                key={`icon-${item.id}`}
+                className="absolute text-white"
+                style={{
+                  left: `${item.left}%`,
+                  top: `${item.top}%`,
+                  opacity: 0.12,
+                  animation: `floatIcon${item.id} ${item.duration}s ease-in-out infinite`,
+                  animationDelay: `${item.delay}s`,
+                }}
+              >
+                <Icon className="w-6 h-6" />
+              </div>
+            );
+          })}
         </div>
 
         <AppSidebar />
@@ -397,19 +432,19 @@ export default function DashboardPage() {
           @keyframes floatDot${dot.id} {
             0%, 100% { 
               transform: translate3d(0, 0, 0); 
-              opacity: 0.4; 
+              opacity: 0.25; 
             }
             25% { 
               transform: translate3d(${dot.xRange * 0.4}px, ${dot.yRange * 0.4}px, 0); 
-              opacity: 0.5; 
+              opacity: 0.3; 
             }
             50% { 
               transform: translate3d(${dot.xRange}px, ${dot.yRange}px, 0); 
-              opacity: 0.6; 
+              opacity: 0.35; 
             }
             75% { 
               transform: translate3d(${dot.xRange * 0.6}px, ${dot.yRange * 0.7}px, 0); 
-              opacity: 0.48; 
+              opacity: 0.28; 
             }
           }
         `).join('\n')}
@@ -431,6 +466,27 @@ export default function DashboardPage() {
             75% { 
               transform: translate3d(${circle.xRange * 0.7}px, ${circle.yRange * 0.6}px, 0) scale(1.03); 
               opacity: ${circle.opacity * 1.2}; 
+            }
+          }
+        `).join('\n')}
+
+        ${medicalIcons.map((icon) => `
+          @keyframes floatIcon${icon.id} {
+            0%, 100% { 
+              transform: translate3d(0, 0, 0) rotate(${icon.rotation}deg); 
+              opacity: 0.12; 
+            }
+            25% { 
+              transform: translate3d(${icon.xRange * 0.4}px, ${icon.yRange * 0.3}px, 0) rotate(${icon.rotation + 5}deg); 
+              opacity: 0.15; 
+            }
+            50% { 
+              transform: translate3d(${icon.xRange}px, ${icon.yRange}px, 0) rotate(${icon.rotation - 8}deg); 
+              opacity: 0.18; 
+            }
+            75% { 
+              transform: translate3d(${icon.xRange * 0.6}px, ${icon.yRange * 0.7}px, 0) rotate(${icon.rotation + 3}deg); 
+              opacity: 0.14; 
             }
           }
         `).join('\n')}
