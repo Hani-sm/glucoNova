@@ -176,6 +176,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== PREDICTION ROUTES ====================
+  
+  app.post('/api/predictions/insulin', authMiddleware, roleMiddleware('patient'), async (req: AuthRequest, res) => {
+    try {
+      const userId = req.user!.userId;
+      
+      const recentHealthData = await storage.getHealthDataByUser(userId, 10);
+      const recentMeals = await storage.getMealsByUser(userId, 10);
+      
+      if (recentHealthData.length === 0) {
+        return res.status(400).json({ 
+          message: 'Insufficient health data for prediction. Please log at least one health entry first.' 
+        });
+      }
+
+      const latestData = recentHealthData[0];
+      const factors: string[] = [];
+      let predictedInsulin = 0;
+      
+      const baseConfidence = recentHealthData.length >= 5 ? 0.6 : 0.4;
+      let confidence = baseConfidence;
+
+      const avgGlucose = recentHealthData.reduce((sum, d) => sum + d.glucose, 0) / recentHealthData.length;
+      const avgInsulin = recentHealthData.reduce((sum, d) => sum + (d.insulin || 0), 0) / recentHealthData.length;
+      
+      const recentMealSlice = recentMeals.slice(0, 3);
+      const recentCarbs = recentMealSlice.length > 0 
+        ? recentMealSlice.reduce((sum, m) => sum + m.carbs, 0) / recentMealSlice.length
+        : 0;
+      const totalMealCount = recentMeals.length;
+
+      if (latestData.glucose > 180) {
+        const correctionFactor = (latestData.glucose - 180) / 50;
+        predictedInsulin += correctionFactor * 2;
+        factors.push(`High glucose level (${latestData.glucose} mg/dL) requires correction dose`);
+        if (recentHealthData.length >= 5) confidence += 0.1;
+      } else if (latestData.glucose < 100) {
+        factors.push(`Low glucose level (${latestData.glucose} mg/dL) - minimal insulin recommended`);
+        predictedInsulin = Math.max(0, predictedInsulin - 1);
+        if (recentHealthData.length >= 5) confidence += 0.05;
+      } else {
+        factors.push(`Normal glucose level (${latestData.glucose} mg/dL)`);
+        if (recentHealthData.length >= 5) confidence += 0.05;
+      }
+
+      if (recentCarbs > 0 && recentMealSlice.length > 0) {
+        const carbRatio = 15;
+        const carbInsulin = recentCarbs / carbRatio;
+        predictedInsulin += carbInsulin;
+        factors.push(`Recent carb intake (~${Math.round(recentCarbs)}g) requires ${carbInsulin.toFixed(1)} units`);
+        if (recentMealSlice.length >= 3) confidence += 0.15;
+      }
+
+      if (recentHealthData.length >= 3) {
+        if (latestData.activityLevel === 'high') {
+          predictedInsulin *= 0.85;
+          factors.push('High activity level - reducing insulin dose by 15%');
+          confidence += 0.05;
+        } else if (latestData.activityLevel === 'low') {
+          predictedInsulin *= 1.05;
+          factors.push('Low activity level - slightly increasing insulin dose');
+          confidence += 0.05;
+        }
+      }
+
+      if (avgInsulin > 0 && recentHealthData.length >= 7) {
+        const historicalWeight = 0.3;
+        predictedInsulin = predictedInsulin * (1 - historicalWeight) + avgInsulin * historicalWeight;
+        factors.push(`Historical average insulin (${avgInsulin.toFixed(1)} units) considered`);
+        confidence += 0.1;
+      }
+
+      predictedInsulin = Math.max(0, Math.round(predictedInsulin * 10) / 10);
+      
+      let maxConfidence = 0.5;
+      if (recentHealthData.length >= 5 && totalMealCount >= 2) {
+        maxConfidence = 0.7;
+      }
+      if (recentHealthData.length >= 10 && totalMealCount >= 5) {
+        maxConfidence = 0.85;
+      }
+      confidence = Math.min(maxConfidence, confidence);
+
+      const prediction = await storage.createPrediction(userId, {
+        predictedInsulin,
+        confidence,
+        factors,
+      });
+
+      res.status(201).json({ 
+        message: 'Insulin prediction generated successfully',
+        prediction: {
+          predictedInsulin: prediction.predictedInsulin,
+          confidence: prediction.confidence,
+          factors: prediction.factors,
+          timestamp: prediction.timestamp,
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || 'Failed to generate prediction' });
+    }
+  });
+
+  app.get('/api/predictions/latest', authMiddleware, roleMiddleware('patient', 'doctor'), async (req: AuthRequest, res) => {
+    try {
+      const userId = req.query.userId as string || req.user!.userId;
+      
+      if (req.user!.role === 'patient' && userId !== req.user!.userId) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const prediction = await storage.getLatestPrediction(userId);
+      res.json({ prediction });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || 'Failed to fetch latest prediction' });
+    }
+  });
+
+  app.get('/api/predictions', authMiddleware, roleMiddleware('patient', 'doctor'), async (req: AuthRequest, res) => {
+    try {
+      const userId = req.query.userId as string || req.user!.userId;
+      
+      if (req.user!.role === 'patient' && userId !== req.user!.userId) {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const predictions = await storage.getPredictionsByUser(userId);
+      res.json({ predictions });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || 'Failed to fetch predictions' });
+    }
+  });
+
   // ==================== ADMIN ROUTES ====================
   
   app.get('/api/admin/users', authMiddleware, roleMiddleware('admin'), async (req: AuthRequest, res) => {

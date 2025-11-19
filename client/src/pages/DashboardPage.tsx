@@ -7,11 +7,17 @@ import ProgressCard from '@/components/ProgressCard';
 import QuickActionCard from '@/components/QuickActionCard';
 import { Droplet, Target, Utensils, Syringe, Heart, Pill, MessageCircle, FileText } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Link } from 'wouter';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { queryClient, apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import { Sparkles } from 'lucide-react';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
 
   const { data: healthData, isLoading: isLoadingHealth } = useQuery({
     queryKey: ['/api/health-data'],
@@ -21,20 +27,47 @@ export default function DashboardPage() {
     queryKey: ['/api/meals'],
   });
 
-  const latestGlucose = healthData?.healthData?.[0]?.glucose || 0;
-  const latestInsulin = healthData?.healthData?.[0]?.insulin || 0;
+  const { data: latestPrediction, isLoading: isLoadingPrediction } = useQuery({
+    queryKey: ['/api/predictions/latest'],
+  });
+
+  const generatePredictionMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest('/api/predictions/insulin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/predictions/latest'] });
+      toast({
+        title: 'Prediction Generated',
+        description: 'Your insulin recommendation is ready',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Prediction Failed',
+        description: error.message || 'Unable to generate prediction',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const latestGlucose = healthData?.data?.[0]?.glucose || 0;
+  const latestInsulin = healthData?.data?.[0]?.insulin || 0;
   
-  const totalCarbs = mealsData?.meals?.reduce((sum: number, meal: any) => sum + (meal.carbs || 0), 0) || 0;
+  const totalCarbs = mealsData?.data?.reduce((sum: number, meal: any) => sum + (meal.carbs || 0), 0) || 0;
   
   const calculateTimeInRange = () => {
-    if (!healthData?.healthData || healthData.healthData.length === 0) return 0;
+    if (!healthData?.data || healthData.data.length === 0) return 0;
     
-    const inRangeCount = healthData.healthData.filter((entry: any) => {
+    const inRangeCount = healthData.data.filter((entry: any) => {
       const glucose = entry.glucose;
       return glucose >= 70 && glucose <= 180;
     }).length;
     
-    return Math.round((inRangeCount / healthData.healthData.length) * 100);
+    return Math.round((inRangeCount / healthData.data.length) * 100);
   };
   
   const timeInRange = calculateTimeInRange();
@@ -108,6 +141,75 @@ export default function DashboardPage() {
                   </div>
                   
                   <div className="space-y-4">
+                    <Card data-testid="card-insulin-prediction" className="relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-emerald-400/10 pointer-events-none" />
+                      <CardHeader className="relative">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="h-5 w-5 text-emerald-400" />
+                            <CardTitle className="text-lg">AI Insulin Prediction</CardTitle>
+                          </div>
+                        </div>
+                        <CardDescription>
+                          Get personalized insulin recommendations
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="relative space-y-4">
+                        {isLoadingPrediction ? (
+                          <p className="text-sm text-muted-foreground">Loading prediction...</p>
+                        ) : latestPrediction?.prediction ? (
+                          <div className="space-y-3">
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-3xl font-bold text-emerald-400">
+                                {latestPrediction.prediction.predictedInsulin.toFixed(1)}
+                              </span>
+                              <span className="text-sm text-muted-foreground">units</span>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Confidence</span>
+                                <span className="font-medium">
+                                  {(latestPrediction.prediction.confidence * 100).toFixed(0)}%
+                                </span>
+                              </div>
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-emerald-400"
+                                  style={{ width: `${latestPrediction.prediction.confidence * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                            {latestPrediction.prediction.factors && latestPrediction.prediction.factors.length > 0 && (
+                              <div className="space-y-2">
+                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                  Contributing Factors
+                                </p>
+                                <ul className="space-y-1">
+                                  {latestPrediction.prediction.factors.slice(0, 3).map((factor: string, index: number) => (
+                                    <li key={index} className="text-xs text-muted-foreground flex items-start gap-2">
+                                      <span className="text-emerald-400 mt-0.5">•</span>
+                                      <span className="flex-1">{factor}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">
+                            No prediction available yet. Generate your first prediction!
+                          </p>
+                        )}
+                        <Button
+                          data-testid="button-generate-prediction"
+                          onClick={() => generatePredictionMutation.mutate()}
+                          disabled={generatePredictionMutation.isPending}
+                          className="w-full"
+                        >
+                          {generatePredictionMutation.isPending ? 'Generating...' : 'Generate New Prediction'}
+                        </Button>
+                      </CardContent>
+                    </Card>
                     <VoiceAssistantCard
                       title="Voice Food Logging"
                       subtitle="Tap mic to log your meal"
