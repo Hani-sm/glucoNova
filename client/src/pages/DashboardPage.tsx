@@ -123,24 +123,24 @@ export default function DashboardPage() {
     '--sidebar-width-icon': '4rem',
   };
 
-  // Floating colorful dots - variety of medical/health colors
+  // Floating emerald green dots
   const floatingDots = [
-    { id: 1, size: 12, left: 15, top: 10, duration: 18, delay: 0, xRange: 28, yRange: 35, color: 'rgba(33, 200, 155, 0.3)' }, // Teal
-    { id: 2, size: 14, left: 85, top: 15, duration: 22, delay: 2, xRange: -32, yRange: 38, color: 'rgba(96, 165, 250, 0.3)' }, // Soft Blue
-    { id: 3, size: 16, left: 10, top: 70, duration: 20, delay: 4, xRange: 35, yRange: -30, color: 'rgba(167, 139, 250, 0.3)' }, // Purple
-    { id: 4, size: 13, left: 88, top: 75, duration: 24, delay: 1, xRange: -26, yRange: 33, color: 'rgba(251, 146, 60, 0.3)' }, // Warm Orange
-    { id: 5, size: 15, left: 5, top: 50, duration: 19, delay: 3, xRange: 30, yRange: -36, color: 'rgba(129, 140, 248, 0.3)' }, // Indigo
-    { id: 6, size: 14, left: 92, top: 45, duration: 21, delay: 5, xRange: -29, yRange: 34, color: 'rgba(34, 197, 94, 0.3)' }, // Green
-    { id: 7, size: 12, left: 20, top: 30, duration: 23, delay: 0.5, xRange: 33, yRange: 40, color: 'rgba(59, 130, 246, 0.3)' }, // Blue
-    { id: 8, size: 17, left: 78, top: 25, duration: 17, delay: 2.5, xRange: -34, yRange: -32, color: 'rgba(236, 72, 153, 0.3)' }, // Pink
-    { id: 9, size: 13, left: 12, top: 85, duration: 25, delay: 1.5, xRange: 27, yRange: 35, color: 'rgba(147, 197, 253, 0.3)' }, // Light Blue
-    { id: 10, size: 15, left: 90, top: 60, duration: 20, delay: 3.5, xRange: -31, yRange: 37, color: 'rgba(196, 181, 253, 0.3)' }, // Lavender
-    { id: 11, size: 14, left: 25, top: 88, duration: 22, delay: 4.5, xRange: 32, yRange: -35, color: 'rgba(45, 212, 191, 0.3)' }, // Cyan
-    { id: 12, size: 16, left: 82, top: 90, duration: 19, delay: 2.2, xRange: -28, yRange: 33, color: 'rgba(253, 186, 116, 0.3)' }, // Peach
-    { id: 13, size: 18, left: 40, top: 18, duration: 21, delay: 1.8, xRange: 30, yRange: 34, color: 'rgba(99, 102, 241, 0.3)' }, // Violet
-    { id: 14, size: 13, left: 65, top: 55, duration: 23, delay: 3.2, xRange: -33, yRange: -36, color: 'rgba(74, 222, 128, 0.3)' }, // Lime
-    { id: 15, size: 15, left: 8, top: 35, duration: 18, delay: 0.8, xRange: 26, yRange: 31, color: 'rgba(56, 189, 248, 0.3)' }, // Sky Blue
-    { id: 16, size: 17, left: 95, top: 82, duration: 24, delay: 4.2, xRange: -35, yRange: 38, color: 'rgba(244, 114, 182, 0.3)' }, // Rose
+    { id: 1, size: 12, left: 15, top: 10, duration: 18, delay: 0, xRange: 28, yRange: 35, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 2, size: 14, left: 85, top: 15, duration: 22, delay: 2, xRange: -32, yRange: 38, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 3, size: 16, left: 10, top: 70, duration: 20, delay: 4, xRange: 35, yRange: -30, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 4, size: 13, left: 88, top: 75, duration: 24, delay: 1, xRange: -26, yRange: 33, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 5, size: 15, left: 5, top: 50, duration: 19, delay: 3, xRange: 30, yRange: -36, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 6, size: 14, left: 92, top: 45, duration: 21, delay: 5, xRange: -29, yRange: 34, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 7, size: 12, left: 20, top: 30, duration: 23, delay: 0.5, xRange: 33, yRange: 40, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 8, size: 17, left: 78, top: 25, duration: 17, delay: 2.5, xRange: -34, yRange: -32, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 9, size: 13, left: 12, top: 85, duration: 25, delay: 1.5, xRange: 27, yRange: 35, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 10, size: 15, left: 90, top: 60, duration: 20, delay: 3.5, xRange: -31, yRange: 37, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 11, size: 14, left: 25, top: 88, duration: 22, delay: 4.5, xRange: 32, yRange: -35, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 12, size: 16, left: 82, top: 90, duration: 19, delay: 2.2, xRange: -28, yRange: 33, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 13, size: 18, left: 40, top: 18, duration: 21, delay: 1.8, xRange: 30, yRange: 34, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 14, size: 13, left: 65, top: 55, duration: 23, delay: 3.2, xRange: -33, yRange: -36, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 15, size: 15, left: 8, top: 35, duration: 18, delay: 0.8, xRange: 26, yRange: 31, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 16, size: 17, left: 95, top: 82, duration: 24, delay: 4.2, xRange: -35, yRange: 38, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
   ];
 
   // Uneven circular elements with emerald green (reduced size and opacity with blur)
