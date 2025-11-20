@@ -10,7 +10,8 @@ import {
   Mic, 
   Settings,
   Upload,
-  LogOut
+  LogOut,
+  FileText
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Link, useLocation } from 'wouter';
@@ -25,6 +26,7 @@ const menuItems = [
   { title: 'Insulin', icon: Droplet, url: '/insulin' },
   { title: 'Food AI', icon: Utensils, url: '/meals' },
   { title: 'Medications', icon: Pill, url: '/medications' },
+  { title: 'Medical Reports', icon: FileText, url: '/reports' },
   { title: 'Voice AI', icon: Mic, url: '/voice' },
 ];
 
