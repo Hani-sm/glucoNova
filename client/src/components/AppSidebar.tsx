@@ -220,50 +220,54 @@ export default function AppSidebar() {
         <div className="pt-4 mt-auto">
           <div className="flex gap-3 mb-3 justify-center">
             {/* Voice/Mic Button - Larger */}
-            <button
-              className="rounded-xl flex items-center justify-center transition-all duration-200"
-              style={{
-                width: '100px',
-                height: '64px',
-                background: 'rgba(10,18,21,0.6)',
-                boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.08), 0 6px 24px rgba(33,200,155,0.3)';
-                e.currentTarget.style.background = 'rgba(10,18,21,0.75)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)';
-                e.currentTarget.style.background = 'rgba(10,18,21,0.6)';
-              }}
-              data-testid="button-voice"
-              aria-label="Voice Assistant"
-            >
-              <Mic className="text-primary" style={{ width: '26px', height: '26px', strokeWidth: 2 }} />
-            </button>
+            <Link href="/voice">
+              <button
+                className="rounded-xl flex items-center justify-center transition-all duration-200"
+                style={{
+                  width: '100px',
+                  height: '64px',
+                  background: 'rgba(10,18,21,0.6)',
+                  boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.08), 0 6px 24px rgba(33,200,155,0.3)';
+                  e.currentTarget.style.background = 'rgba(10,18,21,0.75)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)';
+                  e.currentTarget.style.background = 'rgba(10,18,21,0.6)';
+                }}
+                data-testid="button-voice"
+                aria-label="Voice Assistant"
+              >
+                <Mic className="text-primary" style={{ width: '26px', height: '26px', strokeWidth: 2 }} />
+              </button>
+            </Link>
 
             {/* Upload/Share Button - Larger */}
-            <button
-              className="rounded-xl flex items-center justify-center transition-all duration-200"
-              style={{
-                width: '100px',
-                height: '64px',
-                background: 'rgba(10,18,21,0.6)',
-                boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.08), 0 6px 24px rgba(33,200,155,0.3)';
-                e.currentTarget.style.background = 'rgba(10,18,21,0.75)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)';
-                e.currentTarget.style.background = 'rgba(10,18,21,0.6)';
-              }}
-              data-testid="button-upload"
-              aria-label="Upload Report"
-            >
-              <Upload className="text-primary" style={{ width: '26px', height: '26px', strokeWidth: 2 }} />
-            </button>
+            <Link href="/reports">
+              <button
+                className="rounded-xl flex items-center justify-center transition-all duration-200"
+                style={{
+                  width: '100px',
+                  height: '64px',
+                  background: 'rgba(10,18,21,0.6)',
+                  boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.08), 0 6px 24px rgba(33,200,155,0.3)';
+                  e.currentTarget.style.background = 'rgba(10,18,21,0.75)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)';
+                  e.currentTarget.style.background = 'rgba(10,18,21,0.6)';
+                }}
+                data-testid="button-upload"
+                aria-label="Upload Report"
+              >
+                <Upload className="text-primary" style={{ width: '26px', height: '26px', strokeWidth: 2 }} />
+              </button>
+            </Link>
           </div>
 
           {/* Logout Link - Small Red Text Bottom-Left */}

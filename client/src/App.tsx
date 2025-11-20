@@ -13,6 +13,11 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import HealthDataPage from "@/pages/HealthDataPage";
 import MealLoggingPage from "@/pages/MealLoggingPage";
 import MedicalReportsPage from "@/pages/MedicalReportsPage";
+import DoctorsPage from "@/pages/DoctorsPage";
+import GlucosePage from "@/pages/GlucosePage";
+import InsulinPage from "@/pages/InsulinPage";
+import MedicationsPage from "@/pages/MedicationsPage";
+import VoiceAIPage from "@/pages/VoiceAIPage";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component, allowedRoles, requireApproval = true, ...rest }: any) {
@@ -99,6 +104,51 @@ function Router() {
           <ProtectedRoute 
             component={MedicalReportsPage}
             allowedRoles={['patient', 'doctor']}
+            {...params}
+          />
+        )}
+      </Route>
+      <Route path="/doctors">
+        {(params) => (
+          <ProtectedRoute 
+            component={DoctorsPage}
+            allowedRoles={['patient']}
+            {...params}
+          />
+        )}
+      </Route>
+      <Route path="/glucose">
+        {(params) => (
+          <ProtectedRoute 
+            component={GlucosePage}
+            allowedRoles={['patient']}
+            {...params}
+          />
+        )}
+      </Route>
+      <Route path="/insulin">
+        {(params) => (
+          <ProtectedRoute 
+            component={InsulinPage}
+            allowedRoles={['patient']}
+            {...params}
+          />
+        )}
+      </Route>
+      <Route path="/medications">
+        {(params) => (
+          <ProtectedRoute 
+            component={MedicationsPage}
+            allowedRoles={['patient']}
+            {...params}
+          />
+        )}
+      </Route>
+      <Route path="/voice">
+        {(params) => (
+          <ProtectedRoute 
+            component={VoiceAIPage}
+            allowedRoles={['patient']}
             {...params}
           />
         )}
