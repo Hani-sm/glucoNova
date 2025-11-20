@@ -96,7 +96,7 @@ export class DrizzleStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const isApproved = insertUser.role === 'admin';
+    const isApproved = true;
     
     const result = await db.insert(users).values({
       ...insertUser,

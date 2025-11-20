@@ -38,22 +38,6 @@ function ProtectedRoute({ component: Component, allowedRoles, requireApproval = 
     return <Redirect to="/login" />;
   }
 
-  if (requireApproval && !user.isApproved) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="max-w-md text-center">
-          <h1 className="text-2xl font-bold mb-4">Account Pending Approval</h1>
-          <p className="text-muted-foreground mb-4">
-            Your account is currently under review by our admin team. 
-            You will receive an email notification once your account has been approved.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            If you have any questions, please contact support.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Redirect to="/dashboard" />;

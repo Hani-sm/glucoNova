@@ -45,7 +45,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const token = generateToken(user._id, user.role, user.isApproved);
 
       res.status(201).json({
-        message: 'Registration successful. Awaiting admin approval.',
+        message: 'Registration successful. You can now login.',
         token,
         user: {
           id: user._id,
