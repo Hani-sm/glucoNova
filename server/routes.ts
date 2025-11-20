@@ -40,6 +40,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.createUser({
         ...validatedData,
         password: hashedPassword,
+        isApproved: true,
       });
 
       const token = generateToken(user._id, user.role, user.isApproved);
