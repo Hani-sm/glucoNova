@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/AppSidebar';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -60,22 +59,20 @@ export default function HealthDataPage() {
     createHealthDataMutation.mutate(data);
   };
 
-  const sidebarStyle = {
-    '--sidebar-width': '20rem',
-    '--sidebar-width-icon': '4rem',
-  };
-
   return (
-    <SidebarProvider style={sidebarStyle as React.CSSProperties}>
-      <div className="flex h-screen w-full">
-        <AppSidebar />
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <header className="flex items-center justify-between p-4 border-b border-border">
-            <SidebarTrigger data-testid="button-sidebar-toggle" />
-          </header>
-          
-          <main className="flex-1 overflow-y-auto p-6 space-y-6">
-            <div>
+    <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden">
+      <AppSidebar />
+      <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '320px' }}>
+        <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
+          <div className="flex items-center gap-4">
+            <Droplet className="w-6 h-6 text-primary" />
+            <h2 className="text-xl font-semibold">My Details</h2>
+          </div>
+        </header>
+        
+        <main className="flex-1 overflow-y-auto">
+          <div className="w-full" style={{ padding: '24px 32px' }}>
+            <div className="mb-6">
               <h1 className="text-3xl font-bold mb-1">Log Health Data</h1>
               <p className="text-muted-foreground">Track your glucose, insulin, and carbohydrate intake</p>
             </div>
@@ -259,9 +256,9 @@ export default function HealthDataPage() {
                 </div>
               </Card>
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
-    </SidebarProvider>
+    </div>
   );
 }
