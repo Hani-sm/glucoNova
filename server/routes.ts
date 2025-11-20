@@ -5,7 +5,7 @@ import path from "path";
 import { storage } from "./storage";
 import { authMiddleware, roleMiddleware, approvalMiddleware, authWithApproval, generateToken, type AuthRequest } from "./middleware/auth";
 import { hashPassword, comparePassword } from "./utils/password";
-import { insertUserSchema, loginSchema, healthDataSchema, mealSchema } from "@shared/schema";
+import { insertUserSchema, loginSchema, healthDataSchema, mealSchema, insertUserProfileSchema } from "@shared/schema";
 
 const upload = multer({
   dest: 'uploads/',
@@ -424,6 +424,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ reports });
     } catch (error: any) {
       res.status(500).json({ message: error.message || 'Failed to fetch reports' });
+    }
+  });
+
+  // User Profile Routes
+  app.post('/api/profile', authWithApproval, async (req: AuthRequest, res: any) => {
+    try {
+      // Check if profile already exists
+      const existing = await storage.getUserProfile(req.user!.userId);
+      if (existing) {
+        return res.status(409).json({ message: 'Profile already exists, use PUT to update' });
+      }
+
+      const validated = insertUserProfileSchema.parse(req.body);
+      const profile = await storage.createUserProfile(req.user!.userId, validated);
+      res.status(201).json({ profile });
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: 'Validation error', errors: error.errors });
+      }
+      res.status(500).json({ message: error.message || 'Failed to create profile' });
+    }
+  });
+
+  app.get('/api/profile', authWithApproval, async (req: AuthRequest, res: any) => {
+    try {
+      const profile = await storage.getUserProfile(req.user!.userId);
+      res.json({ profile });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || 'Failed to fetch profile' });
+    }
+  });
+
+  app.put('/api/profile', authWithApproval, async (req: AuthRequest, res: any) => {
+    try {
+      const validated = insertUserProfileSchema.partial().parse(req.body);
+      const profile = await storage.updateUserProfile(req.user!.userId, validated);
+      if (!profile) {
+        return res.status(404).json({ message: 'Profile not found' });
+      }
+      res.json({ profile });
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: 'Validation error', errors: error.errors });
+      }
+      res.status(500).json({ message: error.message || 'Failed to update profile' });
     }
   });
 

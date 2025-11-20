@@ -8,11 +8,14 @@ import {  type User,
   type InsertMedicalReport,
   type Prediction,
   type InsertPrediction,
+  type UserProfile,
+  type InsertUserProfile,
   users,
   healthData,
   meals,
   medicalReports,
   predictions,
+  userProfiles,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
@@ -48,6 +51,11 @@ export interface IStorage {
   createPrediction(userId: string, prediction: InsertPrediction): Promise<Prediction>;
   getPredictionsByUser(userId: string, limit?: number): Promise<Prediction[]>;
   getLatestPrediction(userId: string): Promise<Prediction | null>;
+  
+  // User profile operations
+  createUserProfile(userId: string, profile: InsertUserProfile): Promise<UserProfile>;
+  getUserProfile(userId: string): Promise<UserProfile | null>;
+  updateUserProfile(userId: string, profile: Partial<InsertUserProfile>): Promise<UserProfile | null>;
 }
 
 // Helper function to coerce nullable values
@@ -409,6 +417,104 @@ export class DrizzleStorage implements IStorage {
       confidence: record.confidence / 100,
       factors: record.factors,
       timestamp: record.timestamp,
+    };
+  }
+
+  // User Profile Methods
+  async createUserProfile(userId: string, profile: InsertUserProfile): Promise<UserProfile> {
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) throw new Error('Invalid user ID');
+    
+    const result = await db.insert(userProfiles).values({
+      userId: userIdNum,
+      dateOfBirth: profile.dateOfBirth || null,
+      weight: profile.weight?.toString() || null,
+      height: profile.height?.toString() || null,
+      lastA1c: profile.lastA1c?.toString() || null,
+      medications: profile.medications || null,
+      typicalInsulin: profile.typicalInsulin?.toString() || null,
+      targetRange: profile.targetRange || null,
+    }).returning();
+    
+    const record = result[0];
+    return {
+      _id: record.id.toString(),
+      userId: userId,
+      dateOfBirth: record.dateOfBirth || undefined,
+      weight: record.weight ? parseFloat(record.weight) : undefined,
+      height: record.height ? parseFloat(record.height) : undefined,
+      lastA1c: record.lastA1c ? parseFloat(record.lastA1c) : undefined,
+      medications: record.medications || undefined,
+      typicalInsulin: record.typicalInsulin ? parseFloat(record.typicalInsulin) : undefined,
+      targetRange: record.targetRange || undefined,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+    };
+  }
+
+  async getUserProfile(userId: string): Promise<UserProfile | null> {
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) return null;
+    
+    const result = await db.select()
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, userIdNum))
+      .limit(1);
+    
+    if (result.length === 0) return null;
+    
+    const record = result[0];
+    return {
+      _id: record.id.toString(),
+      userId: userId,
+      dateOfBirth: record.dateOfBirth || undefined,
+      weight: record.weight ? parseFloat(record.weight) : undefined,
+      height: record.height ? parseFloat(record.height) : undefined,
+      lastA1c: record.lastA1c ? parseFloat(record.lastA1c) : undefined,
+      medications: record.medications || undefined,
+      typicalInsulin: record.typicalInsulin ? parseFloat(record.typicalInsulin) : undefined,
+      targetRange: record.targetRange || undefined,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+    };
+  }
+
+  async updateUserProfile(userId: string, profile: Partial<InsertUserProfile>): Promise<UserProfile | null> {
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) return null;
+    
+    const updateData: any = {
+      updatedAt: new Date(),
+    };
+
+    if (profile.dateOfBirth !== undefined) updateData.dateOfBirth = profile.dateOfBirth || null;
+    if (profile.weight !== undefined) updateData.weight = profile.weight !== null && profile.weight !== undefined ? profile.weight.toString() : null;
+    if (profile.height !== undefined) updateData.height = profile.height !== null && profile.height !== undefined ? profile.height.toString() : null;
+    if (profile.lastA1c !== undefined) updateData.lastA1c = profile.lastA1c !== null && profile.lastA1c !== undefined ? profile.lastA1c.toString() : null;
+    if (profile.medications !== undefined) updateData.medications = profile.medications || null;
+    if (profile.typicalInsulin !== undefined) updateData.typicalInsulin = profile.typicalInsulin !== null && profile.typicalInsulin !== undefined ? profile.typicalInsulin.toString() : null;
+    if (profile.targetRange !== undefined) updateData.targetRange = profile.targetRange || null;
+    
+    const result = await db.update(userProfiles)
+      .set(updateData)
+      .where(eq(userProfiles.userId, userIdNum))
+      .returning();
+    
+    if (result.length === 0) return null;
+    
+    const record = result[0];
+    return {
+      _id: record.id.toString(),
+      userId: userId,
+      dateOfBirth: record.dateOfBirth || undefined,
+      weight: record.weight ? parseFloat(record.weight) : undefined,
+      height: record.height ? parseFloat(record.height) : undefined,
+      lastA1c: record.lastA1c ? parseFloat(record.lastA1c) : undefined,
+      medications: record.medications || undefined,
+      typicalInsulin: record.typicalInsulin ? parseFloat(record.typicalInsulin) : undefined,
+      targetRange: record.targetRange || undefined,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
     };
   }
 }

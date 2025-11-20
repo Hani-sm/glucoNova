@@ -65,6 +65,20 @@ export const predictions = pgTable("predictions", {
   timestamp: timestamp("timestamp").notNull().defaultNow(),
 });
 
+export const userProfiles = pgTable("user_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  dateOfBirth: varchar("date_of_birth", { length: 50 }),
+  weight: decimal("weight", { precision: 5, scale: 2 }),
+  height: decimal("height", { precision: 5, scale: 2 }),
+  lastA1c: decimal("last_a1c", { precision: 4, scale: 2 }),
+  medications: varchar("medications", { length: 500 }),
+  typicalInsulin: decimal("typical_insulin", { precision: 5, scale: 2 }),
+  targetRange: varchar("target_range", { length: 50 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // ==================== DRIZZLE-ZOD INSERT SCHEMAS ====================
 
 export const insertUserSchema = createInsertSchema(users, {
@@ -131,6 +145,21 @@ export const insertPredictionSchema = createInsertSchema(predictions, {
   timestamp: true,
 });
 
+export const insertUserProfileSchema = createInsertSchema(userProfiles, {
+  weight: z.coerce.number().positive().optional(),
+  height: z.coerce.number().positive().optional(),
+  lastA1c: z.coerce.number().positive().optional(),
+  typicalInsulin: z.coerce.number().positive().optional(),
+  dateOfBirth: z.string().optional(),
+  medications: z.string().optional(),
+  targetRange: z.string().optional(),
+}).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // ==================== TYPE EXPORTS ====================
 
 // API types (with _id as string for backward compatibility)
@@ -189,12 +218,27 @@ export interface Prediction {
   timestamp: Date;
 }
 
+export interface UserProfile {
+  _id: string;
+  userId: string;
+  dateOfBirth?: string;
+  weight?: number;
+  height?: number;
+  lastA1c?: number;
+  medications?: string;
+  typicalInsulin?: number;
+  targetRange?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type InsertHealthData = z.infer<typeof insertHealthDataSchema>;
 export type InsertMeal = z.infer<typeof insertMealSchema>;
 export type InsertMedicalReport = z.infer<typeof insertMedicalReportSchema>;
 export type InsertPrediction = z.infer<typeof insertPredictionSchema>;
+export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
 
 // Legacy schema names for backward compatibility
 export const healthDataSchema = insertHealthDataSchema;

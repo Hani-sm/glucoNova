@@ -70,6 +70,10 @@ export default function DashboardPage() {
     queryKey: ['/api/predictions/latest'],
   });
 
+  const { data: profileData, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ['/api/profile'],
+  });
+
   const generatePredictionMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest('/api/predictions/insulin', {
@@ -381,6 +385,61 @@ export default function DashboardPage() {
 
                   {/* Right Column - 360px wide */}
                   <div className="space-y-4">
+                    {/* Profile Summary Card */}
+                    {isLoadingProfile ? (
+                      <Card 
+                        data-testid="card-profile-loading" 
+                        className="p-5 glass-card relative overflow-visible"
+                        style={{ borderRadius: '12px' }}
+                      >
+                        <p className="text-sm text-muted-foreground">Loading profile...</p>
+                      </Card>
+                    ) : profileData?.profile && (
+                      <Card 
+                        data-testid="card-profile-summary" 
+                        className="p-5 glass-card relative overflow-visible"
+                        style={{ borderRadius: '12px' }}
+                      >
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <Activity className="h-5 w-5 text-primary" />
+                            <h3 className="font-bold text-base text-foreground">Health Profile</h3>
+                          </div>
+                          <Link href="/details">
+                            <Button variant="ghost" size="sm" data-testid="button-view-profile">
+                              View
+                            </Button>
+                          </Link>
+                        </div>
+                        <div className="space-y-3">
+                          {profileData.profile.weight && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">Weight</span>
+                              <span className="text-sm font-medium text-foreground">{profileData.profile.weight} kg</span>
+                            </div>
+                          )}
+                          {profileData.profile.height && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">Height</span>
+                              <span className="text-sm font-medium text-foreground">{profileData.profile.height} cm</span>
+                            </div>
+                          )}
+                          {profileData.profile.lastA1c && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">Last A1C</span>
+                              <span className="text-sm font-medium text-foreground">{profileData.profile.lastA1c}%</span>
+                            </div>
+                          )}
+                          {profileData.profile.typicalInsulin && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">Typical Insulin</span>
+                              <span className="text-sm font-medium text-foreground">{profileData.profile.typicalInsulin} U</span>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
+                    )}
+                    
                     <Card 
                       data-testid="card-insulin-prediction" 
                       className="p-5 card-interactive glass-card flex flex-col justify-between relative overflow-hidden" 

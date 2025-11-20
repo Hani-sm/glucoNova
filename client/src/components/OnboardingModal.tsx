@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
 import { Upload, FileText, X, Check, Activity, Droplet, Pill, Mic, Heart, Utensils } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -173,28 +174,54 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
       setStep(step + 1);
     } else {
       try {
-        // Save initial health data to the database
-        const response = await fetch('/api/health-data', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: JSON.stringify({
-            glucose: 100, // Default starting value
-            insulin: parseFloat(healthData.typicalInsulin) || 0,
-            carbs: 0,
-            activityLevel: 'moderate',
-            notes: `Initial profile: Weight ${healthData.weight}kg, Height ${healthData.height}cm, Last A1c ${healthData.lastA1c}, Medications: ${healthData.medications}`,
-          }),
-        });
+        const profileData = {
+          dateOfBirth: healthData.dob,
+          weight: parseFloat(healthData.weight),
+          height: parseFloat(healthData.height),
+          lastA1c: healthData.lastA1c ? parseFloat(healthData.lastA1c) : undefined,
+          medications: healthData.medications || undefined,
+          typicalInsulin: healthData.typicalInsulin ? parseFloat(healthData.typicalInsulin) : undefined,
+          targetRange: healthData.targetRange || undefined,
+        };
 
-        if (!response.ok) {
-          throw new Error('Failed to save initial health data');
+        // Save user profile data to the database
+        try {
+          const profileResponse = await apiRequest('/api/profile', {
+            method: 'POST',
+            body: JSON.stringify(profileData),
+          });
+          await profileResponse.json();
+        } catch (error: any) {
+          // If profile already exists (409), update it instead
+          if (error.message.includes('409')) {
+            const updateResponse = await apiRequest('/api/profile', {
+              method: 'PUT',
+              body: JSON.stringify(profileData),
+            });
+            await updateResponse.json();
+          } else {
+            throw error;
+          }
+        }
+
+        // Also save initial health data reading
+        try {
+          const healthResponse = await apiRequest('/api/health-data', {
+            method: 'POST',
+            body: JSON.stringify({
+              glucose: 100,
+              insulin: parseFloat(healthData.typicalInsulin) || 0,
+              carbs: 0,
+              activityLevel: 'moderate',
+              notes: 'Initial reading after onboarding',
+            }),
+          });
+          await healthResponse.json();
+        } catch (error) {
+          console.warn('Failed to save initial health reading:', error);
         }
 
         localStorage.setItem('onboardingCompleted', 'true');
-        localStorage.setItem('healthData', JSON.stringify(healthData));
         
         toast({
           title: 'Profile created successfully',
