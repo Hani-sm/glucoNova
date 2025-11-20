@@ -170,7 +170,7 @@ export default function DashboardPage() {
 
   return (
     <SidebarProvider style={sidebarStyle as React.CSSProperties}>
-      <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden">
+      <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden animate-in fade-in duration-300">
         
         {/* Animated Colorful Light Waves - Behind everything */}
         <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>

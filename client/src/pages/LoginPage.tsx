@@ -32,7 +32,8 @@ export default function LoginPage() {
         description: 'Welcome back to GlucoNova',
       });
       
-      window.location.href = '/dashboard';
+      // Use navigate for instant client-side routing (no page reload)
+      navigate('/dashboard');
     } catch (error: any) {
       toast({
         title: 'Login failed',
@@ -110,11 +111,16 @@ export default function LoginPage() {
 
           <Button 
             type="submit" 
-            className="w-full h-14 text-[1.1rem] bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-white font-bold transition-all duration-300 shadow-lg hover:shadow-emerald-500/30 mt-6" 
+            className="w-full h-14 text-[1.1rem] bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-white font-bold transition-all duration-300 shadow-lg hover:shadow-emerald-500/30 mt-6 relative" 
             disabled={isLoading} 
             data-testid="button-signin"
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                Signing in...
+              </span>
+            ) : 'Sign In'}
           </Button>
         </form>
 
