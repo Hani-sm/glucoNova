@@ -42,72 +42,81 @@ export default function AppSidebar() {
       .slice(0, 2);
   };
 
-  // Calculate time in range (mock for now)
   const timeInRange = 85;
 
   return (
     <>
       <aside 
-        className="fixed left-0 top-0 h-screen flex flex-col bg-[rgba(7,12,15,0.7)] backdrop-blur-sm shadow-[inset_1px_0_0_rgba(33,200,155,0.1),0_4px_16px_rgba(0,0,0,0.2)]"
+        className="fixed left-0 top-0 h-screen flex flex-col backdrop-blur-sm"
         style={{ 
           width: '240px',
+          padding: '24px',
           zIndex: 50,
-          background: 'radial-gradient(ellipse 120% 100% at 0% 50%, rgba(7,12,15,0.7) 0%, rgba(7,12,15,0.85) 50%, rgba(7,12,15,0.9) 100%)',
+          background: 'radial-gradient(ellipse 130% 100% at 0% 50%, rgba(7,12,15,0.68) 0%, rgba(7,12,15,0.78) 60%, rgba(7,12,15,0.88) 100%)',
+          boxShadow: 'inset 1px 0 0 rgba(33,200,155,0.08), 0 4px 24px rgba(0,0,0,0.3)',
         }}
         role="navigation"
         aria-label="Main sidebar"
       >
         {/* Scrollable content wrapper */}
-        <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/30 hover:scrollbar-thumb-primary/50">
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/30 hover:scrollbar-thumb-primary/50">
           
           {/* Header - Logo + App Name */}
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mb-5">
             <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg"
+              className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm"
               style={{
                 background: 'linear-gradient(135deg, #21C89B 0%, #16A085 100%)',
-                boxShadow: '0 0 20px rgba(33, 200, 155, 0.4)',
+                boxShadow: '0 4px 16px rgba(33, 200, 155, 0.35), 0 0 24px rgba(33, 200, 155, 0.15)',
               }}
             >
               GN
             </div>
-            <h1 className="text-lg font-bold text-white tracking-tight">GlucoNova</h1>
+            <h1 className="text-lg font-bold text-[#EAF6F3] tracking-tight">GlucoNova</h1>
           </div>
 
-          {/* User Profile Pill */}
+          {/* User Profile Card - Enhanced */}
           <div 
-            className="rounded-lg p-4 mb-6"
+            className="rounded-xl mb-6"
             style={{
+              padding: '16px',
               background: 'rgba(11,18,20,0.55)',
-              boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)',
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.4), 0 1px 2px rgba(33,200,155,0.05)',
+              borderRadius: '14px',
             }}
           >
-            <div className="flex items-center gap-3 mb-2">
-              <Avatar className="h-12 w-12 ring-2 ring-primary/20">
+            <div className="flex items-center gap-3 mb-3">
+              <Avatar 
+                className="h-12 w-12 ring-2 ring-primary/20"
+                style={{
+                  boxShadow: '0 8px 24px rgba(33,200,155,0.12)',
+                }}
+              >
                 <AvatarFallback 
-                  className="text-white font-semibold text-sm"
+                  className="text-white font-semibold"
                   style={{
                     background: 'linear-gradient(135deg, #21C89B 0%, #16A085 100%)',
+                    fontSize: '16px',
                   }}
                 >
                   {user?.name ? getInitials(user.name) : 'HS'}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-white text-sm truncate">
+                <p className="font-semibold text-[#EAF6F3] truncate" style={{ fontSize: '17px' }}>
                   {user?.name || 'Hanisha SM'}
                 </p>
-                <p className="text-xs text-[#9AA8A6]">Diabetes</p>
+                <p className="text-[#9AA8A6]" style={{ fontSize: '13px' }}>Diabetes</p>
               </div>
             </div>
-            <div className="text-xs">
+            <div style={{ fontSize: '13px' }}>
               <span className="text-[#9AA8A6]">In Range: </span>
               <span className="text-primary font-semibold">{timeInRange}%</span>
             </div>
           </div>
 
-          {/* Navigation Menu */}
-          <nav className="space-y-1">
+          {/* Navigation Menu - Enhanced Spacing & Sizing */}
+          <nav className="space-y-[2px]">
             {menuItems.map((item) => {
               const isActive = location === item.url;
               const Icon = item.icon;
@@ -118,9 +127,11 @@ export default function AppSidebar() {
                   href={item.url}
                 >
                   <button
-                    className="w-full flex items-center gap-4 py-3 px-2 rounded-md text-[#CAD6D4] hover:text-white transition-all duration-200 group relative"
+                    className="w-full flex items-center gap-4 rounded-lg text-[#9AA8A6] hover:text-[#EAF6F3] transition-all duration-150 group relative"
                     style={{
+                      padding: '12px',
                       backgroundColor: isActive ? 'rgba(33,200,155,0.08)' : 'transparent',
+                      color: isActive ? '#EAF6F3' : undefined,
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
@@ -135,31 +146,50 @@ export default function AppSidebar() {
                     data-testid={`link-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
                     aria-current={isActive ? 'page' : undefined}
                   >
-                    {/* Left accent bar on hover */}
+                    {/* Left accent bar - Rounded pill style */}
+                    {isActive && (
+                      <div 
+                        className="absolute left-0 top-1/2 -translate-y-1/2 bg-primary"
+                        style={{
+                          width: '6px',
+                          height: '32px',
+                          borderRadius: '0 4px 4px 0',
+                        }}
+                      />
+                    )}
+
+                    {/* Hover accent bar animation */}
                     <div 
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-0 bg-primary rounded-r transition-all duration-200 group-hover:h-8"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 bg-primary opacity-0 group-hover:opacity-100 transition-all duration-150"
                       style={{
-                        height: isActive ? '32px' : '0',
+                        width: isActive ? '0' : '6px',
+                        height: '32px',
+                        borderRadius: '0 4px 4px 0',
+                        transform: isActive ? 'translateX(-6px) translateY(-50%)' : 'translateY(-50%)',
                       }}
                     />
                     
-                    <Icon className="w-5 h-5 flex-shrink-0" />
-                    <span className="text-[15px] font-medium flex-1 text-left">{item.title}</span>
+                    <Icon className="flex-shrink-0" style={{ width: '22px', height: '22px', strokeWidth: 2 }} />
+                    <span className="font-medium flex-1 text-left" style={{ fontSize: '16px' }}>{item.title}</span>
                     
                     {/* Active indicator - white dot on right */}
                     {isActive && (
-                      <div className="w-2 h-2 rounded-full bg-white ml-auto" />
+                      <div 
+                        className="ml-auto rounded-full bg-white"
+                        style={{ width: '10px', height: '10px' }}
+                      />
                     )}
                   </button>
                 </Link>
               );
             })}
 
-            {/* Settings Item */}
+            {/* Settings Item - Same styling */}
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="w-full flex items-center gap-4 py-3 px-2 rounded-md text-[#CAD6D4] hover:text-white transition-all duration-200 group relative"
+              className="w-full flex items-center gap-4 rounded-lg text-[#9AA8A6] hover:text-[#EAF6F3] transition-all duration-150 group relative"
               style={{
+                padding: '12px',
                 backgroundColor: 'transparent',
               }}
               onMouseEnter={(e) => {
@@ -170,64 +200,83 @@ export default function AppSidebar() {
               }}
               data-testid="button-settings"
             >
-              {/* Left accent bar on hover */}
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-0 bg-primary rounded-r transition-all duration-200 group-hover:h-8" />
+              {/* Hover accent bar */}
+              <div 
+                className="absolute left-0 top-1/2 -translate-y-1/2 bg-primary opacity-0 group-hover:opacity-100 transition-all duration-150"
+                style={{
+                  width: '6px',
+                  height: '32px',
+                  borderRadius: '0 4px 4px 0',
+                }}
+              />
               
-              <Settings className="w-5 h-5 flex-shrink-0" />
-              <span className="text-[15px] font-medium flex-1 text-left">Settings</span>
+              <Settings className="flex-shrink-0" style={{ width: '22px', height: '22px', strokeWidth: 2 }} />
+              <span className="font-medium flex-1 text-left" style={{ fontSize: '16px' }}>Settings</span>
             </button>
           </nav>
         </div>
 
-        {/* Bottom Action Buttons - Fixed at bottom */}
-        <div className="px-6 pb-6 pt-4 border-t border-white/5">
-          <div className="flex gap-3 mb-4">
-            {/* Voice/Mic Button */}
+        {/* Bottom Action Buttons - Larger & Centered */}
+        <div className="pt-6 mt-auto">
+          <div className="flex gap-4 mb-4 justify-center">
+            {/* Voice/Mic Button - Larger */}
             <button
-              className="flex-1 h-12 rounded-lg flex items-center justify-center gap-2 transition-all duration-200"
+              className="rounded-xl flex items-center justify-center transition-all duration-200"
               style={{
-                background: 'rgba(33,200,155,0.1)',
-                boxShadow: '0 0 12px rgba(33,200,155,0.2)',
+                width: '100px',
+                height: '64px',
+                background: 'rgba(10,18,21,0.6)',
+                boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 20px rgba(33,200,155,0.4)';
+                e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.08), 0 6px 24px rgba(33,200,155,0.3)';
+                e.currentTarget.style.background = 'rgba(10,18,21,0.75)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 12px rgba(33,200,155,0.2)';
+                e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)';
+                e.currentTarget.style.background = 'rgba(10,18,21,0.6)';
               }}
               data-testid="button-voice"
               aria-label="Voice Assistant"
             >
-              <Mic className="w-5 h-5 text-primary" />
+              <Mic className="text-primary" style={{ width: '26px', height: '26px', strokeWidth: 2 }} />
             </button>
 
-            {/* Upload/Share Button */}
+            {/* Upload/Share Button - Larger */}
             <button
-              className="flex-1 h-12 rounded-lg flex items-center justify-center gap-2 transition-all duration-200"
+              className="rounded-xl flex items-center justify-center transition-all duration-200"
               style={{
-                background: 'rgba(33,200,155,0.1)',
-                boxShadow: '0 0 12px rgba(33,200,155,0.2)',
+                width: '100px',
+                height: '64px',
+                background: 'rgba(10,18,21,0.6)',
+                boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 20px rgba(33,200,155,0.4)';
+                e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.08), 0 6px 24px rgba(33,200,155,0.3)';
+                e.currentTarget.style.background = 'rgba(10,18,21,0.75)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 12px rgba(33,200,155,0.2)';
+                e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)';
+                e.currentTarget.style.background = 'rgba(10,18,21,0.6)';
               }}
               data-testid="button-upload"
               aria-label="Upload Report"
             >
-              <Upload className="w-5 h-5 text-primary" />
+              <Upload className="text-primary" style={{ width: '26px', height: '26px', strokeWidth: 2 }} />
             </button>
           </div>
 
-          {/* Logout Link */}
+          {/* Logout Link - Small Red Text Bottom-Left */}
           <button
             onClick={logout}
-            className="flex items-center gap-2 text-xs text-red-400 hover:text-red-300 transition-colors"
+            className="flex items-center gap-2 hover:text-red-300 transition-colors"
+            style={{
+              fontSize: '13px',
+              color: '#FF6B6B',
+            }}
             data-testid="button-logout"
           >
-            <LogOut className="w-3.5 h-3.5" />
+            <LogOut style={{ width: '14px', height: '14px' }} />
             <span>Logout</span>
           </button>
         </div>
