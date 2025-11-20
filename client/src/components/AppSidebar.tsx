@@ -116,7 +116,7 @@ export default function AppSidebar() {
           </div>
 
           {/* Navigation Menu - Enhanced Spacing & Sizing */}
-          <nav className="space-y-[1px]">
+          <nav className="space-y-1">
             {menuItems.map((item) => {
               const isActive = location === item.url;
               const Icon = item.icon;
@@ -129,7 +129,7 @@ export default function AppSidebar() {
                   <button
                     className="w-full flex items-center gap-4 rounded-lg text-[#9AA8A6] hover:text-[#EAF6F3] transition-all duration-150 group relative"
                     style={{
-                      padding: '10px 12px',
+                      padding: '12px',
                       backgroundColor: isActive ? 'rgba(33,200,155,0.08)' : 'transparent',
                       color: isActive ? '#EAF6F3' : undefined,
                     }}
@@ -189,7 +189,7 @@ export default function AppSidebar() {
               onClick={() => setIsSettingsOpen(true)}
               className="w-full flex items-center gap-4 rounded-lg text-[#9AA8A6] hover:text-[#EAF6F3] transition-all duration-150 group relative"
               style={{
-                padding: '10px 12px',
+                padding: '12px',
                 backgroundColor: 'transparent',
               }}
               onMouseEnter={(e) => {
