@@ -49,8 +49,8 @@ export default function AppSidebar() {
       <aside 
         className="fixed left-0 top-0 h-screen flex flex-col backdrop-blur-sm"
         style={{ 
-          width: '280px',
-          padding: '20px 20px 20px 20px',
+          width: '320px',
+          padding: '24px',
           zIndex: 50,
           background: 'radial-gradient(ellipse 130% 100% at 0% 50%, rgba(7,12,15,0.68) 0%, rgba(7,12,15,0.78) 60%, rgba(7,12,15,0.88) 100%)',
           boxShadow: 'inset 1px 0 0 rgba(33,200,155,0.08), 0 4px 24px rgba(0,0,0,0.3)',
