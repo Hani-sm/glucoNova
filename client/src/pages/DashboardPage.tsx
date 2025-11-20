@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/AppSidebar';
 import MetricCard from '@/components/MetricCard';
 import GlucoseTrendChart from '@/components/GlucoseTrendChart';
@@ -118,11 +117,6 @@ export default function DashboardPage() {
     return 'In Range';
   };
 
-  const sidebarStyle = {
-    '--sidebar-width': '240px',
-    '--sidebar-width-icon': '4rem',
-  };
-
   // Floating emerald green dots
   const floatingDots = [
     { id: 1, size: 12, left: 15, top: 10, duration: 18, delay: 0, xRange: 28, yRange: 35, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
@@ -169,8 +163,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <SidebarProvider style={sidebarStyle as React.CSSProperties}>
-      <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden animate-in fade-in duration-300">
+    <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden animate-in fade-in duration-300">
         
         {/* Animated Colorful Light Waves - Behind everything */}
         <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
@@ -263,7 +256,7 @@ export default function DashboardPage() {
         </div>
 
         <AppSidebar />
-        <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10 }}>
+        <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '240px' }}>
           {showBanner && (
             <OnboardingBanner 
               onResume={handleResumeSetup}
@@ -271,7 +264,9 @@ export default function DashboardPage() {
             />
           )}
           <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
-            <SidebarTrigger data-testid="button-sidebar-toggle" />
+            <div className="flex items-center gap-4">
+              <h2 className="text-xl font-semibold">Dashboard</h2>
+            </div>
           </header>
           
           <main className="flex-1 overflow-y-auto">
@@ -440,9 +435,8 @@ export default function DashboardPage() {
             </div>
           </main>
         </div>
-      </div>
 
-      <OnboardingModal
+        <OnboardingModal
         isOpen={showOnboarding}
         onClose={() => setShowOnboarding(false)}
         onComplete={handleOnboardingComplete}
@@ -546,6 +540,6 @@ export default function DashboardPage() {
           }
         }
       `}</style>
-    </SidebarProvider>
+    </div>
   );
 }
