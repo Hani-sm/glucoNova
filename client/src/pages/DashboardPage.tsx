@@ -270,8 +270,8 @@ export default function DashboardPage() {
           </header>
           
           <main className="flex-1 overflow-y-auto">
-            <div className="max-w-[1400px] mx-auto" style={{ padding: '24px' }}>
-            <div>
+            <div className="w-full" style={{ padding: '24px 32px' }}>
+            <div className="mb-6">
               <h1 className="text-3xl font-bold mb-1">Welcome back, {user?.name || 'User'}</h1>
               <p className="text-muted-foreground">Here's your health overview for today</p>
             </div>
