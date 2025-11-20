@@ -49,8 +49,8 @@ export default function AppSidebar() {
       <aside 
         className="fixed left-0 top-0 h-screen flex flex-col backdrop-blur-sm"
         style={{ 
-          width: '240px',
-          padding: '24px',
+          width: '280px',
+          padding: '20px 20px 20px 20px',
           zIndex: 50,
           background: 'radial-gradient(ellipse 130% 100% at 0% 50%, rgba(7,12,15,0.68) 0%, rgba(7,12,15,0.78) 60%, rgba(7,12,15,0.88) 100%)',
           boxShadow: 'inset 1px 0 0 rgba(33,200,155,0.08), 0 4px 24px rgba(0,0,0,0.3)',
@@ -62,9 +62,9 @@ export default function AppSidebar() {
         <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/30 hover:scrollbar-thumb-primary/50">
           
           {/* Header - Logo + App Name */}
-          <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-3 mb-4">
             <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm"
+              className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-white text-sm"
               style={{
                 background: 'linear-gradient(135deg, #21C89B 0%, #16A085 100%)',
                 boxShadow: '0 4px 16px rgba(33, 200, 155, 0.35), 0 0 24px rgba(33, 200, 155, 0.15)',
@@ -72,14 +72,14 @@ export default function AppSidebar() {
             >
               GN
             </div>
-            <h1 className="text-lg font-bold text-[#EAF6F3] tracking-tight">GlucoNova</h1>
+            <h1 className="text-xl font-bold text-[#EAF6F3] tracking-tight">GlucoNova</h1>
           </div>
 
           {/* User Profile Card - Enhanced */}
           <div 
-            className="rounded-xl mb-6"
+            className="rounded-xl mb-4"
             style={{
-              padding: '16px',
+              padding: '14px',
               background: 'rgba(11,18,20,0.55)',
               boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.4), 0 1px 2px rgba(33,200,155,0.05)',
               borderRadius: '14px',
@@ -116,7 +116,7 @@ export default function AppSidebar() {
           </div>
 
           {/* Navigation Menu - Enhanced Spacing & Sizing */}
-          <nav className="space-y-[2px]">
+          <nav className="space-y-[1px]">
             {menuItems.map((item) => {
               const isActive = location === item.url;
               const Icon = item.icon;
@@ -129,7 +129,7 @@ export default function AppSidebar() {
                   <button
                     className="w-full flex items-center gap-4 rounded-lg text-[#9AA8A6] hover:text-[#EAF6F3] transition-all duration-150 group relative"
                     style={{
-                      padding: '12px',
+                      padding: '10px 12px',
                       backgroundColor: isActive ? 'rgba(33,200,155,0.08)' : 'transparent',
                       color: isActive ? '#EAF6F3' : undefined,
                     }}
@@ -189,7 +189,7 @@ export default function AppSidebar() {
               onClick={() => setIsSettingsOpen(true)}
               className="w-full flex items-center gap-4 rounded-lg text-[#9AA8A6] hover:text-[#EAF6F3] transition-all duration-150 group relative"
               style={{
-                padding: '12px',
+                padding: '10px 12px',
                 backgroundColor: 'transparent',
               }}
               onMouseEnter={(e) => {
@@ -217,8 +217,8 @@ export default function AppSidebar() {
         </div>
 
         {/* Bottom Action Buttons - Larger & Centered */}
-        <div className="pt-6 mt-auto">
-          <div className="flex gap-4 mb-4 justify-center">
+        <div className="pt-4 mt-auto">
+          <div className="flex gap-3 mb-3 justify-center">
             {/* Voice/Mic Button - Larger */}
             <button
               className="rounded-xl flex items-center justify-center transition-all duration-200"

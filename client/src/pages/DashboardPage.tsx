@@ -256,7 +256,7 @@ export default function DashboardPage() {
         </div>
 
         <AppSidebar />
-        <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '240px' }}>
+        <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '280px' }}>
           {showBanner && (
             <OnboardingBanner 
               onResume={handleResumeSetup}
