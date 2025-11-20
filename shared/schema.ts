@@ -79,6 +79,17 @@ export const userProfiles = pgTable("user_profiles", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+export const medications = pgTable("medications", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  name: varchar("name", { length: 255 }).notNull(),
+  dosage: varchar("dosage", { length: 100 }).notNull(),
+  frequency: varchar("frequency", { length: 255 }).notNull(),
+  timing: varchar("timing", { length: 255 }),
+  category: varchar("category", { length: 255 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // ==================== DRIZZLE-ZOD INSERT SCHEMAS ====================
 
 export const insertUserSchema = createInsertSchema(users, {
@@ -161,6 +172,18 @@ export const insertUserProfileSchema = createInsertSchema(userProfiles, {
   updatedAt: true,
 });
 
+export const insertMedicationSchema = createInsertSchema(medications, {
+  name: z.string().min(1, "Medication name is required"),
+  dosage: z.string().min(1, "Dosage is required"),
+  frequency: z.string().min(1, "Frequency is required"),
+  timing: z.string().optional(),
+  category: z.string().optional(),
+}).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+});
+
 // ==================== TYPE EXPORTS ====================
 
 // API types (with _id as string for backward compatibility)
@@ -233,6 +256,17 @@ export interface UserProfile {
   updatedAt: Date;
 }
 
+export interface Medication {
+  _id: string;
+  userId: string;
+  name: string;
+  dosage: string;
+  frequency: string;
+  timing?: string;
+  category?: string;
+  createdAt: Date;
+}
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type LoginData = z.infer<typeof loginSchema>;
 export type InsertHealthData = z.infer<typeof insertHealthDataSchema>;
@@ -240,6 +274,7 @@ export type InsertMeal = z.infer<typeof insertMealSchema>;
 export type InsertMedicalReport = z.infer<typeof insertMedicalReportSchema>;
 export type InsertPrediction = z.infer<typeof insertPredictionSchema>;
 export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
+export type InsertMedication = z.infer<typeof insertMedicationSchema>;
 
 // Legacy schema names for backward compatibility
 export const healthDataSchema = insertHealthDataSchema;

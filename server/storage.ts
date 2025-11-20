@@ -10,12 +10,15 @@ import {  type User,
   type InsertPrediction,
   type UserProfile,
   type InsertUserProfile,
+  type Medication,
+  type InsertMedication,
   users,
   healthData,
   meals,
   medicalReports,
   predictions,
   userProfiles,
+  medications,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
@@ -56,6 +59,11 @@ export interface IStorage {
   createUserProfile(userId: string, profile: InsertUserProfile): Promise<UserProfile>;
   getUserProfile(userId: string): Promise<UserProfile | null>;
   updateUserProfile(userId: string, profile: Partial<InsertUserProfile>): Promise<UserProfile | null>;
+  
+  // Medication operations
+  createMedication(userId: string, medication: InsertMedication): Promise<Medication>;
+  getMedicationsByUser(userId: string): Promise<Medication[]>;
+  deleteMedication(userId: string, medicationId: string): Promise<boolean>;
 }
 
 // Helper function to coerce nullable values
@@ -516,6 +524,67 @@ export class DrizzleStorage implements IStorage {
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
     };
+  }
+
+  // Medication Methods
+  async createMedication(userId: string, medication: InsertMedication): Promise<Medication> {
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) throw new Error('Invalid user ID');
+    
+    const result = await db.insert(medications).values({
+      userId: userIdNum,
+      name: medication.name,
+      dosage: medication.dosage,
+      frequency: medication.frequency,
+      timing: medication.timing || null,
+      category: medication.category || null,
+    }).returning();
+    
+    const record = result[0];
+    return {
+      _id: record.id.toString(),
+      userId: userId,
+      name: record.name,
+      dosage: record.dosage,
+      frequency: record.frequency,
+      timing: record.timing || undefined,
+      category: record.category || undefined,
+      createdAt: record.createdAt,
+    };
+  }
+
+  async getMedicationsByUser(userId: string): Promise<Medication[]> {
+    const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) return [];
+    
+    const result = await db.select()
+      .from(medications)
+      .where(eq(medications.userId, userIdNum))
+      .orderBy(desc(medications.createdAt));
+    
+    return result.map(record => ({
+      _id: record.id.toString(),
+      userId: userId,
+      name: record.name,
+      dosage: record.dosage,
+      frequency: record.frequency,
+      timing: record.timing || undefined,
+      category: record.category || undefined,
+      createdAt: record.createdAt,
+    }));
+  }
+
+  async deleteMedication(userId: string, medicationId: string): Promise<boolean> {
+    const userIdNum = parseInt(userId);
+    const medIdNum = parseInt(medicationId);
+    
+    if (isNaN(userIdNum) || isNaN(medIdNum)) return false;
+    
+    const result = await db.delete(medications)
+      .where(eq(medications.id, medIdNum))
+      .returning();
+    
+    return result.length > 0;
   }
 }
 

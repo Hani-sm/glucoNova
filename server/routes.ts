@@ -5,7 +5,7 @@ import path from "path";
 import { storage } from "./storage";
 import { authMiddleware, roleMiddleware, approvalMiddleware, authWithApproval, generateToken, type AuthRequest } from "./middleware/auth";
 import { hashPassword, comparePassword } from "./utils/password";
-import { insertUserSchema, loginSchema, healthDataSchema, mealSchema, insertUserProfileSchema } from "@shared/schema";
+import { insertUserSchema, loginSchema, healthDataSchema, mealSchema, insertUserProfileSchema, insertMedicationSchema } from "@shared/schema";
 
 const upload = multer({
   dest: 'uploads/',
@@ -470,6 +470,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Validation error', errors: error.errors });
       }
       res.status(500).json({ message: error.message || 'Failed to update profile' });
+    }
+  });
+
+  // ==================== MEDICATION ROUTES ====================
+  
+  app.post('/api/medications', authWithApproval, async (req: AuthRequest, res: any) => {
+    try {
+      const validated = insertMedicationSchema.parse(req.body);
+      const medication = await storage.createMedication(req.user!.userId, validated);
+      res.status(201).json({ 
+        message: 'Medication added successfully',
+        medication 
+      });
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: 'Validation error', errors: error.errors });
+      }
+      res.status(500).json({ message: error.message || 'Failed to add medication' });
+    }
+  });
+
+  app.get('/api/medications', authWithApproval, async (req: AuthRequest, res: any) => {
+    try {
+      const medications = await storage.getMedicationsByUser(req.user!.userId);
+      res.json({ medications });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || 'Failed to fetch medications' });
+    }
+  });
+
+  app.delete('/api/medications/:id', authWithApproval, async (req: AuthRequest, res: any) => {
+    try {
+      const success = await storage.deleteMedication(req.user!.userId, req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: 'Medication not found' });
+      }
+      res.json({ message: 'Medication deleted successfully' });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || 'Failed to delete medication' });
     }
   });
 
