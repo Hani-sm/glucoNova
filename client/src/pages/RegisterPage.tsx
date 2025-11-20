@@ -54,7 +54,7 @@ export default function RegisterPage() {
       await register(name, email, password, role);
       toast({
         title: 'Registration successful',
-        description: 'Your account will be reviewed by our admin team',
+        description: 'Welcome to GlucoNova! Please login to get started.',
       });
       navigate('/login');
     } catch (error: any) {

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
-import { Upload, FileText, X, Check } from 'lucide-react';
+import { Upload, FileText, X, Check, Activity, Droplet, Pill, Mic, Heart, Utensils } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface OnboardingModalProps {
@@ -44,7 +44,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
   });
   const { toast } = useToast();
 
-  const progress = (step / 4) * 100;
+  const progress = (step / 5) * 100;
 
   const handleFileUpload = useCallback((file: File) => {
     if (file.type === 'application/pdf' || file.type === 'image/jpeg' || file.type === 'image/png') {
@@ -122,7 +122,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
 
   const handleManualEntry = () => {
     setShowParser(false);
-    setStep(3);
+    setStep(4);
   };
 
   const validateData = () => {
@@ -162,14 +162,14 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
   };
 
   const handleNextStep = async () => {
-    // Validate before moving from step 2 (parser) or step 3 (manual) to step 4
-    if ((step === 2 && showParser) || step === 3) {
+    // Validate before moving from step 3 (parser) or step 4 (manual) to step 5
+    if ((step === 3 && showParser) || step === 4) {
       if (!validateData()) {
         return;
       }
     }
     
-    if (step < 4) {
+    if (step < 5) {
       setStep(step + 1);
     } else {
       try {
@@ -241,7 +241,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         {/* Progress Bar */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-foreground">Step {step} of 4</span>
+            <span className="text-sm font-medium text-foreground">Step {step} of 5</span>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -263,20 +263,110 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
             </div>
             <h2 className="text-2xl font-bold mb-3 text-foreground">Welcome to GlucoNova</h2>
             <p className="text-muted-foreground mb-8 max-w-md">
-              We'll set up your account quickly. This will help us provide personalized health insights and AI-powered recommendations.
+              Your AI-powered diabetes management platform. Let's take a quick tour of what you can do!
             </p>
             <Button 
               onClick={handleNextStep}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
               data-testid="button-next-step"
             >
-              Get Started
+              Start Tour
             </Button>
           </div>
         )}
 
-        {/* Step 2: Upload Health Records */}
-        {step === 2 && !showParser && (
+        {/* Step 2: Features Walkthrough */}
+        {step === 2 && (
+          <div className="flex flex-col flex-1">
+            <h2 className="text-xl font-bold mb-2 text-foreground">Available Features</h2>
+            <p className="text-sm text-muted-foreground mb-4">Everything you need to manage your diabetes effectively</p>
+            
+            <div className="flex-1 overflow-y-auto space-y-3">
+              <Card className="p-3 bg-secondary/50 border-border">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Activity className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-sm text-foreground mb-1">Glucose Monitoring</h3>
+                    <p className="text-xs text-muted-foreground">Track your blood glucose levels with visual trends and insights</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-3 bg-secondary/50 border-border">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Droplet className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-sm text-foreground mb-1">AI Insulin Prediction</h3>
+                    <p className="text-xs text-muted-foreground">Get personalized insulin recommendations powered by AI</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-3 bg-secondary/50 border-border">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Utensils className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-sm text-foreground mb-1">Meal Tracking</h3>
+                    <p className="text-xs text-muted-foreground">Log meals manually or use voice input for easy tracking</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-3 bg-secondary/50 border-border">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Pill className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-sm text-foreground mb-1">Medication Management</h3>
+                    <p className="text-xs text-muted-foreground">Keep track of your medications and schedules</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-3 bg-secondary/50 border-border">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Heart className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-sm text-foreground mb-1">Doctor Collaboration</h3>
+                    <p className="text-xs text-muted-foreground">Share your data with your healthcare team securely</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-3 bg-secondary/50 border-border">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Mic className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-sm text-foreground mb-1">Voice Assistant</h3>
+                    <p className="text-xs text-muted-foreground">Log meals hands-free using voice commands</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            <Button
+              onClick={handleNextStep}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground mt-4"
+              data-testid="button-next-features"
+            >
+              Continue to Setup
+            </Button>
+          </div>
+        )}
+
+        {/* Step 3: Upload Health Records */}
+        {step === 3 && !showParser && (
           <div className="flex flex-col flex-1">
             <h2 className="text-xl font-bold mb-2 text-foreground">Upload Health Records</h2>
             <p className="text-sm text-muted-foreground mb-4">Upload a PDF of your health summary to auto-extract your information</p>
@@ -348,8 +438,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
           </div>
         )}
 
-        {/* Step 2: Parser Results */}
-        {step === 2 && showParser && (
+        {/* Step 3: Parser Results */}
+        {step === 3 && showParser && (
           <div className="flex flex-col flex-1">
             <h2 className="text-xl font-bold mb-2 text-foreground">Confirm Your Information</h2>
             <p className="text-sm text-muted-foreground mb-4">Review and edit the extracted data</p>
@@ -438,8 +528,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
           </div>
         )}
 
-        {/* Step 3: Manual Entry */}
-        {step === 3 && (
+        {/* Step 4: Manual Entry */}
+        {step === 4 && (
           <div className="flex flex-col flex-1">
             <h2 className="text-xl font-bold mb-2 text-foreground">Enter Your Details</h2>
             <p className="text-sm text-muted-foreground mb-4">Fill in your health information manually</p>
@@ -519,8 +609,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
           </div>
         )}
 
-        {/* Step 4: Finish */}
-        {step === 4 && (
+        {/* Step 5: Finish */}
+        {step === 5 && (
           <div className="flex flex-col items-center justify-center flex-1 text-center">
             <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
               <Check className="w-8 h-8 text-primary" />
