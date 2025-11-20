@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
 import { Upload, FileText, X, Check, Activity, Droplet, Pill, Mic, Heart, Utensils } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -222,6 +222,10 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         }
 
         localStorage.setItem('onboardingCompleted', 'true');
+        
+        // Invalidate all queries to refresh dashboard data
+        await queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+        await queryClient.invalidateQueries({ queryKey: ['/api/health-data'] });
         
         toast({
           title: 'Profile created successfully',
