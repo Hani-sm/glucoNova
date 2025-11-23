@@ -1,47 +1,57 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
+import { useQuery } from '@tanstack/react-query';
 
 const timeRanges = ['6h', '24h', '7d', '30d'] as const;
 type TimeRange = typeof timeRanges[number];
 
-const mockData: Record<TimeRange, Array<{ time: string; glucose: number }>> = {
-  '6h': [
-    { time: '12 AM', glucose: 95 },
-    { time: '2 AM', glucose: 88 },
-    { time: '4 AM', glucose: 92 },
-    { time: '6 AM', glucose: 105 },
-    { time: '8 AM', glucose: 118 },
-    { time: '10 AM', glucose: 112 },
-  ],
-  '24h': [
-    { time: '12 AM', glucose: 95 },
-    { time: '6 AM', glucose: 105 },
-    { time: '12 PM', glucose: 125 },
-    { time: '6 PM', glucose: 110 },
-    { time: '12 AM', glucose: 98 },
-  ],
-  '7d': [
-    { time: 'Mon', glucose: 108 },
-    { time: 'Tue', glucose: 112 },
-    { time: 'Wed', glucose: 105 },
-    { time: 'Thu', glucose: 118 },
-    { time: 'Fri', glucose: 102 },
-    { time: 'Sat', glucose: 115 },
-    { time: 'Sun', glucose: 110 },
-  ],
-  '30d': [
-    { time: 'Week 1', glucose: 110 },
-    { time: 'Week 2', glucose: 108 },
-    { time: 'Week 3', glucose: 112 },
-    { time: 'Week 4', glucose: 106 },
-  ],
-};
+function formatChartData(data: any[], range: TimeRange) {
+  if (!data || data.length === 0) return [];
+
+  const now = new Date();
+  const filtered = data.filter((item) => {
+    const itemDate = new Date(item.timestamp);
+    const diffMs = now.getTime() - itemDate.getTime();
+    const diffHours = diffMs / (1000 * 60 * 60);
+    const diffDays = diffHours / 24;
+
+    switch (range) {
+      case '6h':
+        return diffHours <= 6;
+      case '24h':
+        return diffHours <= 24;
+      case '7d':
+        return diffDays <= 7;
+      case '30d':
+        return diffDays <= 30;
+      default:
+        return true;
+    }
+  });
+
+  const sorted = [...filtered].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+  return sorted.map((item) => ({
+    time: new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    glucose: item.glucose,
+    timestamp: new Date(item.timestamp),
+  }));
+}
 
 export default function GlucoseTrendChart() {
   const [selectedRange, setSelectedRange] = useState<TimeRange>('24h');
+  const { data: healthData } = useQuery({
+    queryKey: ['/api/health-data'],
+  });
+
+  const chartData = useMemo(() => {
+    return formatChartData((healthData as any)?.data || [], selectedRange);
+  }, [healthData, selectedRange]);
+
+  const currentGlucose = chartData.length > 0 ? chartData[chartData.length - 1].glucose : 0;
 
   return (
     <Card 
@@ -72,7 +82,7 @@ export default function GlucoseTrendChart() {
 
       <div className="flex-1 mb-4">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={mockData[selectedRange]}>
+          <AreaChart data={chartData.length > 0 ? chartData : []}>
             <defs>
               <linearGradient id="glucoseGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
@@ -102,6 +112,8 @@ export default function GlucoseTrendChart() {
                 color: 'hsl(var(--foreground))'
               }}
             />
+            <ReferenceLine y={70} stroke="#FF6B6B" strokeDasharray="5 5" opacity={0.5} />
+            <ReferenceLine y={180} stroke="#FFB84D" strokeDasharray="5 5" opacity={0.5} />
             <Area 
               type="monotone" 
               dataKey="glucose" 
@@ -117,10 +129,10 @@ export default function GlucoseTrendChart() {
       <div className="flex items-center justify-between bg-secondary/50 rounded-lg px-4 py-3">
         <div className="flex items-center gap-3">
           <span className="text-sm text-muted-foreground font-medium">Current Status</span>
-          <span className="font-bold text-xl text-foreground">98 mg/dL</span>
+          <span className="font-bold text-xl text-foreground">{currentGlucose} mg/dL</span>
         </div>
         <Badge className="bg-primary/20 text-primary px-3 py-1" data-testid="badge-status">
-          Within Target
+          {currentGlucose < 70 ? 'Low' : currentGlucose > 180 ? 'High' : 'Within Target'}
         </Badge>
       </div>
     </Card>

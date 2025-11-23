@@ -9,17 +9,60 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
-import { FileText, Upload, Download, Eye } from 'lucide-react';
+import { FileText, Upload, Download, Eye, User, Mail, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+
+interface Report {
+  _id: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  fileUrl: string;
+  uploadedAt: string;
+  description?: string;
+  patientId: string;
+}
+
+interface PatientDetails {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  isApproved: boolean;
+  createdAt: string;
+}
 
 export default function MedicalReportsPage() {
   const { toast } = useToast();
   const { user } = useAuth();
   const [description, setDescription] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+  const [showPatientDetails, setShowPatientDetails] = useState(false);
 
-  const { data: reportsData, isLoading } = useQuery({
+  const { data: reportsData, isLoading } = useQuery<{ reports: Report[] }>({
     queryKey: ['/api/reports'],
+  });
+
+  // Fetch patient details for selected report
+  const { data: patientData, isLoading: isLoadingPatient } = useQuery<{ patient: PatientDetails; report: Report }>({
+    queryKey: ['/api/reports', selectedReportId, 'patient'],
+    enabled: !!selectedReportId && showPatientDetails,
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/reports/${selectedReportId}/patient`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch patient details');
+      }
+
+      return response.json();
+    },
   });
 
   const uploadMutation = useMutation({
@@ -116,10 +159,20 @@ export default function MedicalReportsPage() {
     }
   };
 
+  const handleViewPatientDetails = (reportId: string) => {
+    setSelectedReportId(reportId);
+    setShowPatientDetails(true);
+  };
+
+  const handleClosePatientDetails = () => {
+    setSelectedReportId(null);
+    setShowPatientDetails(false);
+  };
+
   return (
     <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden">
       <AppSidebar />
-      <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '320px' }}>
+      <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '280px' }}>
         <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
           <div className="flex items-center gap-4">
             <Upload className="w-6 h-6 text-primary" />
@@ -192,9 +245,9 @@ export default function MedicalReportsPage() {
 
                 {isLoading ? (
                   <p className="text-sm text-muted-foreground text-center py-8">Loading reports...</p>
-                ) : reportsData?.reports?.length > 0 ? (
+                ) : (reportsData && reportsData.reports && reportsData.reports.length > 0) ? (
                   <div className="space-y-3">
-                    {reportsData.reports.map((report: any) => (
+                    {reportsData!.reports.map((report: Report) => (
                       <div
                         key={report._id}
                         className="p-4 rounded-lg bg-secondary/50 space-y-3"
@@ -227,6 +280,15 @@ export default function MedicalReportsPage() {
                           <Button
                             size="sm"
                             variant="outline"
+                            onClick={() => handleViewPatientDetails(report._id)}
+                            data-testid={`button-patient-details-${report._id}`}
+                          >
+                            <User className="h-4 w-4 mr-2" />
+                            Patient Info
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
                             onClick={() => handleDownload(report.fileUrl, report.fileName)}
                             data-testid={`button-download-${report._id}`}
                           >
@@ -255,6 +317,84 @@ export default function MedicalReportsPage() {
                 )}
               </Card>
             </div>
+
+            {/* Patient Details Modal */}
+            {showPatientDetails && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <Card className="p-6 max-w-md w-full">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                        <User className="h-5 w-5 text-primary" />
+                      </div>
+                      <h2 className="text-xl font-bold">Patient Details</h2>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClosePatientDetails}
+                      data-testid="button-close-patient-details"
+                    >
+                      ×
+                    </Button>
+                  </div>
+
+                  {isLoadingPatient ? (
+                    <p className="text-sm text-muted-foreground text-center py-8">Loading patient details...</p>
+                  ) : patientData ? (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium">Name:</span>
+                          <span className="text-muted-foreground">{patientData.patient.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Mail className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium">Email:</span>
+                          <span className="text-muted-foreground">{patientData.patient.email}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Badge variant={patientData.patient.role === 'patient' ? 'default' : 'secondary'}>
+                            {patientData.patient.role.charAt(0).toUpperCase() + patientData.patient.role.slice(1)}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium">Member Since:</span>
+                          <span className="text-muted-foreground">
+                            {new Date(patientData.patient.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="font-medium">Account Status:</span>
+                          <Badge variant={patientData.patient.isApproved ? 'default' : 'destructive'}>
+                            {patientData.patient.isApproved ? 'Approved' : 'Pending'}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      <div className="pt-4 border-t border-border">
+                        <h3 className="text-sm font-semibold mb-2">Report Information</h3>
+                        <div className="space-y-1 text-sm text-muted-foreground">
+                          <p><span className="font-medium">File:</span> {patientData.report.fileName}</p>
+                          <p><span className="font-medium">Type:</span> {patientData.report.fileType}</p>
+                          <p><span className="font-medium">Uploaded:</span> {new Date(patientData.report.uploadedAt).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-muted-foreground italic pt-4 border-t border-border">
+                        Note: For security reasons, patient credentials (passwords) are not displayed.
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-8">
+                      Failed to load patient details. Please try again.
+                    </p>
+                  )}
+                </Card>
+              </div>
+            )}
           </div>
         </main>
       </div>

@@ -11,29 +11,75 @@ import {
   Settings,
   Upload,
   LogOut,
-  FileText
+  FileText,
+  TrendingUp,
+  Bell,
+  MessageCircle,
+  Calendar,
+  Camera,
+  Zap
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/lib/auth-context';
 import SettingsDrawer from '@/components/SettingsDrawer';
 
-const menuItems = [
-  { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard' },
-  { title: 'My Details', icon: User, url: '/health-data' },
+// Patient navigation menu items - Complete feature set
+const patientMenuItems = [
+  { title: 'Overview', icon: LayoutDashboard, url: '/dashboard' },
+  { title: 'Glucose Monitoring', icon: Activity, url: '/glucose' },
+  { title: 'Insulin & Medication', icon: Droplet, url: '/insulin' },
+  { title: 'Food & Nutrition', icon: Utensils, url: '/meals' },
+  { title: 'Activity & Lifestyle', icon: TrendingUp, url: '/activity' },
+  { title: 'AI Insights', icon: Zap, url: '/ai-insights' },
+  { title: 'Reports & Progress', icon: FileText, url: '/reports' },
+  { title: 'Alerts & Notifications', icon: Bell, url: '/alerts' },
+  { title: 'Messages / Chat', icon: MessageCircle, url: '/messages' },
+  { title: 'Appointments', icon: Calendar, url: '/appointments' },
+  { title: 'Documents & OCR', icon: Camera, url: '/documents' },
   { title: 'My Doctors', icon: Heart, url: '/doctors' },
-  { title: 'Glucose', icon: Activity, url: '/glucose' },
-  { title: 'Insulin', icon: Droplet, url: '/insulin' },
-  { title: 'Food AI', icon: Utensils, url: '/meals' },
-  { title: 'Medications', icon: Pill, url: '/medications' },
-  { title: 'Medical Reports', icon: FileText, url: '/reports' },
   { title: 'Voice AI', icon: Mic, url: '/voice' },
+];
+
+// Doctor navigation menu items - Complete clinical feature set
+const doctorMenuItems = [
+  { title: 'Dashboard Overview', icon: LayoutDashboard, url: '/dashboard' },
+  { title: 'Patient Directory', icon: User, url: '/patients' },
+  { title: 'Patient Details', icon: FileText, url: '/patient-details' },
+  { title: 'Clinical Alerts', icon: Bell, url: '/alerts' },
+  { title: 'AI Insights & Risk', icon: Zap, url: '/ai-insights' },
+  { title: 'Treatment Plans', icon: Pill, url: '/treatment-plans' },
+  { title: 'Reports & Analytics', icon: TrendingUp, url: '/reports' },
+  { title: 'Messages', icon: MessageCircle, url: '/messages' },
+  { title: 'Appointments', icon: Calendar, url: '/appointments' },
+  { title: 'Documents & OCR', icon: Camera, url: '/documents' },
+];
+
+const adminMenuItems = [
+  { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard' },
+  { title: 'Users', icon: User, url: '/users' },
+  { title: 'Reports', icon: FileText, url: '/reports' },
+  { title: 'Settings', icon: Settings, url: '/settings' },
 ];
 
 export default function AppSidebar() {
   const { user, logout } = useAuth();
   const [location] = useLocation();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Determine which menu items to show based on user role
+  const menuItems = user?.role === 'doctor' 
+    ? doctorMenuItems 
+    : user?.role === 'admin' 
+    ? adminMenuItems 
+    : patientMenuItems;
+
+  // Debug log to verify menu items
+  console.log('AppSidebar - User:', user);
+  console.log('AppSidebar - User Role:', user?.role);
+  console.log('AppSidebar - Menu Items Count:', menuItems.length);
+  console.log('AppSidebar - Menu Items:', menuItems);
+  console.log('AppSidebar - About to render', menuItems.length, 'menu items');
 
   const getInitials = (name: string) => {
     return name
@@ -44,245 +90,290 @@ export default function AppSidebar() {
       .slice(0, 2);
   };
 
+  // Comprehensive sidebar with all medical features
   const timeInRange = 85;
 
   return (
     <>
       <aside 
-        className="fixed left-0 top-0 h-screen flex flex-col backdrop-blur-sm"
+        className="fixed left-0 top-0 h-screen flex flex-col"
         style={{ 
-          width: '320px',
-          padding: '24px',
-          zIndex: 50,
-          background: 'radial-gradient(ellipse 130% 100% at 0% 50%, rgba(7,12,15,0.68) 0%, rgba(7,12,15,0.78) 60%, rgba(7,12,15,0.88) 100%)',
-          boxShadow: 'inset 1px 0 0 rgba(33,200,155,0.08), 0 4px 24px rgba(0,0,0,0.3)',
+          width: '280px',
+          padding: '0',
+          zIndex: 100,
+          background: 'linear-gradient(180deg, #1a2332 0%, #0f1419 100%)',
+          boxShadow: '4px 0 20px rgba(0, 0, 0, 0.15)',
+          borderRight: '1px solid rgba(33, 200, 155, 0.1)',
+          display: 'flex',
+          position: 'fixed',
         }}
         role="navigation"
         aria-label="Main sidebar"
+        data-sidebar-version="v2.0-redesigned"
       >
         {/* Scrollable content wrapper */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/30 hover:scrollbar-thumb-primary/50">
+        <div className="flex-1" style={{ minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
           
           {/* Header - Logo + App Name */}
-          <div className="flex items-center gap-3 mb-4">
+          <div 
+            className="flex items-center gap-3" 
+            style={{ 
+              flexShrink: 0,
+              padding: '32px 24px 24px',
+              borderBottom: '1px solid rgba(33, 200, 155, 0.1)',
+              backgroundColor: 'rgba(33, 200, 155, 0.05)',
+            }}
+          >
             <div 
-              className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-white text-sm"
+              className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white text-base"
               style={{
                 background: 'linear-gradient(135deg, #21C89B 0%, #16A085 100%)',
-                boxShadow: '0 4px 16px rgba(33, 200, 155, 0.35), 0 0 24px rgba(33, 200, 155, 0.15)',
+                boxShadow: '0 4px 20px rgba(33, 200, 155, 0.4), 0 0 30px rgba(33, 200, 155, 0.2)',
               }}
             >
               GN
             </div>
-            <h1 className="text-xl font-bold text-[#EAF6F3] tracking-tight">GlucoNova</h1>
+            <div>
+              <h1 className="text-xl font-bold text-white tracking-tight">GlucoNova</h1>
+              <p className="text-xs text-primary" style={{ marginTop: '2px' }}>v2.0 Redesigned</p>
+            </div>
           </div>
 
           {/* User Profile Card - Enhanced */}
           <div 
-            className="rounded-xl mb-4"
+            className="rounded-xl"
             style={{
-              padding: '14px',
-              background: 'rgba(11,18,20,0.55)',
-              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.4), 0 1px 2px rgba(33,200,155,0.05)',
-              borderRadius: '14px',
+              margin: '24px 16px',
+              padding: '20px',
+              background: 'rgba(33, 200, 155, 0.08)',
+              border: '1px solid rgba(33, 200, 155, 0.15)',
+              borderRadius: '16px',
+              flexShrink: 0,
             }}
           >
             <div className="flex items-center gap-3 mb-3">
               <Avatar 
-                className="h-12 w-12 ring-2 ring-primary/20"
+                className="h-12 w-12 ring-2 ring-primary/30"
                 style={{
-                  boxShadow: '0 8px 24px rgba(33,200,155,0.12)',
+                  boxShadow: '0 4px 12px rgba(33,200,155,0.2)',
                 }}
               >
                 <AvatarFallback 
                   className="text-white font-semibold"
                   style={{
                     background: 'linear-gradient(135deg, #21C89B 0%, #16A085 100%)',
-                    fontSize: '16px',
+                    fontSize: '18px',
                   }}
                 >
                   {user?.name ? getInitials(user.name) : 'HS'}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-[#EAF6F3] truncate" style={{ fontSize: '17px' }}>
+                <p className="font-semibold text-white truncate" style={{ fontSize: '15px' }}>
                   {user?.name || 'Hanisha SM'}
                 </p>
-                <p className="text-[#9AA8A6]" style={{ fontSize: '13px' }}>Diabetes</p>
+                <p className="text-gray-400" style={{ fontSize: '13px' }}>Patient</p>
               </div>
             </div>
-            <div style={{ fontSize: '13px' }}>
-              <span className="text-[#9AA8A6]">In Range: </span>
+            <div 
+              className="pt-3 border-t border-primary/10"
+              style={{ fontSize: '13px' }}
+            >
+              <span className="text-gray-400">Time in Range: </span>
               <span className="text-primary font-semibold">{timeInRange}%</span>
             </div>
           </div>
 
-          {/* Navigation Menu - Enhanced Spacing & Sizing */}
-          <nav className="space-y-1">
-            {menuItems.map((item) => {
-              const isActive = location === item.url;
-              const Icon = item.icon;
-              
-              return (
-                <Link 
-                  key={item.title}
-                  href={item.url}
-                >
-                  <button
-                    className="w-full flex items-center gap-4 rounded-lg text-[#9AA8A6] hover:text-[#EAF6F3] transition-all duration-150 group relative"
-                    style={{
-                      padding: '12px',
-                      backgroundColor: isActive ? 'rgba(33,200,155,0.08)' : 'transparent',
-                      color: isActive ? '#EAF6F3' : undefined,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.backgroundColor = 'rgba(33,200,155,0.03)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }
-                    }}
-                    data-testid={`link-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
-                    aria-current={isActive ? 'page' : undefined}
+          {/* Navigation Menu */}
+          <nav style={{ 
+            flex: '1 1 0',
+            padding: '0 16px',
+            overflowY: 'auto',
+            marginBottom: '16px',
+          }}>
+            <div className="space-y-2">
+              {menuItems.map((item) => {
+                const isActive = location === item.url;
+                const Icon = item.icon;
+                
+                return (
+                  <Link 
+                    key={item.title}
+                    href={item.url}
                   >
-                    {/* Left accent bar - Rounded pill style */}
-                    {isActive && (
-                      <div 
-                        className="absolute left-0 top-1/2 -translate-y-1/2 bg-primary"
-                        style={{
-                          width: '6px',
-                          height: '32px',
-                          borderRadius: '0 4px 4px 0',
-                        }}
-                      />
-                    )}
-
-                    {/* Hover accent bar animation */}
-                    <div 
-                      className="absolute left-0 top-1/2 -translate-y-1/2 bg-primary opacity-0 group-hover:opacity-100 transition-all duration-150"
+                    <button
+                      className="w-full flex items-center gap-4 rounded-xl transition-all duration-300 group relative overflow-hidden"
                       style={{
-                        width: isActive ? '0' : '6px',
-                        height: '32px',
-                        borderRadius: '0 4px 4px 0',
-                        transform: isActive ? 'translateX(-6px) translateY(-50%)' : 'translateY(-50%)',
+                        padding: '16px 18px',
+                        backgroundColor: isActive ? 'rgba(33,200,155,0.15)' : 'transparent',
+                        color: isActive ? '#21C89B' : '#8B92A6',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '15px',
+                        fontWeight: 500,
+                        borderLeft: isActive ? '4px solid #21C89B' : '4px solid transparent',
+                        marginLeft: isActive ? '0' : '0',
                       }}
-                    />
-                    
-                    <Icon className="flex-shrink-0" style={{ width: '22px', height: '22px', strokeWidth: 2 }} />
-                    <span className="font-medium flex-1 text-left" style={{ fontSize: '16px' }}>{item.title}</span>
-                    
-                    {/* Active indicator - white dot on right */}
-                    {isActive && (
-                      <div 
-                        className="ml-auto rounded-full bg-white"
-                        style={{ width: '10px', height: '10px' }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'rgba(33,200,155,0.08)';
+                          e.currentTarget.style.color = '#B4BCD0';
+                          e.currentTarget.style.transform = 'translateX(4px)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = '#8B92A6';
+                          e.currentTarget.style.transform = 'translateX(0)';
+                        }
+                      }}
+                      data-testid={`link-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
+                      <Icon 
+                        className="flex-shrink-0" 
+                        style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          strokeWidth: 2.5,
+                          color: isActive ? '#21C89B' : 'currentColor',
+                        }} 
                       />
-                    )}
-                  </button>
-                </Link>
-              );
-            })}
+                      <span className="flex-1 text-left">{item.title}</span>
+                      
+                      {isActive && (
+                        <div 
+                          className="rounded-full bg-primary"
+                          style={{ width: '6px', height: '6px' }}
+                        />
+                      )}
+                    </button>
+                  </Link>
+                );
+              })}
 
-            {/* Settings Item - Same styling */}
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="w-full flex items-center gap-4 rounded-lg text-[#9AA8A6] hover:text-[#EAF6F3] transition-all duration-150 group relative"
-              style={{
-                padding: '12px',
-                backgroundColor: 'transparent',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(33,200,155,0.03)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-              data-testid="button-settings"
-            >
-              {/* Hover accent bar */}
-              <div 
-                className="absolute left-0 top-1/2 -translate-y-1/2 bg-primary opacity-0 group-hover:opacity-100 transition-all duration-150"
-                style={{
-                  width: '6px',
-                  height: '32px',
-                  borderRadius: '0 4px 4px 0',
+              {/* Settings Item */}
+              <button
+                onClick={() => setIsSettingsOpen(true)}
+                className="w-full flex items-center gap-4 rounded-xl transition-all duration-300"
+                style={{ 
+                  padding: '16px 18px',
+                  color: '#8B92A6',
+                  fontSize: '15px',
+                  fontWeight: 500,
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  marginTop: '8px',
                 }}
-              />
-              
-              <Settings className="flex-shrink-0" style={{ width: '22px', height: '22px', strokeWidth: 2 }} />
-              <span className="font-medium flex-1 text-left" style={{ fontSize: '16px' }}>Settings</span>
-            </button>
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(33,200,155,0.08)';
+                  e.currentTarget.style.color = '#B4BCD0';
+                  e.currentTarget.style.transform = 'translateX(4px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#8B92A6';
+                  e.currentTarget.style.transform = 'translateX(0)';
+                }}
+                data-testid="button-settings"
+              >
+                <Settings className="flex-shrink-0" style={{ width: '20px', height: '20px', strokeWidth: 2.5 }} />
+                <span className="flex-1 text-left">Settings</span>
+              </button>
+            </div>
           </nav>
         </div>
 
-        {/* Bottom Action Buttons - Larger & Centered */}
-        <div className="pt-4 mt-auto">
-          <div className="flex gap-3 mb-3 justify-center">
-            {/* Voice/Mic Button - Larger */}
-            <Link href="/voice">
+        {/* Bottom Action Buttons */}
+        <div 
+          className="mt-auto" 
+          style={{ 
+            flexShrink: 0,
+            padding: '16px',
+            borderTop: '1px solid rgba(33, 200, 155, 0.1)',
+            background: 'rgba(0, 0, 0, 0.2)',
+          }}
+        >
+          <div className="flex gap-3 mb-4">
+            {/* Voice/Mic Button */}
+            <Link href="/voice" className="flex-1">
               <button
-                className="rounded-xl flex items-center justify-center transition-all duration-200"
+                className="w-full rounded-xl flex items-center justify-center transition-all duration-300"
                 style={{
-                  width: '100px',
-                  height: '64px',
-                  background: 'rgba(10,18,21,0.6)',
-                  boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)',
+                  height: '56px',
+                  background: 'rgba(33, 200, 155, 0.12)',
+                  border: '1px solid rgba(33, 200, 155, 0.2)',
+                  color: '#21C89B',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.08), 0 6px 24px rgba(33,200,155,0.3)';
-                  e.currentTarget.style.background = 'rgba(10,18,21,0.75)';
+                  e.currentTarget.style.background = 'rgba(33, 200, 155, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(33, 200, 155, 0.3)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)';
-                  e.currentTarget.style.background = 'rgba(10,18,21,0.6)';
+                  e.currentTarget.style.background = 'rgba(33, 200, 155, 0.12)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
                 }}
                 data-testid="button-voice"
                 aria-label="Voice Assistant"
               >
-                <Mic className="text-primary" style={{ width: '26px', height: '26px', strokeWidth: 2 }} />
+                <Mic style={{ width: '24px', height: '24px', strokeWidth: 2.5 }} />
               </button>
             </Link>
 
-            {/* Upload/Share Button - Larger */}
-            <Link href="/reports">
+            {/* Upload/Share Button */}
+            <Link href="/reports" className="flex-1">
               <button
-                className="rounded-xl flex items-center justify-center transition-all duration-200"
+                className="w-full rounded-xl flex items-center justify-center transition-all duration-300"
                 style={{
-                  width: '100px',
-                  height: '64px',
-                  background: 'rgba(10,18,21,0.6)',
-                  boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)',
+                  height: '56px',
+                  background: 'rgba(33, 200, 155, 0.12)',
+                  border: '1px solid rgba(33, 200, 155, 0.2)',
+                  color: '#21C89B',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.08), 0 6px 24px rgba(33,200,155,0.3)';
-                  e.currentTarget.style.background = 'rgba(10,18,21,0.75)';
+                  e.currentTarget.style.background = 'rgba(33, 200, 155, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(33, 200, 155, 0.3)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.05), 0 4px 16px rgba(33,200,155,0.15)';
-                  e.currentTarget.style.background = 'rgba(10,18,21,0.6)';
+                  e.currentTarget.style.background = 'rgba(33, 200, 155, 0.12)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
                 }}
                 data-testid="button-upload"
                 aria-label="Upload Report"
               >
-                <Upload className="text-primary" style={{ width: '26px', height: '26px', strokeWidth: 2 }} />
+                <Upload style={{ width: '24px', height: '24px', strokeWidth: 2.5 }} />
               </button>
             </Link>
           </div>
 
-          {/* Logout Link - Small Red Text Bottom-Left */}
+          {/* Logout Button */}
           <button
             onClick={logout}
-            className="flex items-center gap-2 hover:text-red-300 transition-colors"
+            className="w-full flex items-center justify-center gap-2 rounded-xl transition-all duration-300"
             style={{
-              fontSize: '13px',
+              padding: '14px',
+              fontSize: '14px',
+              fontWeight: 500,
               color: '#FF6B6B',
+              background: 'rgba(255, 107, 107, 0.1)',
+              border: '1px solid rgba(255, 107, 107, 0.2)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 107, 107, 0.15)';
+              e.currentTarget.style.color = '#FF8585';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 107, 107, 0.1)';
+              e.currentTarget.style.color = '#FF6B6B';
             }}
             data-testid="button-logout"
           >
-            <LogOut style={{ width: '14px', height: '14px' }} />
+            <LogOut style={{ width: '16px', height: '16px' }} />
             <span>Logout</span>
           </button>
         </div>

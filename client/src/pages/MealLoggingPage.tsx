@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import AppSidebar from '@/components/AppSidebar';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -10,12 +10,21 @@ import { mealSchema, type InsertMeal } from '@shared/schema';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import { Utensils, Mic } from 'lucide-react';
+import { Utensils, Mic, AlertCircle, TrendingUp, Activity, Sparkles } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 export default function MealLoggingPage() {
   const { toast } = useToast();
   const [isRecording, setIsRecording] = useState(false);
+  const [description, setDescription] = useState('');
+  const [transcript, setTranscript] = useState('');
+  const [analysis, setAnalysis] = useState<any>(null);
+
+  const { data: profileData } = useQuery({
+    queryKey: ['/api/profile'],
+  });
   
   const form = useForm<InsertMeal>({
     resolver: zodResolver(mealSchema),
@@ -56,25 +65,166 @@ export default function MealLoggingPage() {
   });
 
   const onSubmit = (data: InsertMeal) => {
-    createMealMutation.mutate(data);
+    createMealMutation.mutate({ ...data, voiceRecorded: isRecording });
   };
 
-  const handleVoiceRecording = () => {
-    setIsRecording(!isRecording);
-    form.setValue('voiceRecorded', !isRecording);
-    
-    if (!isRecording) {
+  // Simple rule-based estimator for common foods
+  const estimateNutrition = (text: string) => {
+    const lower = text.toLowerCase();
+    const ingredients: string[] = [];
+    let carbs = 0, protein = 0, fat = 0, calories = 0, sugar = 0;
+
+    const add = (ing: string, c:{carbs?:number, protein?:number, fat?:number, calories?:number, sugar?:number}) => {
+      ingredients.push(ing);
+      carbs += c.carbs || 0;
+      protein += c.protein || 0;
+      fat += c.fat || 0;
+      calories += c.calories || 0;
+      sugar += c.sugar || 0;
+    };
+
+    if (lower.includes('rice')) add('rice', { carbs: 45, calories: 200, sugar: 0 });
+    if (lower.includes('bread')) add('bread', { carbs: 30, protein: 5, calories: 180, sugar: 4 });
+    if (lower.includes('oatmeal')) add('oatmeal', { carbs: 40, protein: 6, calories: 220, sugar: 1 });
+    if (lower.includes('banana')) add('banana', { carbs: 27, calories: 105, sugar: 14 });
+    if (lower.includes('apple')) add('apple', { carbs: 25, calories: 95, sugar: 19 });
+    if (lower.includes('chicken')) add('chicken', { protein: 25, fat: 5, calories: 180 });
+    if (lower.includes('salad')) add('salad', { carbs: 10, protein: 2, calories: 60 });
+    if (lower.includes('pasta')) add('pasta', { carbs: 40, protein: 7, calories: 220, sugar: 2 });
+    if (lower.includes('pizza')) add('pizza', { carbs: 35, protein: 12, fat: 12, calories: 300, sugar: 4 });
+    if (lower.includes('milk')) add('milk', { carbs: 12, protein: 8, fat: 4, calories: 150, sugar: 12 });
+    if (lower.includes('yogurt')) add('yogurt', { carbs: 15, protein: 10, fat: 2, calories: 120, sugar: 12 });
+    if (lower.includes('brown rice')) carbs += 5;
+
+    // Portion heuristics
+    const gMatch = lower.match(/(\d+)(\s?)(g|grams)/);
+    if (gMatch) {
+      const grams = parseInt(gMatch[1], 10);
+      const scale = grams / 100;
+      carbs = Math.round(carbs * scale);
+      protein = Math.round(protein * scale);
+      fat = Math.round(fat * scale);
+      calories = Math.round(calories * scale);
+      sugar = Math.round(sugar * scale);
+    }
+
+    return { ingredients, macros: { carbs, protein, fat, calories, sugar } };
+  };
+
+  const impactInsights = (macros: any, profile: any) => {
+    const type = profile?.profile?.diabetesType || 'unknown';
+    const insulin = profile?.profile?.typicalInsulin || 0;
+    const carbs = macros.carbs || 0;
+    const glycemicLoad = Math.round(carbs * 0.55); // rough estimate
+    let impact = 'moderate';
+    if (carbs >= 60) impact = 'high';
+    else if (carbs <= 25) impact = 'low';
+
+    let recommendation = 'Consider pre-bolus insulin and post-meal walk.';
+    if (type === 'type 1') recommendation = 'Match insulin dose to carbs (ICR). Pre-bolus 10–15 min.';
+    if (type === 'type 2') recommendation = 'Prefer lower GI foods; add protein/fiber to reduce spike.';
+
+    return {
+      impact,
+      glycemicLoad,
+      recommendation,
+      advisory: insulin > 0 ? 'Adjust dose per ICR/ISF if applicable.' : 'Monitor post-meal glucose closely.',
+    };
+  };
+
+  const analyzeDescription = (text: string) => {
+    if (!text.trim()) {
       toast({
-        title: 'Voice Recording',
-        description: 'Voice recording feature will be available soon',
+        title: 'No Input',
+        description: 'Please enter or speak a meal description first',
+        variant: 'destructive',
       });
+      return;
+    }
+    const est = estimateNutrition(text);
+    const insights = impactInsights(est.macros, profileData);
+    setAnalysis({ ...est, insights });
+    // pre-fill form
+    form.setValue('name', text.trim());
+    form.setValue('carbs', est.macros.carbs || 0);
+    form.setValue('protein', est.macros.protein || 0);
+    form.setValue('fat', est.macros.fat || 0);
+    form.setValue('calories', est.macros.calories || 0);
+    
+    toast({
+      title: 'Analysis Complete',
+      description: `Found ${est.ingredients.length} ingredients with nutritional breakdown`,
+    });
+  };
+
+  // Voice recording handler
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onstart = () => {
+        setIsRecording(true);
+      };
+
+      recognitionRef.current.onresult = (event: any) => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          interim += transcript;
+        }
+        setTranscript(interim);
+        setDescription(interim);
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        toast({
+          title: 'Error',
+          description: `Speech recognition error: ${event.error}`,
+          variant: 'destructive',
+        });
+        setIsRecording(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsRecording(false);
+        if (transcript) {
+          analyzeDescription(transcript);
+        }
+      };
+    }
+  }, [transcript, toast]);
+
+  const handleVoiceRecording = () => {
+    if (!recognitionRef.current) {
+      toast({
+        title: 'Not Supported',
+        description: 'Speech Recognition is not supported in your browser',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    } else {
+      setTranscript('');
+      setDescription('');
+      setAnalysis(null);
+      recognitionRef.current.start();
     }
   };
 
   return (
     <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden">
       <AppSidebar />
-      <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '320px' }}>
+      <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '280px' }}>
         <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
           <div className="flex items-center gap-4">
             <Utensils className="w-6 h-6 text-primary" />
@@ -98,18 +248,129 @@ export default function MealLoggingPage() {
                   <h2 className="text-xl font-bold">New Meal</h2>
                 </div>
 
-                <div className="mb-4">
-                  <Button
-                    type="button"
-                    variant={isRecording ? 'destructive' : 'outline'}
-                    className="w-full"
-                    onClick={handleVoiceRecording}
-                    data-testid="button-voice-record"
-                  >
-                    <Mic className="h-4 w-4 mr-2" />
-                    {isRecording ? 'Stop Recording' : 'Log with Voice'}
-                  </Button>
+                <div className="mb-4 space-y-2">
+                  <FormLabel>Describe Your Meal (text or voice)</FormLabel>
+                  <Input
+                    placeholder="e.g., Chicken salad with brown rice, 200g"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    data-testid="input-meal-description"
+                    className={isRecording ? 'border-red-500 animate-pulse' : ''}
+                  />
+                  {isRecording && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                      <Activity className="h-3 w-3 animate-pulse" />
+                      Listening... Speak now
+                    </p>
+                  )}
+                  {transcript && !isRecording && (
+                    <p className="text-xs text-green-500 flex items-center gap-1">
+                      <Sparkles className="h-3 w-3" />
+                      Captured: {transcript}
+                    </p>
+                  )}
+                  <div className="flex gap-2">
+                    <Button type="button" variant={isRecording ? 'destructive' : 'outline'} onClick={handleVoiceRecording} className="flex-1" data-testid="button-voice-record">
+                      <Mic className="h-4 w-4 mr-2" />
+                      {isRecording ? 'Stop Recording' : 'Log with Voice'}
+                    </Button>
+                    <Button type="button" onClick={() => analyzeDescription(description)} className="flex-1" data-testid="button-analyze" disabled={!description.trim()}>
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Analyze
+                    </Button>
+                  </div>
                 </div>
+
+                {/* Analysis Results */}
+                {analysis && (
+                  <div className="mb-6 space-y-4">
+                    <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-primary" />
+                          AI Nutritional Analysis
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {/* Ingredients */}
+                        {analysis.ingredients.length > 0 && (
+                          <div>
+                            <p className="text-xs font-semibold text-muted-foreground mb-1">Detected Ingredients:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {analysis.ingredients.map((ing: string, idx: number) => (
+                                <Badge key={idx} variant="secondary" className="text-xs">{ing}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Macros */}
+                        <div>
+                          <p className="text-xs font-semibold text-muted-foreground mb-2">Macronutrients:</p>
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div className="bg-background/50 rounded p-2">
+                              <span className="text-muted-foreground">Carbs:</span>
+                              <span className="ml-1 font-bold text-orange-500">{analysis.macros.carbs}g</span>
+                            </div>
+                            <div className="bg-background/50 rounded p-2">
+                              <span className="text-muted-foreground">Protein:</span>
+                              <span className="ml-1 font-bold text-blue-500">{analysis.macros.protein}g</span>
+                            </div>
+                            <div className="bg-background/50 rounded p-2">
+                              <span className="text-muted-foreground">Fat:</span>
+                              <span className="ml-1 font-bold text-yellow-500">{analysis.macros.fat}g</span>
+                            </div>
+                            <div className="bg-background/50 rounded p-2">
+                              <span className="text-muted-foreground">Sugar:</span>
+                              <span className="ml-1 font-bold text-red-500">{analysis.macros.sugar}g</span>
+                            </div>
+                          </div>
+                          <div className="bg-primary/20 rounded p-2 mt-2 text-center">
+                            <span className="text-muted-foreground text-sm">Total Calories:</span>
+                            <span className="ml-2 font-bold text-lg text-primary">{analysis.macros.calories}</span>
+                          </div>
+                        </div>
+
+                        {/* Blood Sugar Impact */}
+                        <Alert className={`border-2 ${
+                          analysis.insights.impact === 'high' ? 'border-red-500 bg-red-500/10' :
+                          analysis.insights.impact === 'moderate' ? 'border-yellow-500 bg-yellow-500/10' :
+                          'border-green-500 bg-green-500/10'
+                        }`}>
+                          <TrendingUp className="h-4 w-4" />
+                          <AlertDescription className="space-y-2">
+                            <div>
+                              <p className="font-semibold text-sm">Blood Sugar Impact: <span className="uppercase">{analysis.insights.impact}</span></p>
+                              <p className="text-xs text-muted-foreground">Estimated Glycemic Load: {analysis.insights.glycemicLoad}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-xs"><strong>Recommendation:</strong> {analysis.insights.recommendation}</p>
+                              <p className="text-xs"><strong>Advisory:</strong> {analysis.insights.advisory}</p>
+                            </div>
+                          </AlertDescription>
+                        </Alert>
+
+                        {/* Personalized Insights */}
+                        {profileData?.profile && (
+                          <div className="bg-background/50 rounded p-3 space-y-1">
+                            <p className="text-xs font-semibold text-muted-foreground">Personalized Insights:</p>
+                            <p className="text-xs">
+                              • Diabetes Type: <strong>{profileData.profile.diabetesType || 'Not specified'}</strong>
+                            </p>
+                            {profileData.profile.typicalInsulin > 0 && (
+                              <p className="text-xs">
+                                • Typical Insulin: <strong>{profileData.profile.typicalInsulin} units</strong>
+                              </p>
+                            )}
+                            <p className="text-xs text-muted-foreground italic">
+                              This meal contains {analysis.macros.carbs}g of carbs. Consider your insulin-to-carb ratio when dosing.
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
 
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

@@ -1,0 +1,91 @@
+GlucoNova Deployment Checklist
+================================
+
+PRE-DEPLOYMENT SECURITY
+□ Changed JWT_SECRET from default value to secure random string
+□ Verified .env is in .gitignore
+□ Removed any hardcoded credentials from source code
+□ Updated CORS settings for production domain
+□ Reviewed all environment variables
+
+DATABASE
+□ PostgreSQL database created and accessible
+□ Connection string (DATABASE_URL) obtained
+□ Database migrations run successfully (npm run db:push)
+□ Database backups configured
+□ Connection pooling configured
+
+BUILD & TEST
+□ Run: npm install
+□ Run: npm run build (builds successfully)
+□ Test production build locally: npm start
+□ All pages load correctly
+□ API endpoints respond properly
+□ File uploads work
+□ Voice features functional
+
+HOSTING PLATFORM SETUP
+□ Account created (Render/Railway/Heroku/VPS)
+□ Project/service created
+□ Repository connected (if using Git deployment)
+□ Environment variables configured:
+  □ DATABASE_URL
+  □ JWT_SECRET
+  □ NODE_ENV=production
+  □ PORT (if required)
+  □ FRONTEND_URL (if frontend separate)
+
+DEPLOYMENT
+□ Initial deployment successful
+□ Application accessible at production URL
+□ No errors in server logs
+□ Database connection verified
+□ SSL/HTTPS enabled
+
+POST-DEPLOYMENT VERIFICATION
+□ Register a test user account
+□ Login successfully
+□ Test main features:
+  □ Dashboard loads
+  □ Glucose monitoring works
+  □ Meal logging (text and voice)
+  □ Medical report upload and OCR
+  □ AI insulin predictions
+  □ Messages/chat interface
+  □ Appointments scheduling
+□ Check mobile responsiveness
+□ Test on different browsers
+
+MONITORING & MAINTENANCE
+□ Error monitoring setup (logs accessible)
+□ Performance monitoring enabled
+□ Uptime monitoring configured
+□ Database backup schedule verified
+□ Set calendar reminders for:
+  □ Weekly: Review logs
+  □ Monthly: Update dependencies
+  □ Quarterly: Security audit
+
+DOCUMENTATION
+□ Updated README with production URL
+□ Documented environment variables
+□ Created admin credentials securely stored
+□ Team members have access to deployment platform
+
+OPTIONAL (Recommended)
+□ Custom domain configured
+□ CDN setup for static assets
+□ Rate limiting implemented
+□ Redis caching configured (for scaling)
+□ Automated deployment pipeline (CI/CD)
+
+FINAL CHECKS
+□ All checkboxes above completed
+□ Deployment announcement ready
+□ Support channels prepared
+□ User documentation updated
+
+Deployment Date: _______________
+Deployed By: _______________
+Production URL: _______________
+Database Host: _______________

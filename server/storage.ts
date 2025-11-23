@@ -42,6 +42,7 @@ export interface IStorage {
   
   // Medical report operations
   getMedicalReportsByPatient(patientId: string): Promise<MedicalReport[]>;
+  getMedicalReportById(reportId: string): Promise<MedicalReport | null>;
   createMedicalReport(patientId: string, uploaderId: string, report: {
     fileName: string;
     fileUrl: string;
@@ -321,6 +322,31 @@ export class DrizzleStorage implements IStorage {
       description: record.description || undefined,
       uploadedAt: record.uploadedAt,
     }));
+  }
+
+  async getMedicalReportById(reportId: string): Promise<MedicalReport | null> {
+    const reportIdNum = parseInt(reportId);
+    if (isNaN(reportIdNum)) return null;
+    
+    const result = await db.select()
+      .from(medicalReports)
+      .where(eq(medicalReports.id, reportIdNum))
+      .limit(1);
+    
+    if (result.length === 0) return null;
+    
+    const record = result[0];
+    return {
+      _id: record.id.toString(),
+      patientId: record.patientId.toString(),
+      fileName: record.fileName,
+      fileUrl: record.fileUrl,
+      fileType: record.fileType,
+      fileSize: record.fileSize,
+      uploadedBy: record.uploadedBy.toString(),
+      description: record.description || undefined,
+      uploadedAt: record.uploadedAt,
+    };
   }
 
   async createMedicalReport(patientId: string, uploaderId: string, report: {

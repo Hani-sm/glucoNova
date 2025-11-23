@@ -5,34 +5,34 @@ interface PublicLayoutProps {
 export default function PublicLayout({ children }: PublicLayoutProps) {
   // Floating emerald dots - noticeable movement
   const floatingDots = [
-    { id: 1, size: 12, left: 15, top: 10, duration: 18, delay: 0, xRange: 28, yRange: 35 },
-    { id: 2, size: 14, left: 85, top: 15, duration: 22, delay: 2, xRange: -32, yRange: 38 },
-    { id: 3, size: 16, left: 10, top: 70, duration: 20, delay: 4, xRange: 35, yRange: -30 },
-    { id: 4, size: 13, left: 88, top: 75, duration: 24, delay: 1, xRange: -26, yRange: 33 },
-    { id: 5, size: 15, left: 5, top: 50, duration: 19, delay: 3, xRange: 30, yRange: -36 },
-    { id: 6, size: 14, left: 92, top: 45, duration: 21, delay: 5, xRange: -29, yRange: 34 },
-    { id: 7, size: 12, left: 20, top: 30, duration: 23, delay: 0.5, xRange: 33, yRange: 40 },
-    { id: 8, size: 17, left: 78, top: 25, duration: 17, delay: 2.5, xRange: -34, yRange: -32 },
-    { id: 9, size: 13, left: 12, top: 85, duration: 25, delay: 1.5, xRange: 27, yRange: 35 },
-    { id: 10, size: 15, left: 90, top: 60, duration: 20, delay: 3.5, xRange: -31, yRange: 37 },
-    { id: 11, size: 14, left: 25, top: 88, duration: 22, delay: 4.5, xRange: 32, yRange: -35 },
-    { id: 12, size: 16, left: 82, top: 90, duration: 19, delay: 2.2, xRange: -28, yRange: 33 },
-    { id: 13, size: 18, left: 40, top: 18, duration: 21, delay: 1.8, xRange: 30, yRange: 34 },
-    { id: 14, size: 13, left: 65, top: 55, duration: 23, delay: 3.2, xRange: -33, yRange: -36 },
-    { id: 15, size: 15, left: 8, top: 35, duration: 18, delay: 0.8, xRange: 26, yRange: 31 },
-    { id: 16, size: 17, left: 95, top: 82, duration: 24, delay: 4.2, xRange: -35, yRange: 38 },
+    { id: 1, size: 12, left: 15, top: 10, duration: 35, delay: 0, xRange: 2, yRange: 3 },
+    { id: 2, size: 14, left: 85, top: 15, duration: 38, delay: 2, xRange: -2, yRange: 3 },
+    { id: 3, size: 16, left: 10, top: 70, duration: 36, delay: 4, xRange: 2, yRange: -2 },
+    { id: 4, size: 13, left: 88, top: 75, duration: 40, delay: 1, xRange: -2, yRange: 3 },
+    { id: 5, size: 15, left: 5, top: 50, duration: 37, delay: 3, xRange: 2, yRange: -3 },
+    { id: 6, size: 14, left: 92, top: 45, duration: 39, delay: 5, xRange: -2, yRange: 3 },
+    { id: 7, size: 12, left: 20, top: 30, duration: 41, delay: 0.5, xRange: 2, yRange: 3 },
+    { id: 8, size: 17, left: 78, top: 25, duration: 34, delay: 2.5, xRange: -2, yRange: -2 },
+    { id: 9, size: 13, left: 12, top: 85, duration: 42, delay: 1.5, xRange: 2, yRange: 3 },
+    { id: 10, size: 15, left: 90, top: 60, duration: 37, delay: 3.5, xRange: -2, yRange: 3 },
+    { id: 11, size: 14, left: 25, top: 88, duration: 39, delay: 4.5, xRange: 2, yRange: -3 },
+    { id: 12, size: 16, left: 82, top: 90, duration: 36, delay: 2.2, xRange: -2, yRange: 3 },
+    { id: 13, size: 18, left: 40, top: 18, duration: 38, delay: 1.8, xRange: 2, yRange: 3 },
+    { id: 14, size: 13, left: 65, top: 55, duration: 40, delay: 3.2, xRange: -2, yRange: -3 },
+    { id: 15, size: 15, left: 8, top: 35, duration: 35, delay: 0.8, xRange: 2, yRange: 2 },
+    { id: 16, size: 17, left: 95, top: 82, duration: 41, delay: 4.2, xRange: -2, yRange: 3 },
   ];
 
   // Uneven circular elements with varying opacity
   const unevenCircles = [
-    { id: 1, size: 25, left: 30, top: 20, duration: 20, delay: 0, opacity: 0.08, xRange: 38, yRange: 45 },
-    { id: 2, size: 35, left: 70, top: 65, duration: 19, delay: 3, opacity: 0.32, xRange: -42, yRange: 48 },
-    { id: 3, size: 20, left: 18, top: 55, duration: 22, delay: 1.5, opacity: 0.06, xRange: 45, yRange: -40 },
-    { id: 4, size: 30, left: 85, top: 35, duration: 18, delay: 4, opacity: 0.25, xRange: -40, yRange: 46 },
-    { id: 5, size: 28, left: 50, top: 80, duration: 24, delay: 2.5, opacity: 0.15, xRange: 43, yRange: -42 },
-    { id: 6, size: 22, left: 12, top: 25, duration: 21, delay: 5, opacity: 0.1, xRange: -46, yRange: 50 },
-    { id: 7, size: 32, left: 60, top: 10, duration: 23, delay: 1, opacity: 0.28, xRange: 37, yRange: 41 },
-    { id: 8, size: 24, left: 92, top: 70, duration: 19, delay: 3.5, opacity: 0.12, xRange: -44, yRange: -47 },
+    { id: 1, size: 25, left: 30, top: 20, duration: 38, delay: 0, opacity: 0.08, xRange: 2, yRange: 3 },
+    { id: 2, size: 35, left: 70, top: 65, duration: 36, delay: 3, opacity: 0.32, xRange: -3, yRange: 3 },
+    { id: 3, size: 20, left: 18, top: 55, duration: 40, delay: 1.5, opacity: 0.06, xRange: 3, yRange: -2 },
+    { id: 4, size: 30, left: 85, top: 35, duration: 35, delay: 4, opacity: 0.25, xRange: -2, yRange: 3 },
+    { id: 5, size: 28, left: 50, top: 80, duration: 42, delay: 2.5, opacity: 0.15, xRange: 3, yRange: -3 },
+    { id: 6, size: 22, left: 12, top: 25, duration: 39, delay: 5, opacity: 0.1, xRange: -3, yRange: 3 },
+    { id: 7, size: 32, left: 60, top: 10, duration: 41, delay: 1, opacity: 0.28, xRange: 2, yRange: 3 },
+    { id: 8, size: 24, left: 92, top: 70, duration: 36, delay: 3.5, opacity: 0.12, xRange: -3, yRange: -3 },
   ];
 
   return (
@@ -111,19 +111,19 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           @keyframes floatDot${dot.id} {
             0%, 100% { 
               transform: translate3d(0, 0, 0); 
-              opacity: 0.4; 
+              opacity: 0.35; 
             }
             25% { 
-              transform: translate3d(${dot.xRange * 0.4}px, ${dot.yRange * 0.4}px, 0); 
-              opacity: 0.5; 
+              transform: translate3d(${dot.xRange * 0.2}px, ${dot.yRange * 0.15}px, 0); 
+              opacity: 0.36; 
             }
             50% { 
-              transform: translate3d(${dot.xRange}px, ${dot.yRange}px, 0); 
-              opacity: 0.6; 
+              transform: translate3d(${dot.xRange * 0.5}px, ${dot.yRange * 0.55}px, 0); 
+              opacity: 0.39; 
             }
             75% { 
-              transform: translate3d(${dot.xRange * 0.6}px, ${dot.yRange * 0.7}px, 0); 
-              opacity: 0.48; 
+              transform: translate3d(${dot.xRange * 0.3}px, ${dot.yRange * 0.4}px, 0); 
+              opacity: 0.35; 
             }
           }
         `).join('\n')}
@@ -135,16 +135,16 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               opacity: ${circle.opacity}; 
             }
             25% { 
-              transform: translate3d(${circle.xRange * 0.5}px, ${circle.yRange * 0.4}px, 0) scale(1.05); 
-              opacity: ${circle.opacity * 1.3}; 
+              transform: translate3d(${circle.xRange * 0.2}px, ${circle.yRange * 0.15}px, 0) scale(1.002); 
+              opacity: ${circle.opacity + 0.005}; 
             }
             50% { 
-              transform: translate3d(${circle.xRange}px, ${circle.yRange}px, 0) scale(1.1); 
-              opacity: ${circle.opacity * 1.5}; 
+              transform: translate3d(${circle.xRange * 0.5}px, ${circle.yRange * 0.55}px, 0) scale(1.003); 
+              opacity: ${circle.opacity + 0.01}; 
             }
             75% { 
-              transform: translate3d(${circle.xRange * 0.7}px, ${circle.yRange * 0.6}px, 0) scale(1.03); 
-              opacity: ${circle.opacity * 1.2}; 
+              transform: translate3d(${circle.xRange * 0.3}px, ${circle.yRange * 0.4}px, 0) scale(1.002); 
+              opacity: ${circle.opacity + 0.003}; 
             }
           }
         `).join('\n')}
@@ -155,8 +155,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             opacity: 0.3;
           }
           50% { 
-            transform: translateY(-30px) scaleX(1.1);
-            opacity: 0.4;
+            transform: translateY(-1.5px) scaleX(1.003);
+            opacity: 0.32;
           }
         }
 
@@ -166,8 +166,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             opacity: 0.2;
           }
           50% { 
-            transform: translateX(40px) scaleY(1.15);
-            opacity: 0.3;
+            transform: translateX(2px) scaleY(1.004);
+            opacity: 0.22;
           }
         }
 
@@ -177,8 +177,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             opacity: 0.25;
           }
           50% { 
-            transform: translateY(30px) scaleX(1.1);
-            opacity: 0.35;
+            transform: translateY(1.5px) scaleX(1.003);
+            opacity: 0.27;
           }
         }
       `}</style>

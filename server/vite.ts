@@ -33,7 +33,8 @@ export async function setupVite(app: Express, server: Server) {
       ...viteLogger,
       error: (msg, options) => {
         viteLogger.error(msg, options);
-        process.exit(1);
+        // Don't exit on error in development - just log it
+        console.error('Vite error:', msg);
       },
     },
     server: serverOptions,
@@ -58,9 +59,17 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`,
       );
-      const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      
+      try {
+        const page = await vite.transformIndexHtml(url, template);
+        res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      } catch (transformError) {
+        // If Vite transform fails, serve the raw template anyway to prevent blank pages
+        console.warn('Vite transform error - serving unmodified template:', transformError);
+        res.status(200).set({ "Content-Type": "text/html" }).end(template);
+      }
     } catch (e) {
+      console.error('Error serving page:', e);
       vite.ssrFixStacktrace(e as Error);
       next(e);
     }

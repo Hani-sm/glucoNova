@@ -7,21 +7,50 @@ import ProgressCard from '@/components/ProgressCard';
 import QuickActionCard from '@/components/QuickActionCard';
 import OnboardingModal from '@/components/OnboardingModal';
 import OnboardingBanner from '@/components/OnboardingBanner';
-import { Droplet, Target, Utensils, Syringe, Heart, Pill, MessageCircle, FileText, Activity, Stethoscope, Thermometer, TestTube, Clipboard } from 'lucide-react';
+import { Droplet, Target, Utensils, Syringe, Heart, Pill, MessageCircle, FileText, Activity, Stethoscope, Thermometer, TestTube, Clipboard, Sparkles } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { queryClient, apiRequest } from '@/lib/queryClient';
+import { queryClient } from '@/lib/queryClient';
+import { apiRequest } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
-import { Sparkles } from 'lucide-react';
+
+interface HealthDataEntry {
+  glucose: number;
+  insulin: number;
+  carbs: number;
+  timestamp: string;
+  [key: string]: any;
+}
+
+interface MealDataEntry {
+  carbs: number;
+  [key: string]: any;
+}
+
+interface PredictionData {
+  predictedInsulin: number;
+  confidence: number;
+  factors: string[];
+  timestamp: string;
+}
+
+interface ProfileData {
+  weight?: number;
+  height?: number;
+  lastA1c?: number;
+  typicalInsulin?: number;
+  [key: string]: any;
+}
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     const onboardingCompleted = localStorage.getItem('onboardingCompleted');
@@ -58,28 +87,29 @@ export default function DashboardPage() {
     setShowBanner(false);
   };
 
-  const { data: healthData, isLoading: isLoadingHealth } = useQuery({
+  const { data: healthData, isLoading: isLoadingHealth } = useQuery<{ data: HealthDataEntry[] }>({
     queryKey: ['/api/health-data'],
   });
 
-  const { data: mealsData, isLoading: isLoadingMeals } = useQuery({
+  const { data: mealsData, isLoading: isLoadingMeals } = useQuery<{ data: MealDataEntry[] }>({
     queryKey: ['/api/meals'],
   });
 
-  const { data: latestPrediction, isLoading: isLoadingPrediction } = useQuery({
+  const { data: latestPrediction, isLoading: isLoadingPrediction } = useQuery<{ prediction: PredictionData }>({
     queryKey: ['/api/predictions/latest'],
   });
 
-  const { data: profileData, isLoading: isLoadingProfile } = useQuery({
+  const { data: profileData, isLoading: isLoadingProfile } = useQuery<{ profile: ProfileData }>({
     queryKey: ['/api/profile'],
+  });
+
+  const { data: reportsData } = useQuery({
+    queryKey: ['/api/reports'],
   });
 
   const generatePredictionMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('/api/predictions/insulin', {
-        method: 'POST',
-      });
-      return response.json();
+      return await apiRequest('/api/predictions/insulin', 'POST', {});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/predictions/latest'] });
@@ -121,74 +151,111 @@ export default function DashboardPage() {
     return 'In Range';
   };
 
+  // Calculate health score based on multiple factors
+  const calculateHealthScore = () => {
+    let score = 0;
+    let maxScore = 0;
+
+    // Time in range (40 points)
+    maxScore += 40;
+    if (timeInRange >= 70) score += 40;
+    else if (timeInRange >= 50) score += 30;
+    else if (timeInRange >= 30) score += 20;
+    else score += 10;
+
+    // Glucose control (30 points)
+    maxScore += 30;
+    if (latestGlucose >= 70 && latestGlucose <= 180) score += 30;
+    else if (latestGlucose >= 60 && latestGlucose <= 200) score += 20;
+    else score += 10;
+
+    // Data logging consistency (30 points)
+    maxScore += 30;
+    const dataPoints = healthData?.data?.length || 0;
+    if (dataPoints >= 10) score += 30;
+    else if (dataPoints >= 5) score += 20;
+    else if (dataPoints >= 1) score += 10;
+
+    return Math.round((score / maxScore) * 100);
+  };
+
+  const healthScore = calculateHealthScore();
+
+  // Determine achievements
+  const achievements = [];
+  if (timeInRange >= 70) achievements.push({ title: 'Time Champion', desc: '70%+ in range', icon: '🏆' });
+  if (healthData?.data && Array.isArray(healthData.data) && healthData.data.length >= 10) achievements.push({ title: 'Consistent Logger', desc: '10+ entries', icon: '📊' });
+  if (latestGlucose >= 70 && latestGlucose <= 180) achievements.push({ title: 'Perfect Range', desc: 'Current glucose in range', icon: '🎯' });
+  if (mealsData?.data && Array.isArray(mealsData.data) && mealsData.data.length >= 5) achievements.push({ title: 'Meal Tracker', desc: '5+ meals logged', icon: '🍽️' });
+
   // Floating emerald green dots
   const floatingDots = [
-    { id: 1, size: 12, left: 15, top: 10, duration: 18, delay: 0, xRange: 28, yRange: 35, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 2, size: 14, left: 85, top: 15, duration: 22, delay: 2, xRange: -32, yRange: 38, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 3, size: 16, left: 10, top: 70, duration: 20, delay: 4, xRange: 35, yRange: -30, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 4, size: 13, left: 88, top: 75, duration: 24, delay: 1, xRange: -26, yRange: 33, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 5, size: 15, left: 5, top: 50, duration: 19, delay: 3, xRange: 30, yRange: -36, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 6, size: 14, left: 92, top: 45, duration: 21, delay: 5, xRange: -29, yRange: 34, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 7, size: 12, left: 20, top: 30, duration: 23, delay: 0.5, xRange: 33, yRange: 40, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 8, size: 17, left: 78, top: 25, duration: 17, delay: 2.5, xRange: -34, yRange: -32, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 9, size: 13, left: 12, top: 85, duration: 25, delay: 1.5, xRange: 27, yRange: 35, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 10, size: 15, left: 90, top: 60, duration: 20, delay: 3.5, xRange: -31, yRange: 37, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 11, size: 14, left: 25, top: 88, duration: 22, delay: 4.5, xRange: 32, yRange: -35, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 12, size: 16, left: 82, top: 90, duration: 19, delay: 2.2, xRange: -28, yRange: 33, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 13, size: 18, left: 40, top: 18, duration: 21, delay: 1.8, xRange: 30, yRange: 34, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 14, size: 13, left: 65, top: 55, duration: 23, delay: 3.2, xRange: -33, yRange: -36, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 15, size: 15, left: 8, top: 35, duration: 18, delay: 0.8, xRange: 26, yRange: 31, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
-    { id: 16, size: 17, left: 95, top: 82, duration: 24, delay: 4.2, xRange: -35, yRange: 38, color: 'rgba(33, 200, 155, 0.3)' }, // Emerald
+    { id: 1, size: 12, left: 15, top: 10, duration: 50, delay: 0, xRange: 0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 2, size: 14, left: 85, top: 15, duration: 55, delay: 2, xRange: -0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 3, size: 16, left: 10, top: 70, duration: 52, delay: 4, xRange: 0.4, yRange: -0.4, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 4, size: 13, left: 88, top: 75, duration: 58, delay: 1, xRange: -0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 5, size: 15, left: 5, top: 50, duration: 54, delay: 3, xRange: 0.4, yRange: -0.6, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 6, size: 14, left: 92, top: 45, duration: 56, delay: 5, xRange: -0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 7, size: 12, left: 20, top: 30, duration: 60, delay: 0.5, xRange: 0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 8, size: 17, left: 78, top: 25, duration: 48, delay: 2.5, xRange: -0.4, yRange: -0.4, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 9, size: 13, left: 12, top: 85, duration: 62, delay: 1.5, xRange: 0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 10, size: 15, left: 90, top: 60, duration: 54, delay: 3.5, xRange: -0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 11, size: 14, left: 25, top: 88, duration: 56, delay: 4.5, xRange: 0.4, yRange: -0.6, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 12, size: 16, left: 82, top: 90, duration: 52, delay: 2.2, xRange: -0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 13, size: 18, left: 40, top: 18, duration: 55, delay: 1.8, xRange: 0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 14, size: 13, left: 65, top: 55, duration: 58, delay: 3.2, xRange: -0.4, yRange: -0.6, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 15, size: 15, left: 8, top: 35, duration: 50, delay: 0.8, xRange: 0.4, yRange: 0.4, color: 'rgba(52, 211, 153, 0.3)' },
+    { id: 16, size: 17, left: 95, top: 82, duration: 60, delay: 4.2, xRange: -0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.3)' },
   ];
 
   // Uneven circular elements with emerald green (reduced size and opacity with blur)
   const unevenCircles = [
-    { id: 1, size: 18, left: 30, top: 20, duration: 20, delay: 0, opacity: 0.025, xRange: 38, yRange: 45, color: 'rgba(33, 200, 155, 0.08)' }, // Emerald
-    { id: 2, size: 25, left: 70, top: 65, duration: 19, delay: 3, opacity: 0.08, xRange: -42, yRange: 48, color: 'rgba(33, 200, 155, 0.12)' }, // Emerald
-    { id: 3, size: 15, left: 18, top: 55, duration: 22, delay: 1.5, opacity: 0.02, xRange: 45, yRange: -40, color: 'rgba(33, 200, 155, 0.06)' }, // Emerald
-    { id: 4, size: 22, left: 85, top: 35, duration: 18, delay: 4, opacity: 0.06, xRange: -40, yRange: 46, color: 'rgba(33, 200, 155, 0.1)' }, // Emerald
-    { id: 5, size: 20, left: 50, top: 80, duration: 24, delay: 2.5, opacity: 0.045, xRange: 43, yRange: -42, color: 'rgba(33, 200, 155, 0.08)' }, // Emerald
-    { id: 6, size: 16, left: 12, top: 25, duration: 21, delay: 5, opacity: 0.03, xRange: -46, yRange: 50, color: 'rgba(33, 200, 155, 0.07)' }, // Emerald
-    { id: 7, size: 24, left: 60, top: 10, duration: 23, delay: 1, opacity: 0.07, xRange: 37, yRange: 41, color: 'rgba(33, 200, 155, 0.11)' }, // Emerald
-    { id: 8, size: 17, left: 92, top: 70, duration: 19, delay: 3.5, opacity: 0.035, xRange: -44, yRange: -47, color: 'rgba(33, 200, 155, 0.07)' }, // Emerald
+    { id: 1, size: 18, left: 30, top: 20, duration: 55, delay: 0, opacity: 0.015, xRange: 0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.08)' },
+    { id: 2, size: 25, left: 70, top: 65, duration: 52, delay: 3, opacity: 0.04, xRange: -0.6, yRange: 0.6, color: 'rgba(52, 211, 153, 0.12)' },
+    { id: 3, size: 15, left: 18, top: 55, duration: 58, delay: 1.5, opacity: 0.01, xRange: 0.6, yRange: -0.4, color: 'rgba(52, 211, 153, 0.06)' },
+    { id: 4, size: 22, left: 85, top: 35, duration: 50, delay: 4, opacity: 0.03, xRange: -0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.1)' },
+    { id: 5, size: 20, left: 50, top: 80, duration: 62, delay: 2.5, opacity: 0.025, xRange: 0.6, yRange: -0.6, color: 'rgba(52, 211, 153, 0.08)' },
+    { id: 6, size: 16, left: 12, top: 25, duration: 56, delay: 5, opacity: 0.015, xRange: -0.6, yRange: 0.6, color: 'rgba(52, 211, 153, 0.07)' },
+    { id: 7, size: 24, left: 60, top: 10, duration: 60, delay: 1, opacity: 0.035, xRange: 0.4, yRange: 0.6, color: 'rgba(52, 211, 153, 0.11)' },
+    { id: 8, size: 17, left: 92, top: 70, duration: 52, delay: 3.5, opacity: 0.02, xRange: -0.6, yRange: -0.6, color: 'rgba(52, 211, 153, 0.07)' },
   ];
 
   // Floating medical icons (white with low opacity)
   const medicalIcons = [
-    { id: 1, Icon: Pill, left: 12, top: 15, duration: 22, delay: 0, xRange: 30, yRange: 40, rotation: 15 },
-    { id: 2, Icon: Syringe, left: 82, top: 25, duration: 25, delay: 2, xRange: -35, yRange: 38, rotation: -20 },
-    { id: 3, Icon: Heart, left: 25, top: 60, duration: 20, delay: 4, xRange: 32, yRange: -35, rotation: 10 },
-    { id: 4, Icon: Activity, left: 70, top: 80, duration: 23, delay: 1.5, xRange: -28, yRange: 42, rotation: -15 },
-    { id: 5, Icon: Droplet, left: 45, top: 35, duration: 21, delay: 3.5, xRange: 30, yRange: 35, rotation: 12 },
-    { id: 6, Icon: Stethoscope, left: 88, top: 55, duration: 24, delay: 5, xRange: -33, yRange: -40, rotation: -18 },
-    { id: 7, Icon: Thermometer, left: 18, top: 78, duration: 19, delay: 2.5, xRange: 35, yRange: 37, rotation: 8 },
-    { id: 8, Icon: TestTube, left: 55, top: 12, duration: 26, delay: 1, xRange: -30, yRange: 45, rotation: -12 },
-    { id: 9, Icon: Clipboard, left: 35, top: 88, duration: 20, delay: 4.5, xRange: 28, yRange: -38, rotation: 16 },
+    { id: 1, Icon: Pill, left: 12, top: 15, duration: 55, delay: 0, xRange: 0.4, yRange: 0.6, rotation: 15 },
+    { id: 2, Icon: Syringe, left: 82, top: 25, duration: 60, delay: 2, xRange: -0.4, yRange: 0.6, rotation: -20 },
+    { id: 3, Icon: Heart, left: 25, top: 60, duration: 54, delay: 4, xRange: 0.4, yRange: -0.4, rotation: 10 },
+    { id: 4, Icon: Activity, left: 70, top: 80, duration: 58, delay: 1.5, xRange: -0.4, yRange: 0.6, rotation: -15 },
+    { id: 5, Icon: Droplet, left: 45, top: 35, duration: 56, delay: 3.5, xRange: 0.4, yRange: 0.6, rotation: 12 },
+    { id: 6, Icon: Stethoscope, left: 88, top: 55, duration: 62, delay: 5, xRange: -0.4, yRange: -0.6, rotation: -18 },
+    { id: 7, Icon: Thermometer, left: 18, top: 78, duration: 52, delay: 2.5, xRange: 0.4, yRange: 0.6, rotation: 8 },
+    { id: 8, Icon: TestTube, left: 55, top: 12, duration: 60, delay: 1, xRange: -0.4, yRange: 0.6, rotation: -12 },
+    { id: 9, Icon: Clipboard, left: 35, top: 88, duration: 54, delay: 4.5, xRange: 0.4, yRange: -0.4, rotation: 16 },
   ];
 
   return (
-    <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden animate-in fade-in duration-300">
+    <div className="flex h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 relative overflow-hidden animate-in fade-in duration-300" style={{ backdropFilter: 'blur(0px)' }}>
         
         {/* Animated Colorful Light Waves - Behind everything */}
         <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
           <div 
             className="absolute top-0 left-0 right-0 h-96 opacity-30"
             style={{
-              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(96, 165, 250, 0.08), transparent)',
+              background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(52, 211, 153, 0.08), transparent)',
               animation: 'wave1 15s ease-in-out infinite',
             }}
           />
           <div 
             className="absolute top-1/3 left-0 right-0 h-96 opacity-20"
             style={{
-              background: 'radial-gradient(ellipse 70% 40% at 30% 50%, rgba(167, 139, 250, 0.06), transparent)',
+              background: 'radial-gradient(ellipse 70% 40% at 30% 50%, rgba(52, 211, 153, 0.06), transparent)',
               animation: 'wave2 18s ease-in-out infinite',
             }}
           />
           <div 
             className="absolute bottom-0 left-0 right-0 h-96 opacity-25"
             style={{
-              background: 'radial-gradient(ellipse 75% 45% at 70% 100%, rgba(45, 212, 191, 0.07), transparent)',
+              background: 'radial-gradient(ellipse 75% 45% at 70% 100%, rgba(52, 211, 153, 0.07), transparent)',
               animation: 'wave3 20s ease-in-out infinite',
             }}
           />
@@ -260,7 +327,7 @@ export default function DashboardPage() {
         </div>
 
         <AppSidebar />
-        <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '320px' }}>
+        <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '280px' }}>
           {showBanner && (
             <OnboardingBanner 
               onResume={handleResumeSetup}
@@ -290,49 +357,75 @@ export default function DashboardPage() {
                 <div className="grid gap-7" style={{ gridTemplateColumns: '1fr 360px' }}>
                   {/* Left Column - Main Content */}
                   <div className="space-y-6">
-                    {/* Top Stats Row - 4 cards across with colorful variety */}
-                    <div className="grid grid-cols-4 gap-4">
-                      <MetricCard
-                        title="Glucose"
-                        value={latestGlucose > 0 ? latestGlucose.toString() : '--'}
-                        unit="mg/dL"
-                        status={latestGlucose > 0 ? getGlucoseStatus(latestGlucose) : 'No Data'}
-                        icon={Droplet}
-                        iconColor="#60A5FA"
-                        badgeBgColor="rgba(96, 165, 250, 0.2)"
-                        badgeTextColor="#60A5FA"
-                      />
-                      <MetricCard
-                        title="Time in Range"
-                        value={`${timeInRange}%`}
-                        unit=""
-                        status={timeInRange >= 70 ? 'Excellent' : timeInRange >= 50 ? 'Good' : 'Needs Improvement'}
-                        icon={Target}
-                        iconColor="#A78BFA"
-                        badgeBgColor="rgba(167, 139, 250, 0.2)"
-                        badgeTextColor="#A78BFA"
-                      />
-                      <MetricCard
-                        title="Carbs Today"
-                        value={totalCarbs > 0 ? `${totalCarbs}g` : '--'}
-                        unit=""
-                        status={totalCarbs > 0 ? 'Tracked' : 'No Data'}
-                        icon={Utensils}
-                        iconColor="#FB923C"
-                        badgeBgColor="rgba(251, 146, 60, 0.2)"
-                        badgeTextColor="#FB923C"
-                      />
-                      <MetricCard
-                        title="Active Insulin"
-                        value={latestInsulin > 0 ? `${latestInsulin}U` : '--'}
-                        unit=""
-                        status={latestInsulin > 0 ? 'Active' : 'No Data'}
-                        icon={Syringe}
-                        iconColor="#2DD4BF"
-                        badgeBgColor="rgba(45, 212, 191, 0.2)"
-                        badgeTextColor="#2DD4BF"
-                      />
+                    {/* Dashboard Tabs */}
+                    <div className="flex gap-2 mb-2">
+                      <button 
+                        onClick={() => setActiveTab('overview')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'overview' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}
+                      >
+                        Overview
+                      </button>
+                      <button 
+                        onClick={() => setActiveTab('ai-insights')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${activeTab === 'ai-insights' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}
+                      >
+                        <Sparkles className="w-4 h-4" />
+                        AI Insights
+                      </button>
+                      <button 
+                        onClick={() => setActiveTab('trends')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'trends' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}
+                      >
+                        Trends
+                      </button>
                     </div>
+                
+                    {/* Tab Content */}
+                    {activeTab === 'overview' && (
+                      <>
+                        {/* Top Stats Row - 4 cards across with colorful variety */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <MetricCard
+                            title="Glucose"
+                            value={latestGlucose > 0 ? latestGlucose.toString() : '--'}
+                            unit="mg/dL"
+                            status={latestGlucose > 0 ? getGlucoseStatus(latestGlucose) : 'No Data'}
+                            icon={Droplet}
+                            iconColor="#60A5FA"
+                            badgeBgColor="rgba(96, 165, 250, 0.2)"
+                            badgeTextColor="#60A5FA"
+                          />
+                          <MetricCard
+                            title="Time in Range"
+                            value={`${timeInRange}%`}
+                            unit=""
+                            status={timeInRange >= 70 ? 'Excellent' : timeInRange >= 50 ? 'Good' : 'Needs Improvement'}
+                            icon={Target}
+                            iconColor="#A78BFA"
+                            badgeBgColor="rgba(167, 139, 250, 0.2)"
+                            badgeTextColor="#A78BFA"
+                          />
+                          <MetricCard
+                            title="Carbs Today"
+                            value={totalCarbs > 0 ? `${totalCarbs}g` : '--'}
+                            unit=""
+                            status={totalCarbs > 0 ? 'Tracked' : 'No Data'}
+                            icon={Utensils}
+                            iconColor="#FB923C"
+                            badgeBgColor="rgba(251, 146, 60, 0.2)"
+                            badgeTextColor="#FB923C"
+                          />
+                          <MetricCard
+                            title="Active Insulin"
+                            value={latestInsulin > 0 ? `${latestInsulin}U` : '--'}
+                            unit=""
+                            status={latestInsulin > 0 ? 'Active' : 'No Data'}
+                            icon={Syringe}
+                            iconColor="#2DD4BF"
+                            badgeBgColor="rgba(45, 212, 191, 0.2)"
+                            badgeTextColor="#2DD4BF"
+                          />
+                        </div>
 
                     {/* Glucose Trends Chart */}
                     <GlucoseTrendChart />
@@ -381,7 +474,242 @@ export default function DashboardPage() {
                         </div>
                       </div>
                     </div>
+                  </>
+                )}
+
+                {activeTab === 'ai-insights' && (
+                  <div className="space-y-6">
+                    {/* Health Score Card */}
+                    <Card className="p-6 bg-gradient-to-br from-primary/10 to-emerald-500/10 border-primary/20">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-lg bg-primary/20">
+                            <Heart className="w-5 h-5 text-primary" />
+                          </div>
+                          <h2 className="text-xl font-bold">Your Health Score</h2>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-4xl font-bold text-primary">{healthScore}</div>
+                          <div className="text-xs text-muted-foreground">out of 100</div>
+                        </div>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-3">
+                        <div 
+                          className="bg-gradient-to-r from-primary to-emerald-500 h-3 rounded-full transition-all duration-500" 
+                          style={{ width: `${healthScore}%` }}
+                        />
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-3">
+                        {healthScore >= 80 ? 'Excellent diabetes management! Keep up the great work.' :
+                         healthScore >= 60 ? 'Good progress. Focus on consistency for better results.' :
+                         'Let\'s work on improving your glucose control. Start with regular monitoring.'}
+                      </p>
+                    </Card>
+
+                    {/* Achievements */}
+                    {achievements.length > 0 && (
+                      <Card className="p-6">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-2 rounded-lg bg-amber-500/20">
+                            <Sparkles className="w-5 h-5 text-amber-500" />
+                          </div>
+                          <h2 className="text-xl font-bold">Achievements</h2>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          {achievements.map((achievement, idx) => (
+                            <div key={idx} className="p-4 rounded-lg bg-gradient-to-br from-secondary/50 to-primary/5 border border-border">
+                              <div className="text-3xl mb-2">{achievement.icon}</div>
+                              <div className="font-medium text-foreground">{achievement.title}</div>
+                              <div className="text-xs text-muted-foreground mt-1">{achievement.desc}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+
+                    <Card className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-primary/20">
+                          <Sparkles className="w-5 h-5 text-primary" />
+                        </div>
+                        <h2 className="text-xl font-bold">AI-Powered Insights</h2>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        {healthData?.data && healthData.data.length > 0 ? (
+                          <>
+                            <div className="p-4 rounded-lg bg-secondary/50 border border-border">
+                              <div className="flex items-start gap-3">
+                                <div className="mt-0.5 p-1.5 rounded-md bg-emerald-500/20">
+                                  <Target className="w-4 h-4 text-emerald-500" />
+                                </div>
+                                <div>
+                                  <h3 className="font-medium text-foreground">Glucose Pattern Detected</h3>
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    {timeInRange >= 70 
+                                      ? 'Excellent glucose control! Your levels stay within target range most of the time.'
+                                      : 'Your glucose tends to fluctuate. Consider adjusting meal timing and insulin doses.'}
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-500">Recommendation</span>
+                                    <span className="text-xs text-muted-foreground">AI-Generated</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {mealsData?.data && mealsData.data.length > 0 && (
+                              <div className="p-4 rounded-lg bg-secondary/50 border border-border">
+                                <div className="flex items-start gap-3">
+                                  <div className="mt-0.5 p-1.5 rounded-md bg-blue-500/20">
+                                    <Utensils className="w-4 h-4 text-blue-500" />
+                                  </div>
+                                  <div>
+                                    <h3 className="font-medium text-foreground">Nutrition Analysis</h3>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                      Average daily carbs: {Math.round(totalCarbs / Math.max(1, mealsData.data.length))}g. 
+                                      {totalCarbs > 200 ? ' Consider reducing carb intake for better control.' : ' Good carbohydrate management!'}
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-2">
+                                      <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-500">Insight</span>
+                                      <span className="text-xs text-muted-foreground">Data-Driven</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="p-8 text-center">
+                            <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                            <h3 className="font-medium text-foreground mb-1">Start Tracking for AI Insights</h3>
+                            <p className="text-sm text-muted-foreground">Log your glucose and meals to receive personalized AI recommendations</p>
+                          </div>
+                        )}
+                        
+                        <div className="p-4 rounded-lg bg-secondary/50 border border-border">
+                          <div className="flex items-start gap-3">
+                            <div className="mt-0.5 p-1.5 rounded-md bg-purple-500/20">
+                              <Activity className="w-4 h-4 text-purple-500" />
+                            </div>
+                            <div>
+                              <h3 className="font-medium text-foreground">Activity Recommendation</h3>
+                              <p className="text-sm text-muted-foreground mt-1">Post-meal walks of 15-20 minutes can help reduce glucose spikes by up to 25%. Try walking after your largest meal.</p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <span className="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-500">Suggestion</span>
+                                <span className="text-xs text-muted-foreground">Evidence-Based</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                    
+                    <Card className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-lg bg-primary/20">
+                            <Syringe className="w-5 h-5 text-primary" />
+                          </div>
+                          <h2 className="text-xl font-bold">Insulin Recommendation</h2>
+                        </div>
+                        <span className="text-sm text-muted-foreground">Based on latest data</span>
+                      </div>
+                      
+                      <div className="flex items-end justify-between p-4 rounded-lg bg-gradient-to-r from-primary/10 to-emerald-500/10 border border-primary/20">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Recommended Dose</p>
+                          <p className="text-3xl font-bold text-primary mt-1">{latestPrediction?.prediction ? latestPrediction.prediction.predictedInsulin.toFixed(1) : '--'} <span className="text-lg">units</span></p>
+                          <p className="text-xs text-muted-foreground mt-1">Confidence: {latestPrediction?.prediction ? (latestPrediction.prediction.confidence * 100).toFixed(0) : '--'}%</p>
+                        </div>
+                        <Button className="bg-primary hover:bg-primary/90">
+                          Log Dose
+                        </Button>
+                      </div>
+                      
+                      <div className="mt-4 pt-4 border-t border-border">
+                        <h3 className="text-sm font-medium text-foreground mb-2">Factors Considered</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {latestPrediction?.prediction?.factors?.map((factor: string, index: number) => (
+                            <span key={index} className="text-xs px-2 py-1 rounded-full bg-secondary text-muted-foreground">
+                              {factor}
+                            </span>
+                          )) || (
+                            <span className="text-xs text-muted-foreground">No factors available</span>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
                   </div>
+                )}
+
+                {activeTab === 'trends' && (
+                  <div className="space-y-6">
+                    <Card className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-primary/20">
+                          <Activity className="w-5 h-5 text-primary" />
+                        </div>
+                        <h2 className="text-xl font-bold">7-Day Glucose Trends</h2>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-4">Your glucose patterns over the past week</p>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="p-4 rounded-lg bg-secondary/50 text-center">
+                          <p className="text-2xl font-bold text-emerald-500">82%</p>
+                          <p className="text-sm text-muted-foreground mt-1">Time in Range</p>
+                        </div>
+                        <div className="p-4 rounded-lg bg-secondary/50 text-center">
+                          <p className="text-2xl font-bold text-blue-500">142</p>
+                          <p className="text-sm text-muted-foreground mt-1">Avg. Glucose</p>
+                        </div>
+                        <div className="p-4 rounded-lg bg-secondary/50 text-center">
+                          <p className="text-2xl font-bold text-purple-500">12</p>
+                          <p className="text-sm text-muted-foreground mt-1">Readings/Day</p>
+                        </div>
+                      </div>
+                    </Card>
+                    
+                    <Card className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2 rounded-lg bg-primary/20">
+                          <Utensils className="w-5 h-5 text-primary" />
+                        </div>
+                        <h2 className="text-xl font-bold">Nutrition Trends</h2>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-4">Your carbohydrate intake patterns</p>
+                      <div className="space-y-3">
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="text-muted-foreground">Breakfast</span>
+                            <span className="font-medium">45g avg</span>
+                          </div>
+                          <div className="w-full bg-secondary rounded-full h-2">
+                            <div className="bg-emerald-500 h-2 rounded-full" style={{ width: '45%' }}></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="text-muted-foreground">Lunch</span>
+                            <span className="font-medium">65g avg</span>
+                          </div>
+                          <div className="w-full bg-secondary rounded-full h-2">
+                            <div className="bg-blue-500 h-2 rounded-full" style={{ width: '65%' }}></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="text-muted-foreground">Dinner</span>
+                            <span className="font-medium">55g avg</span>
+                          </div>
+                          <div className="w-full bg-secondary rounded-full h-2">
+                            <div className="bg-purple-500 h-2 rounded-full" style={{ width: '55%' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                )}
+              </div>
 
                   {/* Right Column - 360px wide */}
                   <div className="space-y-4">
@@ -507,19 +835,35 @@ export default function DashboardPage() {
           @keyframes floatDot${dot.id} {
             0%, 100% { 
               transform: translate3d(0, 0, 0); 
-              opacity: 0.25; 
+              opacity: 0.2; 
+            }
+            12.5% { 
+              transform: translate3d(${dot.xRange * 1}px, ${dot.yRange * 0.8}px, 0); 
+              opacity: 0.205; 
             }
             25% { 
-              transform: translate3d(${dot.xRange * 0.4}px, ${dot.yRange * 0.4}px, 0); 
-              opacity: 0.3; 
+              transform: translate3d(${dot.xRange * 2}px, ${dot.yRange * 1.5}px, 0); 
+              opacity: 0.2; 
+            }
+            37.5% { 
+              transform: translate3d(${dot.xRange * 3}px, ${dot.yRange * 2.2}px, 0); 
+              opacity: 0.21; 
             }
             50% { 
-              transform: translate3d(${dot.xRange}px, ${dot.yRange}px, 0); 
-              opacity: 0.35; 
+              transform: translate3d(${dot.xRange * 4}px, ${dot.yRange * 3}px, 0); 
+              opacity: 0.22; 
+            }
+            62.5% { 
+              transform: translate3d(${dot.xRange * 3.5}px, ${dot.yRange * 2.5}px, 0); 
+              opacity: 0.215; 
             }
             75% { 
-              transform: translate3d(${dot.xRange * 0.6}px, ${dot.yRange * 0.7}px, 0); 
-              opacity: 0.28; 
+              transform: translate3d(${dot.xRange * 2.5}px, ${dot.yRange * 2}px, 0); 
+              opacity: 0.2; 
+            }
+            87.5% { 
+              transform: translate3d(${dot.xRange * 1}px, ${dot.yRange * 0.8}px, 0); 
+              opacity: 0.205; 
             }
           }
         `).join('\n')}
@@ -530,17 +874,33 @@ export default function DashboardPage() {
               transform: translate3d(0, 0, 0) scale(1); 
               opacity: ${circle.opacity}; 
             }
+            12.5% { 
+              transform: translate3d(${circle.xRange * 1}px, ${circle.yRange * 0.8}px, 0) scale(1.0005); 
+              opacity: ${circle.opacity + 0.0005}; 
+            }
             25% { 
-              transform: translate3d(${circle.xRange * 0.5}px, ${circle.yRange * 0.4}px, 0) scale(1.05); 
-              opacity: ${circle.opacity * 1.3}; 
+              transform: translate3d(${circle.xRange * 2}px, ${circle.yRange * 1.5}px, 0) scale(1.001); 
+              opacity: ${circle.opacity + 0.001}; 
+            }
+            37.5% { 
+              transform: translate3d(${circle.xRange * 3}px, ${circle.yRange * 2.2}px, 0) scale(1.0015); 
+              opacity: ${circle.opacity + 0.0015}; 
             }
             50% { 
-              transform: translate3d(${circle.xRange}px, ${circle.yRange}px, 0) scale(1.1); 
-              opacity: ${circle.opacity * 1.5}; 
+              transform: translate3d(${circle.xRange * 4}px, ${circle.yRange * 3}px, 0) scale(1.002); 
+              opacity: ${circle.opacity + 0.002}; 
+            }
+            62.5% { 
+              transform: translate3d(${circle.xRange * 3.5}px, ${circle.yRange * 2.5}px, 0) scale(1.0015); 
+              opacity: ${circle.opacity + 0.0015}; 
             }
             75% { 
-              transform: translate3d(${circle.xRange * 0.7}px, ${circle.yRange * 0.6}px, 0) scale(1.03); 
-              opacity: ${circle.opacity * 1.2}; 
+              transform: translate3d(${circle.xRange * 2.5}px, ${circle.yRange * 2}px, 0) scale(1.001); 
+              opacity: ${circle.opacity + 0.001}; 
+            }
+            87.5% { 
+              transform: translate3d(${circle.xRange * 1}px, ${circle.yRange * 0.8}px, 0) scale(1.0005); 
+              opacity: ${circle.opacity + 0.0005}; 
             }
           }
         `).join('\n')}
@@ -549,19 +909,35 @@ export default function DashboardPage() {
           @keyframes floatIcon${icon.id} {
             0%, 100% { 
               transform: translate3d(0, 0, 0) rotate(${icon.rotation}deg); 
-              opacity: 0.12; 
+              opacity: 0.1; 
+            }
+            12.5% { 
+              transform: translate3d(${icon.xRange * 1}px, ${icon.yRange * 0.8}px, 0) rotate(${icon.rotation + 0.05}deg); 
+              opacity: 0.105; 
             }
             25% { 
-              transform: translate3d(${icon.xRange * 0.4}px, ${icon.yRange * 0.3}px, 0) rotate(${icon.rotation + 5}deg); 
-              opacity: 0.15; 
+              transform: translate3d(${icon.xRange * 2}px, ${icon.yRange * 1.5}px, 0) rotate(${icon.rotation + 0.1}deg); 
+              opacity: 0.11; 
+            }
+            37.5% { 
+              transform: translate3d(${icon.xRange * 3}px, ${icon.yRange * 2.2}px, 0) rotate(${icon.rotation + 0.08}deg); 
+              opacity: 0.11; 
             }
             50% { 
-              transform: translate3d(${icon.xRange}px, ${icon.yRange}px, 0) rotate(${icon.rotation - 8}deg); 
-              opacity: 0.18; 
+              transform: translate3d(${icon.xRange * 4}px, ${icon.yRange * 3}px, 0) rotate(${icon.rotation - 0.1}deg); 
+              opacity: 0.11; 
+            }
+            62.5% { 
+              transform: translate3d(${icon.xRange * 3.5}px, ${icon.yRange * 2.5}px, 0) rotate(${icon.rotation - 0.05}deg); 
+              opacity: 0.11; 
             }
             75% { 
-              transform: translate3d(${icon.xRange * 0.6}px, ${icon.yRange * 0.7}px, 0) rotate(${icon.rotation + 3}deg); 
-              opacity: 0.14; 
+              transform: translate3d(${icon.xRange * 2.5}px, ${icon.yRange * 2}px, 0) rotate(${icon.rotation + 0.05}deg); 
+              opacity: 0.105; 
+            }
+            87.5% { 
+              transform: translate3d(${icon.xRange * 1}px, ${icon.yRange * 0.8}px, 0) rotate(${icon.rotation}deg); 
+              opacity: 0.1; 
             }
           }
         `).join('\n')}
@@ -572,8 +948,8 @@ export default function DashboardPage() {
             opacity: 0.3;
           }
           50% { 
-            transform: translateY(-30px) scaleX(1.1);
-            opacity: 0.4;
+            transform: translateY(-1.5px) scaleX(1.003);
+            opacity: 0.32;
           }
         }
 
@@ -583,8 +959,8 @@ export default function DashboardPage() {
             opacity: 0.2;
           }
           50% { 
-            transform: translateX(40px) scaleY(1.15);
-            opacity: 0.3;
+            transform: translateX(2px) scaleY(1.004);
+            opacity: 0.22;
           }
         }
 
@@ -594,8 +970,8 @@ export default function DashboardPage() {
             opacity: 0.25;
           }
           50% { 
-            transform: translateY(30px) scaleX(1.1);
-            opacity: 0.35;
+            transform: translateY(1.5px) scaleX(1.003);
+            opacity: 0.27;
           }
         }
       `}</style>

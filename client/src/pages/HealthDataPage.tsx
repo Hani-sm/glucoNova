@@ -12,11 +12,13 @@ import { healthDataSchema, type InsertHealthData } from '@shared/schema';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import { Droplet, TrendingUp } from 'lucide-react';
+import { Droplet, TrendingUp, User, Calendar, Activity, Heart } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useAuth } from '@/lib/auth-context';
 
 export default function HealthDataPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const form = useForm<InsertHealthData>({
     resolver: zodResolver(healthDataSchema),
@@ -27,6 +29,14 @@ export default function HealthDataPage() {
       activityLevel: 'moderate',
       notes: '',
     },
+  });
+
+  const { data: profileData } = useQuery({
+    queryKey: ['/api/profile'],
+  });
+
+  const { data: reportsData } = useQuery({
+    queryKey: ['/api/reports'],
   });
 
   const createHealthDataMutation = useMutation({
@@ -62,7 +72,7 @@ export default function HealthDataPage() {
   return (
     <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden">
       <AppSidebar />
-      <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '320px' }}>
+      <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '280px' }}>
         <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
           <div className="flex items-center gap-4">
             <Droplet className="w-6 h-6 text-primary" />
@@ -73,9 +83,92 @@ export default function HealthDataPage() {
         <main className="flex-1 overflow-y-auto">
           <div className="w-full" style={{ padding: '24px 32px' }}>
             <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-1">Log Health Data</h1>
-              <p className="text-muted-foreground">Track your glucose, insulin, and carbohydrate intake</p>
+              <h1 className="text-3xl font-bold mb-1">My Profile & Health Data</h1>
+              <p className="text-muted-foreground">View your profile and track your health metrics</p>
             </div>
+
+            {/* Patient Profile Card */}
+            <Card className="p-6 mb-6 bg-gradient-to-br from-primary/5 to-emerald-500/5 border-primary/20">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <User className="h-5 w-5 text-primary" />
+                </div>
+                <h2 className="text-xl font-bold">Patient Profile</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <User className="w-4 h-4" />
+                    <span>Name</span>
+                  </div>
+                  <p className="font-semibold">{user?.name || 'Not set'}</p>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="w-4 h-4" />
+                    <span>Date of Birth</span>
+                  </div>
+                  <p className="font-semibold">
+                    {profileData?.profile?.dateOfBirth 
+                      ? new Date(profileData.profile.dateOfBirth).toLocaleDateString()
+                      : 'Not set'}
+                  </p>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Activity className="w-4 h-4" />
+                    <span>Weight</span>
+                  </div>
+                  <p className="font-semibold">
+                    {profileData?.profile?.weight 
+                      ? `${profileData.profile.weight} kg`
+                      : 'Not set'}
+                  </p>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Activity className="w-4 h-4" />
+                    <span>Height</span>
+                  </div>
+                  <p className="font-semibold">
+                    {profileData?.profile?.height 
+                      ? `${profileData.profile.height} cm`
+                      : 'Not set'}
+                  </p>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Heart className="w-4 h-4" />
+                    <span>Diabetes Type</span>
+                  </div>
+                  <p className="font-semibold">
+                    {profileData?.profile?.diabetesType || 'Not set'}
+                  </p>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Droplet className="w-4 h-4" />
+                    <span>Medical Reports</span>
+                  </div>
+                  <p className="font-semibold">
+                    {reportsData?.reports?.length || 0} uploaded
+                  </p>
+                </div>
+              </div>
+              
+              {profileData?.profile?.emergencyContact && (
+                <div className="mt-4 pt-4 border-t border-border">
+                  <p className="text-sm text-muted-foreground mb-2">Emergency Contact</p>
+                  <p className="font-semibold">{profileData.profile.emergencyContact}</p>
+                </div>
+              )}
+            </Card>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="p-6">

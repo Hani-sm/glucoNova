@@ -27,9 +27,16 @@ class ApiClient {
       },
     });
 
+    // If 401 (unauthorized) and no token, return empty response for login page
+    if (response.status === 401 && !this.getToken()) {
+      console.log(`API: 401 Unauthorized for ${endpoint} (no token - user not logged in)`);
+      throw new Error('Unauthorized');
+    }
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'Request failed' }));
-      throw new Error(error.message || 'Request failed');
+      console.error(`API Error [${response.status}] ${endpoint}:`, error);
+      throw new Error(error.message || `Request failed with status ${response.status}`);
     }
 
     return response.json();
@@ -135,6 +142,31 @@ class ApiClient {
 }
 
 export const api = new ApiClient();
+
+// Utility function for direct API requests
+export async function apiRequest(endpoint: string, method: string = 'GET', body?: any): Promise<any> {
+  const token = getAuthToken();
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`/api${endpoint}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Request failed' }));
+    throw new Error(error.message || 'Request failed');
+  }
+
+  return response.json();
+}
 
 export function setAuthToken(token: string) {
   localStorage.setItem('token', token);

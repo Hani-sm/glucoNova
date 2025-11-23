@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Upload, FileText, X, Check, Activity, Droplet, Pill, Mic, Heart, Utensils } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useQuery } from '@tanstack/react-query';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -33,6 +34,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [showParser, setShowParser] = useState(false);
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+  const [showExistingReports, setShowExistingReports] = useState(false);
   const [healthData, setHealthData] = useState<HealthData>({
     name: '',
     dob: '',
@@ -44,6 +47,12 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
     targetRange: '70-180',
   });
   const { toast } = useToast();
+
+  // Fetch existing medical reports
+  const { data: reportsData, isLoading: isLoadingReports } = useQuery<{ reports: any[] }>({
+    queryKey: ['/api/reports'],
+    enabled: isOpen && showExistingReports,
+  });
 
   const progress = (step / 5) * 100;
 
@@ -60,19 +69,50 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
       setUploadedFile(file);
       setShowParser(true);
       
-      // Simulate parsing PDF data
-      setTimeout(() => {
-        setHealthData({
-          name: 'John Doe',
-          dob: '1980-05-15',
-          weight: '75',
-          height: '175',
-          lastA1c: '6.5',
-          medications: 'Metformin, Insulin',
-          typicalInsulin: '20',
-          targetRange: '70-180',
-        });
-      }, 500);
+      // Send file to server for actual PDF parsing
+      const parseFile = async () => {
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          const token = localStorage.getItem('token');
+          const response = await fetch('/api/reports/parse', {
+            method: 'POST',
+            headers: {
+              'Authorization': token ? `Bearer ${token}` : '',
+            },
+            body: formData,
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to parse document');
+          }
+          
+          const parsedData = await response.json();
+          
+          // Update health data with parsed values from the document
+          setHealthData(prev => ({
+            ...prev,
+            ...(parsedData.name && { name: parsedData.name }),
+            ...(parsedData.dob && { dob: parsedData.dob }),
+            ...(parsedData.weight && { weight: parsedData.weight }),
+            ...(parsedData.height && { height: parsedData.height }),
+            ...(parsedData.lastA1c && { lastA1c: parsedData.lastA1c }),
+            ...(parsedData.medications && { medications: parsedData.medications }),
+            ...(parsedData.typicalInsulin && { typicalInsulin: parsedData.typicalInsulin }),
+            ...(parsedData.targetRange && { targetRange: parsedData.targetRange }),
+          }));
+        } catch (error) {
+          console.error('PDF parsing error:', error);
+          toast({
+            title: 'Parsing failed',
+            description: 'Could not extract data from document. Please enter details manually.',
+            variant: 'destructive',
+          });
+        }
+      };
+      
+      parseFile();
     } else {
       toast({
         title: 'Invalid file type',
@@ -123,7 +163,108 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
 
   const handleManualEntry = () => {
     setShowParser(false);
+    setShowExistingReports(false);
     setStep(4);
+  };
+
+  const handleSelectExistingReport = () => {
+    setShowExistingReports(true);
+  };
+
+  const handleReportSelection = async (reportId: string) => {
+    try {
+      setSelectedReportId(reportId);
+      
+      // Fetch patient details from the selected report
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/reports/${reportId}/patient`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch patient details');
+      }
+
+      const data = await response.json();
+      
+      // Also try to parse the file to get health data
+      const reportFile = reportsData?.reports.find(r => r._id === reportId);
+      if (reportFile && reportFile.fileUrl) {
+        try {
+          // Fetch the file and parse it
+          const fileResponse = await fetch(reportFile.fileUrl, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          
+          if (fileResponse.ok) {
+            const blob = await fileResponse.blob();
+            const file = new File([blob], reportFile.fileName, { type: reportFile.fileType });
+            
+            // Parse the file
+            const parseFormData = new FormData();
+            parseFormData.append('file', file);
+            
+            const parseResponse = await fetch('/api/reports/parse', {
+              method: 'POST',
+              headers: {
+                'Authorization': token ? `Bearer ${token}` : '',
+              },
+              body: parseFormData,
+            });
+            
+            if (parseResponse.ok) {
+              const parsedData = await parseResponse.json();
+              
+              // Update health data with parsed values
+              setHealthData(prev => ({
+                ...prev,
+                name: parsedData.name || data.patient.name || prev.name,
+                dob: parsedData.dob || prev.dob,
+                weight: parsedData.weight || prev.weight,
+                height: parsedData.height || prev.height,
+                lastA1c: parsedData.lastA1c || prev.lastA1c,
+                medications: parsedData.medications || prev.medications,
+                typicalInsulin: parsedData.typicalInsulin || prev.typicalInsulin,
+                targetRange: parsedData.targetRange || prev.targetRange,
+              }));
+            }
+          }
+        } catch (parseError) {
+          console.error('Error parsing report file:', parseError);
+          // Fall back to just using patient data
+          setHealthData(prev => ({
+            ...prev,
+            name: data.patient.name || prev.name,
+          }));
+        }
+      } else {
+        // Just use patient data if file parsing is not available
+        setHealthData(prev => ({
+          ...prev,
+          name: data.patient.name || prev.name,
+        }));
+      }
+      
+      setShowParser(true);
+      setShowExistingReports(false);
+      
+      toast({
+        title: 'Report loaded',
+        description: 'Patient information has been populated. Please review and confirm.',
+      });
+    } catch (error) {
+      console.error('Error loading report:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load patient details from report',
+        variant: 'destructive',
+      });
+    }
   };
 
   const validateData = () => {
@@ -396,8 +537,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
           </div>
         )}
 
-        {/* Step 3: Upload Health Records */}
-        {step === 3 && !showParser && (
+        {/* Step 3: Upload Health Records OR Select Existing */}
+        {step === 3 && !showParser && !showExistingReports && (
           <div className="flex flex-col flex-1">
             <h2 className="text-xl font-bold mb-2 text-foreground">Upload Health Records</h2>
             <p className="text-sm text-muted-foreground mb-4">Upload a PDF of your health summary to auto-extract your information</p>
@@ -448,7 +589,16 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
               )}
             </div>
 
-            <div className="flex gap-3 mt-4">
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              <Button
+                variant="outline"
+                onClick={handleSelectExistingReport}
+                className="flex-1"
+                data-testid="button-select-existing"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Select Existing
+              </Button>
               <Button
                 variant="outline"
                 onClick={handleUseSample}
@@ -465,6 +615,82 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
               >
                 Enter Manually
               </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Select from Existing Reports */}
+        {step === 3 && showExistingReports && (
+          <div className="flex flex-col flex-1">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-bold text-foreground">Select Existing Report</h2>
+                <p className="text-sm text-muted-foreground">Choose from your previously uploaded medical reports</p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowExistingReports(false)}
+                data-testid="button-back-to-upload"
+              >
+                Back
+              </Button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto space-y-3">
+              {isLoadingReports ? (
+                <div className="flex items-center justify-center py-8">
+                  <p className="text-sm text-muted-foreground">Loading reports...</p>
+                </div>
+              ) : reportsData && reportsData.reports && reportsData.reports.length > 0 ? (
+                reportsData.reports.map((report: any) => (
+                  <Card
+                    key={report._id}
+                    className="p-4 bg-secondary/50 border-border hover:border-primary/50 cursor-pointer transition-all"
+                    onClick={() => handleReportSelection(report._id)}
+                    data-testid={`report-card-${report._id}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm text-foreground truncate">{report.fileName}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Uploaded: {new Date(report.uploadedAt).toLocaleDateString()}
+                        </p>
+                        {report.description && (
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                            {report.description}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary">
+                            {report.fileType}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {(report.fileSize / 1024).toFixed(1)} KB
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <FileText className="w-12 h-12 text-muted-foreground mb-3" />
+                  <p className="text-sm text-foreground mb-2">No reports found</p>
+                  <p className="text-xs text-muted-foreground mb-4">Upload a medical report to get started</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowExistingReports(false)}
+                    data-testid="button-upload-new"
+                  >
+                    Upload New Report
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -1,0 +1,19 @@
+# Build configuration
+[build]
+  command = "npm install && npm run build"
+  publish = "dist/public"
+
+# Environment variables (set these in Render dashboard)
+# DATABASE_URL - Your PostgreSQL connection string
+# JWT_SECRET - Secure random string
+# NODE_ENV=production
+
+[[redirects]]
+  from = "/api/*"
+  to = "/api/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

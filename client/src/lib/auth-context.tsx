@@ -9,37 +9,70 @@ interface User {
   isApproved: boolean;
 }
 
+interface SkipAuthUser {
+  id: string;
+  name: string;
+  role: 'patient' | 'doctor';
+  isSkipAuth: true;
+}
+
 interface AuthContextType {
-  user: User | null;
+  user: User | SkipAuthUser | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, role: string) => Promise<void>;
   logout: () => void;
+  setSkipAuthUser: (role: 'patient' | 'doctor') => void;
   isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | SkipAuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const initAuth = async () => {
+      console.log('AuthProvider: Initializing auth...');
+      
+      // Check for skip auth first
+      const skipAuth = localStorage.getItem('skipAuth');
+      const userRole = localStorage.getItem('userRole');
+      
+      if (skipAuth === 'true' && userRole) {
+        console.log('AuthProvider: Skip auth detected, setting temporary user');
+        const tempUser: SkipAuthUser = {
+          id: `skip-auth-${Date.now()}`,
+          name: 'Guest User',
+          role: userRole as 'patient' | 'doctor',
+          isSkipAuth: true
+        };
+        setUser(tempUser);
+        setLoading(false);
+        return;
+      }
+      
       const token = getAuthToken();
       
       if (token) {
         try {
+          console.log('AuthProvider: Found token, fetching user info...');
           const response = await api.getMe();
+          console.log('AuthProvider: User fetched successfully', response);
           setUser(response);
           setCurrentUser(response);
         } catch (error) {
+          console.error('AuthProvider: Failed to fetch user, clearing token', error);
           removeAuthToken();
           removeCurrentUser();
           setUser(null);
         }
+      } else {
+        console.log('AuthProvider: No token found, user is logged out');
       }
       
+      console.log('AuthProvider: Auth initialization complete');
       setLoading(false);
     };
 
@@ -63,11 +96,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     removeAuthToken();
     removeCurrentUser();
+    localStorage.removeItem('skipAuth');
+    localStorage.removeItem('userRole');
     setUser(null);
   };
 
+  const setSkipAuthUser = (role: 'patient' | 'doctor') => {
+    const tempUser: SkipAuthUser = {
+      id: `skip-auth-${Date.now()}`,
+      name: 'Guest User',
+      role,
+      isSkipAuth: true
+    };
+    setUser(tempUser);
+    localStorage.setItem('skipAuth', 'true');
+    localStorage.setItem('userRole', role);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, setSkipAuthUser, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );
