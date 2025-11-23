@@ -37,3 +37,10 @@ yarn-error.log*
 
 # OS
 Thumbs.db
+
+# Development cache and state
+.local/
+.config/
+
+# Documentation files (kept in git but ignored during development)
+# *.txt files in root are typically deployment guides
