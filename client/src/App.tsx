@@ -26,6 +26,7 @@ import AppointmentsPage from "@/pages/AppointmentsPage";
 import DocumentsOCRPage from "@/pages/DocumentsOCRPage";
 import NotFound from "@/pages/not-found";
 import { ReactNode, Component } from "react";
+import '@/i18n/config'; // Initialize i18n
 
 // Error Boundary Component
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {

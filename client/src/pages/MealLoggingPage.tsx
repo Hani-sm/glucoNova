@@ -16,8 +16,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from '@/components/LanguageSelector';
 
 export default function MealLoggingPage() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isRecording, setIsRecording] = useState(false);
   const [description, setDescription] = useState('');
@@ -54,8 +57,8 @@ export default function MealLoggingPage() {
     },
     onSuccess: () => {
       toast({
-        title: 'Success',
-        description: 'Meal logged successfully',
+        title: t('food.messages.logSuccess'),
+        description: t('food.messages.logSuccessDesc'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/meals'] });
       form.reset();
@@ -63,8 +66,8 @@ export default function MealLoggingPage() {
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to log meal',
+        title: t('food.messages.logError'),
+        description: error.message || t('food.messages.logErrorDesc'),
         variant: 'destructive',
       });
     },
@@ -367,8 +370,8 @@ export default function MealLoggingPage() {
   const analyzeDescription = (text: string) => {
     if (!text.trim()) {
       toast({
-        title: 'No Input',
-        description: 'Please enter or speak a meal description first',
+        title: t('food.messages.noInput'),
+        description: t('food.messages.noInputDesc'),
         variant: 'destructive',
       });
       return;
@@ -388,13 +391,13 @@ export default function MealLoggingPage() {
     // Provide helpful feedback
     if (est.ingredients.length > 0 && est.ingredients[0] !== 'Unknown food item') {
       toast({
-        title: '✓ Analysis Complete',
-        description: `Recognized ${est.ingredients.length} food item(s): ${est.ingredients.join(', ')}`,
+        title: t('food.messages.analysisComplete'),
+        description: t('food.messages.recognizedFoods', { count: est.ingredients.length, foods: est.ingredients.join(', ') }),
       });
     } else {
       toast({
-        title: 'Generic Estimation',
-        description: 'Could not identify specific food. Showing average meal values. You can adjust manually.',
+        title: t('food.messages.genericEstimation'),
+        description: t('food.messages.genericEstimationDesc'),
         variant: 'default',
       });
     }
@@ -427,8 +430,8 @@ export default function MealLoggingPage() {
 
       recognitionRef.current.onerror = (event: any) => {
         toast({
-          title: 'Error',
-          description: `Speech recognition error: ${event.error}`,
+          title: t('food.messages.logError'),
+          description: t('food.messages.speechError', { error: event.error }),
           variant: 'destructive',
         });
         setIsRecording(false);
@@ -446,8 +449,8 @@ export default function MealLoggingPage() {
   const handleVoiceRecording = () => {
     if (!recognitionRef.current) {
       toast({
-        title: 'Not Supported',
-        description: 'Speech Recognition is not supported in your browser',
+        title: t('food.messages.speechNotSupported'),
+        description: t('food.messages.speechNotSupportedDesc'),
         variant: 'destructive',
       });
       return;
@@ -473,13 +476,14 @@ export default function MealLoggingPage() {
             <Utensils className="w-6 h-6 text-primary" />
             <h2 className="text-xl font-semibold">Food AI</h2>
           </div>
+          <LanguageSelector />
         </header>
         
         <main className="flex-1 overflow-y-auto">
           <div className="w-full" style={{ padding: '24px 32px' }}>
             <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-1">Log Meals</h1>
-              <p className="text-muted-foreground">Track your nutrition and meal intake</p>
+              <h1 className="text-3xl font-bold mb-1">{t('food.title')}</h1>
+              <p className="text-muted-foreground">{t('food.subtitle')}</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
