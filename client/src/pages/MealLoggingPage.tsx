@@ -27,7 +27,7 @@ export default function MealLoggingPage() {
   const [portionSize, setPortionSize] = useState('');
   const [portionUnit, setPortionUnit] = useState('grams');
 
-  const { data: profileData } = useQuery({
+  const { data: profileData } = useQuery<{ profile: any }>({
     queryKey: ['/api/profile'],
   });
   
@@ -45,7 +45,12 @@ export default function MealLoggingPage() {
 
   const createMealMutation = useMutation({
     mutationFn: async (data: InsertMeal) => {
-      return apiRequest('/api/meals', 'POST', data);
+      const response = await apiRequest('/api/meals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -65,7 +70,7 @@ export default function MealLoggingPage() {
     },
   });
 
-  const { data: mealHistory } = useQuery({
+  const { data: mealHistory } = useQuery<{ meals: any[] }>({
     queryKey: ['/api/meals'],
   });
 
