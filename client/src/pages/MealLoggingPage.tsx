@@ -10,10 +10,12 @@ import { mealSchema, type InsertMeal } from '@shared/schema';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import { Utensils, Mic, AlertCircle, TrendingUp, Activity, Sparkles } from 'lucide-react';
+import { Utensils, Mic, AlertCircle, TrendingUp, Activity, Sparkles, Keyboard, Scale } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function MealLoggingPage() {
   const { toast } = useToast();
@@ -21,6 +23,9 @@ export default function MealLoggingPage() {
   const [description, setDescription] = useState('');
   const [transcript, setTranscript] = useState('');
   const [analysis, setAnalysis] = useState<any>(null);
+  const [inputMode, setInputMode] = useState<'voice' | 'manual'>('manual');
+  const [portionSize, setPortionSize] = useState('');
+  const [portionUnit, setPortionUnit] = useState('grams');
 
   const { data: profileData } = useQuery({
     queryKey: ['/api/profile'],
@@ -248,38 +253,124 @@ export default function MealLoggingPage() {
                   <h2 className="text-xl font-bold">New Meal</h2>
                 </div>
 
-                <div className="mb-4 space-y-2">
-                  <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Describe Your Meal (text or voice)</label>
-                  <Input
-                    placeholder="e.g., Chicken salad with brown rice, 200g"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    data-testid="input-meal-description"
-                    className={isRecording ? 'border-red-500 animate-pulse' : ''}
-                  />
-                  {isRecording && (
-                    <p className="text-xs text-red-500 flex items-center gap-1">
-                      <Activity className="h-3 w-3 animate-pulse" />
-                      Listening... Speak now
-                    </p>
-                  )}
-                  {transcript && !isRecording && (
-                    <p className="text-xs text-green-500 flex items-center gap-1">
-                      <Sparkles className="h-3 w-3" />
-                      Captured: {transcript}
-                    </p>
-                  )}
-                  <div className="flex gap-2">
-                    <Button type="button" variant={isRecording ? 'destructive' : 'outline'} onClick={handleVoiceRecording} className="flex-1" data-testid="button-voice-record">
-                      <Mic className="h-4 w-4 mr-2" />
-                      {isRecording ? 'Stop Recording' : 'Log with Voice'}
-                    </Button>
-                    <Button type="button" onClick={() => analyzeDescription(description)} className="flex-1" data-testid="button-analyze" disabled={!description.trim()}>
+                <Tabs value={inputMode} onValueChange={(v) => setInputMode(v as 'voice' | 'manual')} className="mb-4">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="manual" className="flex items-center gap-2">
+                      <Keyboard className="h-4 w-4" />
+                      Type Manually
+                    </TabsTrigger>
+                    <TabsTrigger value="voice" className="flex items-center gap-2">
+                      <Mic className="h-4 w-4" />
+                      Voice Input
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="manual" className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium leading-none">Food Description</label>
+                      <Input
+                        placeholder="e.g., Grilled chicken breast with steamed broccoli"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        data-testid="input-meal-description"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium leading-none flex items-center gap-2">
+                          <Scale className="h-3 w-3" />
+                          Portion Size
+                        </label>
+                        <Input
+                          type="number"
+                          placeholder="200"
+                          value={portionSize}
+                          onChange={(e) => setPortionSize(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium leading-none">Unit</label>
+                        <Select value={portionUnit} onValueChange={setPortionUnit}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="grams">Grams (g)</SelectItem>
+                            <SelectItem value="oz">Ounces (oz)</SelectItem>
+                            <SelectItem value="cup">Cup</SelectItem>
+                            <SelectItem value="tbsp">Tablespoon</SelectItem>
+                            <SelectItem value="pieces">Pieces</SelectItem>
+                            <SelectItem value="serving">Serving</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <Button 
+                      type="button" 
+                      onClick={() => {
+                        const desc = portionSize ? `${description}, ${portionSize}${portionUnit}` : description;
+                        analyzeDescription(desc);
+                      }} 
+                      className="w-full" 
+                      disabled={!description.trim()}
+                    >
                       <Sparkles className="h-4 w-4 mr-2" />
-                      Analyze
+                      Analyze Nutrition
                     </Button>
-                  </div>
-                </div>
+                  </TabsContent>
+
+                  <TabsContent value="voice" className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium leading-none">Speak Your Meal</label>
+                      <Input
+                        placeholder="e.g., Chicken salad with brown rice, 200g"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        data-testid="input-meal-description-voice"
+                        className={isRecording ? 'border-red-500 animate-pulse' : ''}
+                        readOnly={isRecording}
+                      />
+                      {isRecording && (
+                        <p className="text-xs text-red-500 flex items-center gap-1">
+                          <Activity className="h-3 w-3 animate-pulse" />
+                          Listening... Speak now
+                        </p>
+                      )}
+                      {transcript && !isRecording && (
+                        <p className="text-xs text-green-500 flex items-center gap-1">
+                          <Sparkles className="h-3 w-3" />
+                          Captured: {transcript}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button 
+                        type="button" 
+                        variant={isRecording ? 'destructive' : 'default'} 
+                        onClick={handleVoiceRecording} 
+                        className="flex-1" 
+                        data-testid="button-voice-record"
+                      >
+                        <Mic className="h-4 w-4 mr-2" />
+                        {isRecording ? 'Stop Recording' : 'Start Voice Input'}
+                      </Button>
+                      <Button 
+                        type="button" 
+                        variant="outline"
+                        onClick={() => analyzeDescription(description)} 
+                        className="flex-1" 
+                        data-testid="button-analyze" 
+                        disabled={!description.trim()}
+                      >
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Analyze
+                      </Button>
+                    </div>
+                  </TabsContent>
+                </Tabs>
 
                 {/* Analysis Results */}
                 {analysis && (
