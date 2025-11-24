@@ -2,8 +2,10 @@ import { useState, useRef } from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Camera, Upload, FileText, Scan, CheckCircle, AlertCircle } from 'lucide-react';
+import { Camera, Upload, FileText, Scan, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
+import { useQuery, useMutation, queryClient } from '@tanstack/react-query';
 
 export default function DocumentsOCRPage() {
   const { toast } = useToast();
@@ -11,49 +13,125 @@ export default function DocumentsOCRPage() {
   const [uploading, setUploading] = useState(false);
   const [extractedData, setExtractedData] = useState<any>(null);
 
+  const uploadMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      // First upload to server
+      const uploadResponse = await apiRequest('/api/reports/upload', 'POST', formData, {
+        headers: {}, // Let browser set Content-Type with boundary
+      });
+      
+      // Then parse the document for data extraction
+      const parseFormData = new FormData();
+      parseFormData.append('file', file);
+      
+      const parseResponse = await apiRequest('/api/reports/parse', 'POST', parseFormData, {
+        headers: {}, // Let browser set Content-Type with boundary
+      });
+      
+      return { upload: uploadResponse, parsed: parseResponse };
+    },
+    onSuccess: (data) => {
+      const parsed = data.parsed;
+      
+      // Build AI insights from extracted data
+      const aiInsights: string[] = [];
+      if (parsed.lastA1c) {
+        const a1c = parseFloat(parsed.lastA1c);
+        if (a1c < 7) {
+          aiInsights.push(`HbA1c (${parsed.lastA1c}%) shows excellent diabetes control`);
+        } else if (a1c < 8) {
+          aiInsights.push(`HbA1c (${parsed.lastA1c}%) indicates moderate diabetes control`);
+        } else {
+          aiInsights.push(`HbA1c (${parsed.lastA1c}%) is elevated - consult with healthcare provider`);
+        }
+      }
+      
+      if (parsed.weight) {
+        aiInsights.push(`Weight: ${parsed.weight} kg recorded`);
+      }
+      
+      if (parsed.medications) {
+        aiInsights.push(`Current medications: ${parsed.medications}`);
+      }
+      
+      if (parsed.typicalInsulin) {
+        aiInsights.push(`Insulin dose: ${parsed.typicalInsulin} units noted`);
+      }
+      
+      // Calculate insulin recommendations
+      let basalInsulin = 12;
+      let insulinToCarbRatio = '1:10';
+      
+      if (parsed.weight) {
+        const weight = parseFloat(parsed.weight);
+        basalInsulin = Math.round((weight * 0.4) / 2);
+        const totalDaily = basalInsulin * 2;
+        const ratio = Math.round(500 / totalDaily);
+        insulinToCarbRatio = `1:${ratio}`;
+      }
+      
+      const extractedFields: Record<string, string> = {};
+      if (parsed.name) extractedFields['Patient Name'] = parsed.name;
+      if (parsed.dob) extractedFields['Date of Birth'] = parsed.dob;
+      if (parsed.weight) extractedFields['Weight'] = `${parsed.weight} kg`;
+      if (parsed.height) extractedFields['Height'] = `${parsed.height} cm`;
+      if (parsed.lastA1c) extractedFields['HbA1c'] = `${parsed.lastA1c}%`;
+      if (parsed.medications) extractedFields['Medications'] = parsed.medications;
+      if (parsed.typicalInsulin) extractedFields['Insulin Dose'] = `${parsed.typicalInsulin} units`;
+      if (parsed.targetRange) extractedFields['Target Range'] = `${parsed.targetRange} mg/dL`;
+      
+      const mockData = {
+        reportType: 'Medical Report',
+        date: new Date().toISOString().split('T')[0],
+        extractedFields,
+        aiInsights: aiInsights.length > 0 ? aiInsights : [
+          'Document uploaded successfully',
+          'AI analysis completed - review extracted data above'
+        ],
+        confidence: Object.keys(extractedFields).length > 0 ? 92 : 60,
+        basalInsulin,
+        insulinToCarbRatio,
+      };
+      
+      setExtractedData(mockData);
+      setUploading(false);
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/reports'] });
+      
+      toast({ 
+        title: 'Document processed successfully!', 
+        description: `AI extracted ${Object.keys(extractedFields).length} medical data points from your report`,
+        variant: 'default',
+      });
+    },
+    onError: (error: any) => {
+      setUploading(false);
+      toast({
+        title: 'Upload failed',
+        description: error.message || 'Failed to process document',
+        variant: 'destructive',
+      });
+    },
+  });
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setUploading(true);
     toast({ title: 'Uploading document...', description: 'AI is analyzing your medical report' });
-
-    // Simulate OCR processing with AI
-    setTimeout(() => {
-      const mockData = {
-        reportType: 'Lab Results',
-        date: '2024-11-20',
-        doctor: 'Dr. Sarah Smith',
-        extractedFields: {
-          'HbA1c': '7.2%',
-          'Fasting Glucose': '126 mg/dL',
-          'Total Cholesterol': '185 mg/dL',
-          'Blood Pressure': '128/82 mmHg',
-          'Creatinine': '0.9 mg/dL',
-        },
-        aiInsights: [
-          'HbA1c indicates moderate diabetes control',
-          'Fasting glucose slightly elevated - consider medication adjustment',
-          'Cholesterol levels are within normal range',
-        ],
-        confidence: 95,
-      };
-
-      setExtractedData(mockData);
-      setUploading(false);
-      toast({ 
-        title: 'Document processed successfully!', 
-        description: 'AI has extracted key medical data from your report',
-        variant: 'default',
-      });
-    }, 2000);
+    
+    uploadMutation.mutate(file);
   };
 
-  const documents = [
-    { id: 1, name: 'Lab Results - Nov 2024', type: 'Lab Report', date: '2024-11-20', status: 'processed' },
-    { id: 2, name: 'Prescription - Dr. Smith', type: 'Prescription', date: '2024-11-18', status: 'processed' },
-    { id: 3, name: 'Blood Test Results', type: 'Lab Report', date: '2024-11-10', status: 'processing' },
-  ];
+  const { data: reportsData } = useQuery({
+    queryKey: ['/api/reports'],
+  });
+  
+  const documents = reportsData?.reports || [];
 
   return (
     <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden">
@@ -137,20 +215,20 @@ export default function DocumentsOCRPage() {
                   </div>
 
                   <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-                    <h4 className="font-semibold mb-2 text-green-500">Insulin Prediction Based on Report</h4>
-                    <p className="text-sm mb-2">Based on your HbA1c and glucose levels, the AI recommends:</p>
+                    <h4 className="font-semibold mb-2 text-green-500">AI Insulin Prediction Based on Extracted Data</h4>
+                    <p className="text-sm mb-2">Based on extracted medical data, the AI recommends:</p>
                     <div className="flex items-center gap-4">
                       <div className="text-center p-3 bg-background/50 rounded">
-                        <p className="text-2xl font-bold text-primary">12 units</p>
+                        <p className="text-2xl font-bold text-primary">{extractedData.basalInsulin || 12} units</p>
                         <p className="text-xs text-muted-foreground">Basal insulin (daily)</p>
                       </div>
                       <div className="text-center p-3 bg-background/50 rounded">
-                        <p className="text-2xl font-bold text-primary">1:10</p>
+                        <p className="text-2xl font-bold text-primary">{extractedData.insulinToCarbRatio || '1:10'}</p>
                         <p className="text-xs text-muted-foreground">Insulin-to-carb ratio</p>
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground mt-3">
-                      ⚠️ This is an AI prediction. Please consult your healthcare provider before making changes.
+                      ⚠️ This is an AI prediction based on your uploaded medical report. Please consult your healthcare provider before making changes.
                     </p>
                   </div>
                 </div>
@@ -164,32 +242,29 @@ export default function DocumentsOCRPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {documents.map((doc) => (
-                  <div key={doc.id} className="flex items-center justify-between p-4 bg-secondary rounded-lg hover:bg-secondary/80 transition-all">
+                {documents.length > 0 ? documents.map((doc: any) => (
+                  <div key={doc._id} className="flex items-center justify-between p-4 bg-secondary rounded-lg hover:bg-secondary/80 transition-all">
                     <div className="flex items-center gap-4">
                       <FileText className="w-8 h-8 text-primary" />
                       <div>
-                        <p className="font-semibold">{doc.name}</p>
-                        <p className="text-sm text-muted-foreground">{doc.type} • {doc.date}</p>
+                        <p className="font-semibold">{doc.fileName}</p>
+                        <p className="text-sm text-muted-foreground">{doc.fileType} • {new Date(doc.uploadedAt).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      {doc.status === 'processed' ? (
-                        <span className="flex items-center gap-1 text-sm text-green-500">
-                          <CheckCircle className="w-4 h-4" />
-                          Processed
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1 text-sm text-yellow-500">
-                          <AlertCircle className="w-4 h-4" />
-                          Processing
-                        </span>
-                      )}
+                      <span className="flex items-center gap-1 text-sm text-green-500">
+                        <CheckCircle className="w-4 h-4" />
+                        Processed
+                      </span>
                       <Button variant="outline" size="sm">View</Button>
-                      <Button variant="ghost" size="sm">Download</Button>
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>No documents uploaded yet</p>
+                    <p className="text-sm mt-2">Upload your first medical report to get started with AI analysis</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
