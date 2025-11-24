@@ -78,44 +78,266 @@ export default function MealLoggingPage() {
     createMealMutation.mutate({ ...data, voiceRecorded: isRecording });
   };
 
-  // Simple rule-based estimator for common foods
+  // Fuzzy string matching helper - calculates similarity between strings
+  const calculateSimilarity = (str1: string, str2: string): number => {
+    const longer = str1.length > str2.length ? str1 : str2;
+    const shorter = str1.length > str2.length ? str2 : str1;
+    if (longer.length === 0) return 1.0;
+    
+    const editDistance = (s1: string, s2: string): number => {
+      s1 = s1.toLowerCase();
+      s2 = s2.toLowerCase();
+      const costs: number[] = [];
+      for (let i = 0; i <= s1.length; i++) {
+        let lastValue = i;
+        for (let j = 0; j <= s2.length; j++) {
+          if (i === 0) {
+            costs[j] = j;
+          } else if (j > 0) {
+            let newValue = costs[j - 1];
+            if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
+              newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+            }
+            costs[j - 1] = lastValue;
+            lastValue = newValue;
+          }
+        }
+        if (i > 0) costs[s2.length] = lastValue;
+      }
+      return costs[s2.length];
+    };
+    
+    return (longer.length - editDistance(longer, shorter)) / longer.length;
+  };
+
+  // Comprehensive food database with Indian and international foods
+  const foodDatabase = [
+    // Indian Staples - Breads
+    { names: ['chapati', 'roti', 'chapathi', 'chapti', 'phulka'], carbs: 15, protein: 3, fat: 1, calories: 80, sugar: 0 },
+    { names: ['naan', 'nan', 'naan bread'], carbs: 45, protein: 9, fat: 8, calories: 262, sugar: 3 },
+    { names: ['paratha', 'paratha', 'parotha', 'parota'], carbs: 28, protein: 5, fat: 10, calories: 210, sugar: 1 },
+    { names: ['puri', 'poori', 'puri bread'], carbs: 20, protein: 3, fat: 12, calories: 164, sugar: 1 },
+    { names: ['bhakri', 'bhakari', 'bhakhari'], carbs: 25, protein: 4, fat: 1, calories: 120, sugar: 0 },
+    
+    // Indian Rice Dishes
+    { names: ['rice', 'white rice', 'steamed rice', 'plain rice'], carbs: 45, protein: 4, fat: 0.5, calories: 200, sugar: 0 },
+    { names: ['brown rice', 'brown rice'], carbs: 50, protein: 5, fat: 2, calories: 218, sugar: 0 },
+    { names: ['biryani', 'biriyani', 'briyani', 'veg biryani', 'chicken biryani'], carbs: 55, protein: 12, fat: 15, calories: 400, sugar: 2 },
+    { names: ['pulao', 'pilaf', 'pulav', 'veg pulao'], carbs: 48, protein: 8, fat: 10, calories: 320, sugar: 1 },
+    { names: ['jeera rice', 'cumin rice', 'zeera rice'], carbs: 46, protein: 4, fat: 5, calories: 240, sugar: 0 },
+    { names: ['lemon rice', 'chitranna'], carbs: 50, protein: 4, fat: 8, calories: 280, sugar: 1 },
+    { names: ['curd rice', 'yogurt rice', 'daddojanam', 'thayir sadam'], carbs: 42, protein: 8, fat: 6, calories: 250, sugar: 8 },
+    
+    // Indian Breakfast Items
+    { names: ['idli', 'idly', 'idlli'], carbs: 12, protein: 3, fat: 0.5, calories: 65, sugar: 0 },
+    { names: ['dosa', 'dosai', 'dose'], carbs: 28, protein: 6, fat: 4, calories: 168, sugar: 1 },
+    { names: ['masala dosa', 'masala dose'], carbs: 45, protein: 8, fat: 12, calories: 320, sugar: 2 },
+    { names: ['uttapam', 'uttappam', 'uthappam'], carbs: 32, protein: 7, fat: 5, calories: 200, sugar: 1 },
+    { names: ['upma', 'uppma', 'uppittu'], carbs: 35, protein: 5, fat: 8, calories: 230, sugar: 1 },
+    { names: ['poha', 'aval', 'avalakki', 'beaten rice'], carbs: 30, protein: 3, fat: 5, calories: 180, sugar: 2 },
+    { names: ['medu vada', 'vada', 'vadai', 'medhu vada'], carbs: 18, protein: 5, fat: 12, calories: 180, sugar: 0 },
+    { names: ['sambar vada', 'sambar vadai'], carbs: 25, protein: 7, fat: 10, calories: 210, sugar: 2 },
+    { names: ['pongal', 'ven pongal', 'khara pongal'], carbs: 42, protein: 8, fat: 10, calories: 290, sugar: 1 },
+    { names: ['rava dosa', 'ravai dosai'], carbs: 30, protein: 5, fat: 6, calories: 190, sugar: 1 },
+    
+    // Indian Curries & Gravies
+    { names: ['dal', 'daal', 'dhal', 'lentils', 'dal curry'], carbs: 20, protein: 12, fat: 5, calories: 165, sugar: 1 },
+    { names: ['sambar', 'sambhar', 'sambaar'], carbs: 18, protein: 8, fat: 4, calories: 130, sugar: 3 },
+    { names: ['rasam', 'rasaam', 'chaaru'], carbs: 8, protein: 2, fat: 3, calories: 60, sugar: 2 },
+    { names: ['paneer butter masala', 'paneer masala', 'butter paneer'], carbs: 15, protein: 14, fat: 20, calories: 300, sugar: 5 },
+    { names: ['palak paneer', 'saag paneer'], carbs: 12, protein: 15, fat: 18, calories: 270, sugar: 3 },
+    { names: ['chicken curry', 'murgh curry'], carbs: 10, protein: 25, fat: 12, calories: 250, sugar: 3 },
+    { names: ['butter chicken', 'murgh makhani'], carbs: 12, protein: 28, fat: 20, calories: 350, sugar: 6 },
+    { names: ['rajma', 'rajma curry', 'kidney beans'], carbs: 35, protein: 15, fat: 5, calories: 250, sugar: 2 },
+    { names: ['chole', 'chana masala', 'chickpea curry'], carbs: 38, protein: 14, fat: 6, calories: 260, sugar: 3 },
+    
+    // Indian Snacks
+    { names: ['samosa', 'samosa', 'singara'], carbs: 25, protein: 5, fat: 15, calories: 260, sugar: 2 },
+    { names: ['pakora', 'pakoda', 'bhaji', 'bhajia'], carbs: 18, protein: 4, fat: 12, calories: 180, sugar: 1 },
+    { names: ['vada pav', 'wada pav', 'vada pao'], carbs: 50, protein: 8, fat: 18, calories: 390, sugar: 3 },
+    { names: ['pav bhaji', 'pav bhaji'], carbs: 55, protein: 10, fat: 15, calories: 400, sugar: 4 },
+    { names: ['dhokla', 'khaman', 'khaman dhokla'], carbs: 28, protein: 6, fat: 4, calories: 170, sugar: 5 },
+    { names: ['kachori', 'kachauri'], carbs: 30, protein: 6, fat: 18, calories: 300, sugar: 2 },
+    { names: ['bhel puri', 'bhel', 'bhelpuri'], carbs: 45, protein: 5, fat: 8, calories: 270, sugar: 4 },
+    
+    // Indian Sweets
+    { names: ['gulab jamun', 'gulab jamun', 'gulaab jamun'], carbs: 35, protein: 4, fat: 12, calories: 260, sugar: 30 },
+    { names: ['jalebi', 'jalebi', 'jilapi'], carbs: 50, protein: 2, fat: 15, calories: 350, sugar: 45 },
+    { names: ['ladoo', 'laddu', 'laddoo', 'besan ladoo'], carbs: 40, protein: 6, fat: 18, calories: 340, sugar: 35 },
+    { names: ['barfi', 'burfi', 'milk barfi'], carbs: 38, protein: 8, fat: 15, calories: 320, sugar: 32 },
+    { names: ['kheer', 'payasam', 'payas'], carbs: 42, protein: 7, fat: 10, calories: 280, sugar: 35 },
+    { names: ['rasgulla', 'rasagulla', 'rosogolla'], carbs: 28, protein: 5, fat: 1, calories: 140, sugar: 25 },
+    
+    // International - Grains & Breads
+    { names: ['bread', 'white bread', 'sandwich bread'], carbs: 30, protein: 5, fat: 2, calories: 180, sugar: 4 },
+    { names: ['whole wheat bread', 'brown bread'], carbs: 28, protein: 6, fat: 2, calories: 170, sugar: 3 },
+    { names: ['bagel', 'bagle'], carbs: 45, protein: 8, fat: 1, calories: 245, sugar: 5 },
+    { names: ['croissant', 'croisant', 'kwason'], carbs: 26, protein: 5, fat: 12, calories: 231, sugar: 6 },
+    { names: ['pasta', 'spaghetti', 'penne', 'macaroni'], carbs: 40, protein: 7, fat: 1, calories: 220, sugar: 2 },
+    { names: ['quinoa', 'kinwa', 'quinua'], carbs: 39, protein: 8, fat: 4, calories: 222, sugar: 2 },
+    { names: ['oatmeal', 'oats', 'porridge'], carbs: 40, protein: 6, fat: 3, calories: 220, sugar: 1 },
+    
+    // International - Proteins
+    { names: ['chicken', 'chicken breast', 'grilled chicken'], carbs: 0, protein: 25, fat: 5, calories: 180, sugar: 0 },
+    { names: ['fish', 'grilled fish', 'baked fish'], carbs: 0, protein: 22, fat: 8, calories: 180, sugar: 0 },
+    { names: ['salmon', 'salman', 'grilled salmon'], carbs: 0, protein: 25, fat: 13, calories: 230, sugar: 0 },
+    { names: ['egg', 'boiled egg', 'eggs'], carbs: 1, protein: 6, fat: 5, calories: 70, sugar: 0 },
+    { names: ['omelet', 'omelette', 'omlette'], carbs: 2, protein: 12, fat: 10, calories: 154, sugar: 1 },
+    { names: ['beef', 'steak', 'beef steak'], carbs: 0, protein: 26, fat: 15, calories: 250, sugar: 0 },
+    { names: ['pork', 'pork chop'], carbs: 0, protein: 25, fat: 12, calories: 220, sugar: 0 },
+    { names: ['tofu', 'bean curd'], carbs: 3, protein: 10, fat: 6, calories: 94, sugar: 1 },
+    
+    // International - Fast Food
+    { names: ['pizza', 'cheese pizza', 'piza'], carbs: 35, protein: 12, fat: 12, calories: 300, sugar: 4 },
+    { names: ['burger', 'hamburger', 'cheeseburger', 'burgar'], carbs: 40, protein: 20, fat: 18, calories: 400, sugar: 6 },
+    { names: ['french fries', 'fries', 'chips'], carbs: 48, protein: 4, fat: 17, calories: 365, sugar: 1 },
+    { names: ['hot dog', 'hotdog'], carbs: 25, protein: 10, fat: 15, calories: 290, sugar: 4 },
+    { names: ['sandwich', 'sandwitch', 'club sandwich'], carbs: 35, protein: 15, fat: 10, calories: 300, sugar: 5 },
+    { names: ['sub', 'subway', 'submarine sandwich'], carbs: 45, protein: 20, fat: 12, calories: 380, sugar: 6 },
+    { names: ['taco', 'tacos'], carbs: 20, protein: 12, fat: 10, calories: 220, sugar: 2 },
+    { names: ['burrito', 'burito'], carbs: 50, protein: 18, fat: 15, calories: 420, sugar: 3 },
+    
+    // Vegetables
+    { names: ['salad', 'green salad', 'mixed salad'], carbs: 10, protein: 2, fat: 0.5, calories: 60, sugar: 4 },
+    { names: ['broccoli', 'brocoli', 'brocolli'], carbs: 7, protein: 3, fat: 0.5, calories: 35, sugar: 2 },
+    { names: ['potato', 'potatoes', 'boiled potato', 'aloo'], carbs: 37, protein: 4, fat: 0.5, calories: 163, sugar: 2 },
+    { names: ['sweet potato', 'sweet potatoes', 'yam'], carbs: 41, protein: 2, fat: 0.5, calories: 180, sugar: 13 },
+    { names: ['corn', 'maize', 'sweet corn'], carbs: 25, protein: 4, fat: 2, calories: 123, sugar: 6 },
+    { names: ['peas', 'green peas', 'matar'], carbs: 21, protein: 8, fat: 0.5, calories: 118, sugar: 8 },
+    
+    // Fruits
+    { names: ['banana', 'bananna', 'kela'], carbs: 27, protein: 1, fat: 0.5, calories: 105, sugar: 14 },
+    { names: ['apple', 'aple', 'seb'], carbs: 25, protein: 0.5, fat: 0.5, calories: 95, sugar: 19 },
+    { names: ['orange', 'orenge', 'santra'], carbs: 21, protein: 1, fat: 0.5, calories: 86, sugar: 17 },
+    { names: ['mango', 'mangoes', 'aam'], carbs: 28, protein: 1, fat: 0.5, calories: 107, sugar: 24 },
+    { names: ['grapes', 'grape', 'angoor'], carbs: 27, protein: 1, fat: 0.5, calories: 104, sugar: 23 },
+    { names: ['watermelon', 'watermellon', 'tarbooj'], carbs: 12, protein: 1, fat: 0.5, calories: 46, sugar: 10 },
+    { names: ['papaya', 'papaia', 'papita'], carbs: 15, protein: 1, fat: 0.5, calories: 59, sugar: 11 },
+    { names: ['pineapple', 'pineaple', 'ananas'], carbs: 22, protein: 1, fat: 0.5, calories: 83, sugar: 16 },
+    
+    // Dairy
+    { names: ['milk', 'whole milk', 'doodh'], carbs: 12, protein: 8, fat: 8, calories: 150, sugar: 12 },
+    { names: ['skim milk', 'fat free milk', 'low fat milk'], carbs: 12, protein: 8, fat: 0.5, calories: 90, sugar: 12 },
+    { names: ['yogurt', 'yoghurt', 'curd', 'dahi'], carbs: 15, protein: 10, fat: 4, calories: 120, sugar: 12 },
+    { names: ['greek yogurt', 'greek yoghurt'], carbs: 9, protein: 17, fat: 5, calories: 130, sugar: 7 },
+    { names: ['cheese', 'cheddar', 'paneer'], carbs: 2, protein: 14, fat: 18, calories: 220, sugar: 1 },
+    { names: ['butter', 'makkhan'], carbs: 0, protein: 0.5, fat: 23, calories: 204, sugar: 0 },
+    { names: ['ghee', 'clarified butter', 'ghee'], carbs: 0, protein: 0, fat: 25, calories: 225, sugar: 0 },
+    
+    // Beverages
+    { names: ['coffee', 'black coffee', 'kafi'], carbs: 0, protein: 0.5, fat: 0, calories: 5, sugar: 0 },
+    { names: ['tea', 'chai', 'black tea'], carbs: 0, protein: 0, fat: 0, calories: 2, sugar: 0 },
+    { names: ['juice', 'fruit juice', 'orange juice'], carbs: 26, protein: 1, fat: 0, calories: 110, sugar: 24 },
+    { names: ['soda', 'soft drink', 'coke', 'pepsi'], carbs: 39, protein: 0, fat: 0, calories: 150, sugar: 39 },
+  ];
+
+  // Enhanced nutrition estimator with fuzzy matching and spelling tolerance
   const estimateNutrition = (text: string) => {
-    const lower = text.toLowerCase();
+    const lower = text.toLowerCase().trim();
     const ingredients: string[] = [];
     let carbs = 0, protein = 0, fat = 0, calories = 0, sugar = 0;
+    const matchedFoods: string[] = [];
 
-    const add = (ing: string, c:{carbs?:number, protein?:number, fat?:number, calories?:number, sugar?:number}) => {
-      ingredients.push(ing);
-      carbs += c.carbs || 0;
-      protein += c.protein || 0;
-      fat += c.fat || 0;
-      calories += c.calories || 0;
-      sugar += c.sugar || 0;
+    const add = (foodName: string, nutrition: {carbs?:number, protein?:number, fat?:number, calories?:number, sugar?:number}) => {
+      if (!matchedFoods.includes(foodName)) {
+        ingredients.push(foodName);
+        matchedFoods.push(foodName);
+        carbs += nutrition.carbs || 0;
+        protein += nutrition.protein || 0;
+        fat += nutrition.fat || 0;
+        calories += nutrition.calories || 0;
+        sugar += nutrition.sugar || 0;
+      }
     };
 
-    if (lower.includes('rice')) add('rice', { carbs: 45, calories: 200, sugar: 0 });
-    if (lower.includes('bread')) add('bread', { carbs: 30, protein: 5, calories: 180, sugar: 4 });
-    if (lower.includes('oatmeal')) add('oatmeal', { carbs: 40, protein: 6, calories: 220, sugar: 1 });
-    if (lower.includes('banana')) add('banana', { carbs: 27, calories: 105, sugar: 14 });
-    if (lower.includes('apple')) add('apple', { carbs: 25, calories: 95, sugar: 19 });
-    if (lower.includes('chicken')) add('chicken', { protein: 25, fat: 5, calories: 180 });
-    if (lower.includes('salad')) add('salad', { carbs: 10, protein: 2, calories: 60 });
-    if (lower.includes('pasta')) add('pasta', { carbs: 40, protein: 7, calories: 220, sugar: 2 });
-    if (lower.includes('pizza')) add('pizza', { carbs: 35, protein: 12, fat: 12, calories: 300, sugar: 4 });
-    if (lower.includes('milk')) add('milk', { carbs: 12, protein: 8, fat: 4, calories: 150, sugar: 12 });
-    if (lower.includes('yogurt')) add('yogurt', { carbs: 15, protein: 10, fat: 2, calories: 120, sugar: 12 });
-    if (lower.includes('brown rice')) carbs += 5;
+    // Extract numbers for quantity (pieces, cups, etc.)
+    const numberMatch = lower.match(/(\d+)/);
+    let quantity = numberMatch ? parseInt(numberMatch[1], 10) : 1;
+    if (quantity > 20) quantity = 1; // Sanity check - likely grams not count
 
-    // Portion heuristics
-    const gMatch = lower.match(/(\d+)(\s?)(g|grams)/);
+    // Check for each food in database with fuzzy matching
+    foodDatabase.forEach(food => {
+      food.names.forEach(foodName => {
+        // Exact match
+        if (lower.includes(foodName)) {
+          add(foodName, food);
+        } else {
+          // Fuzzy match for spelling errors (similarity > 85%)
+          const words = lower.split(/\s+/);
+          words.forEach(word => {
+            if (word.length > 3) { // Only fuzzy match words longer than 3 chars
+              const similarity = calculateSimilarity(word, foodName);
+              if (similarity > 0.85) {
+                add(foodName, food);
+              }
+            }
+          });
+        }
+      });
+    });
+
+    // If no ingredients found, try splitting on common separators
+    if (ingredients.length === 0) {
+      const parts = lower.split(/[,;+&]|\band\b|\bwith\b/);
+      parts.forEach(part => {
+        const trimmed = part.trim();
+        if (trimmed) {
+          foodDatabase.forEach(food => {
+            food.names.forEach(foodName => {
+              const similarity = calculateSimilarity(trimmed, foodName);
+              if (similarity > 0.75) {
+                add(foodName, food);
+              }
+            });
+          });
+        }
+      });
+    }
+
+    // Portion size adjustments
+    const gMatch = lower.match(/(\d+)\s?(g|grams?|gram)/i);
+    const mlMatch = lower.match(/(\d+)\s?(ml|milliliters?)/i);
+    const cupMatch = lower.match(/(\d+)\s?(cups?|cup)/i);
+    const tbspMatch = lower.match(/(\d+)\s?(tbsp|tablespoons?)/i);
+    const pieceMatch = lower.match(/(\d+)\s?(pieces?|pcs?|nos?|items?)/i);
+
+    let portionMultiplier = 1;
+
     if (gMatch) {
       const grams = parseInt(gMatch[1], 10);
-      const scale = grams / 100;
-      carbs = Math.round(carbs * scale);
-      protein = Math.round(protein * scale);
-      fat = Math.round(fat * scale);
-      calories = Math.round(calories * scale);
-      sugar = Math.round(sugar * scale);
+      portionMultiplier = grams / 100; // Nutritional values are per 100g
+    } else if (mlMatch) {
+      const ml = parseInt(mlMatch[1], 10);
+      portionMultiplier = ml / 100;
+    } else if (cupMatch) {
+      const cups = parseInt(cupMatch[1], 10);
+      portionMultiplier = cups * 2; // 1 cup ≈ 200g
+    } else if (tbspMatch) {
+      const tbsp = parseInt(tbspMatch[1], 10);
+      portionMultiplier = tbsp * 0.15; // 1 tbsp ≈ 15g
+    } else if (pieceMatch) {
+      const pieces = parseInt(pieceMatch[1], 10);
+      portionMultiplier = pieces; // Already per piece
+    } else if (numberMatch && !lower.includes('gram') && !lower.includes('ml')) {
+      // If just a number without unit, assume it's piece count
+      portionMultiplier = quantity;
+    }
+
+    // Apply portion multiplier
+    carbs = Math.round(carbs * portionMultiplier);
+    protein = Math.round(protein * portionMultiplier);
+    fat = Math.round(fat * portionMultiplier);
+    calories = Math.round(calories * portionMultiplier);
+    sugar = Math.round(sugar * portionMultiplier);
+
+    // If still no match, provide generic estimation
+    if (ingredients.length === 0) {
+      ingredients.push('Unknown food item');
+      carbs = 30; // Generic meal assumption
+      protein = 8;
+      fat = 5;
+      calories = 200;
+      sugar = 3;
     }
 
     return { ingredients, macros: { carbs, protein, fat, calories, sugar } };
@@ -151,9 +373,11 @@ export default function MealLoggingPage() {
       });
       return;
     }
+    
     const est = estimateNutrition(text);
     const insights = impactInsights(est.macros, profileData);
     setAnalysis({ ...est, insights });
+    
     // pre-fill form
     form.setValue('name', text.trim());
     form.setValue('carbs', est.macros.carbs || 0);
@@ -161,10 +385,19 @@ export default function MealLoggingPage() {
     form.setValue('fat', est.macros.fat || 0);
     form.setValue('calories', est.macros.calories || 0);
     
-    toast({
-      title: 'Analysis Complete',
-      description: `Found ${est.ingredients.length} ingredients with nutritional breakdown`,
-    });
+    // Provide helpful feedback
+    if (est.ingredients.length > 0 && est.ingredients[0] !== 'Unknown food item') {
+      toast({
+        title: '✓ Analysis Complete',
+        description: `Recognized ${est.ingredients.length} food item(s): ${est.ingredients.join(', ')}`,
+      });
+    } else {
+      toast({
+        title: 'Generic Estimation',
+        description: 'Could not identify specific food. Showing average meal values. You can adjust manually.',
+        variant: 'default',
+      });
+    }
   };
 
   // Voice recording handler
@@ -274,11 +507,12 @@ export default function MealLoggingPage() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium leading-none">Food Description</label>
                       <Input
-                        placeholder="e.g., Grilled chicken breast with steamed broccoli"
+                        placeholder="e.g., 2 chapati with dal, biryani 200g, dosa idli sambar, chicken salad"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         data-testid="input-meal-description"
                       />
+                      <p className="text-xs text-muted-foreground">💡 Tip: Just type what you ate - spelling doesn't need to be perfect!</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -330,13 +564,14 @@ export default function MealLoggingPage() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium leading-none">Speak Your Meal</label>
                       <Input
-                        placeholder="e.g., Chicken salad with brown rice, 200g"
+                        placeholder="e.g., I ate two idlis with sambar, or chicken biryani 250 grams"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         data-testid="input-meal-description-voice"
                         className={isRecording ? 'border-red-500 animate-pulse' : ''}
                         readOnly={isRecording}
                       />
+                      <p className="text-xs text-muted-foreground">💡 Tip: Speak naturally - say food name and quantity</p>
                       {isRecording && (
                         <p className="text-xs text-red-500 flex items-center gap-1">
                           <Activity className="h-3 w-3 animate-pulse" />
