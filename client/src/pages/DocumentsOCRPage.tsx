@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Camera, Upload, FileText, Scan, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
-import { useQuery, useMutation, queryClient } from '@tanstack/react-query';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 export default function DocumentsOCRPage() {
   const { toast } = useToast();
@@ -19,21 +19,26 @@ export default function DocumentsOCRPage() {
       formData.append('file', file);
       
       // First upload to server
-      const uploadResponse = await apiRequest('/api/reports/upload', 'POST', formData, {
-        headers: {}, // Let browser set Content-Type with boundary
-      });
+      const uploadResponse: any = await fetch('/api/reports/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      }).then(res => res.json());
       
       // Then parse the document for data extraction
       const parseFormData = new FormData();
       parseFormData.append('file', file);
       
-      const parseResponse = await apiRequest('/api/reports/parse', 'POST', parseFormData, {
-        headers: {}, // Let browser set Content-Type with boundary
-      });
+      const parseResponse: any = await fetch('/api/reports/parse', {
+        method: 'POST',
+        body: parseFormData,
+      }).then(res => res.json());
       
       return { upload: uploadResponse, parsed: parseResponse };
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       const parsed = data.parsed;
       
       // Build AI insights from extracted data
@@ -127,7 +132,7 @@ export default function DocumentsOCRPage() {
     uploadMutation.mutate(file);
   };
 
-  const { data: reportsData } = useQuery({
+  const { data: reportsData } = useQuery<{ reports: any[] }>({
     queryKey: ['/api/reports'],
   });
   
