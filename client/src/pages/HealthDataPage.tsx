@@ -33,15 +33,16 @@ export default function HealthDataPage() {
 
   const { data: profileData } = useQuery({
     queryKey: ['/api/profile'],
-  });
+  }) as { data?: any };
 
   const { data: reportsData } = useQuery({
     queryKey: ['/api/reports'],
-  });
+  }) as { data?: any };
 
   const createHealthDataMutation = useMutation({
     mutationFn: async (data: InsertHealthData) => {
-      return apiRequest('/api/health-data', 'POST', data);
+      const response = await apiRequest('/api/health-data', { method: 'POST', body: JSON.stringify(data) });
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -63,7 +64,7 @@ export default function HealthDataPage() {
 
   const { data: healthHistory } = useQuery({
     queryKey: ['/api/health-data'],
-  });
+  }) as { data?: any };
 
   const onSubmit = (data: InsertHealthData) => {
     createHealthDataMutation.mutate(data);
@@ -111,8 +112,8 @@ export default function HealthDataPage() {
                     <span>Date of Birth</span>
                   </div>
                   <p className="font-semibold">
-                    {profileData?.profile?.dateOfBirth 
-                      ? new Date(profileData.profile.dateOfBirth).toLocaleDateString()
+                    {(profileData as any)?.profile?.dateOfBirth 
+                      ? new Date((profileData as any).profile.dateOfBirth).toLocaleDateString()
                       : 'Not set'}
                   </p>
                 </div>
@@ -123,8 +124,8 @@ export default function HealthDataPage() {
                     <span>Weight</span>
                   </div>
                   <p className="font-semibold">
-                    {profileData?.profile?.weight 
-                      ? `${profileData.profile.weight} kg`
+                    {(profileData as any)?.profile?.weight 
+                      ? `${(profileData as any).profile.weight} kg`
                       : 'Not set'}
                   </p>
                 </div>
@@ -135,8 +136,8 @@ export default function HealthDataPage() {
                     <span>Height</span>
                   </div>
                   <p className="font-semibold">
-                    {profileData?.profile?.height 
-                      ? `${profileData.profile.height} cm`
+                    {(profileData as any)?.profile?.height 
+                      ? `${(profileData as any).profile.height} cm`
                       : 'Not set'}
                   </p>
                 </div>
@@ -147,7 +148,7 @@ export default function HealthDataPage() {
                     <span>Diabetes Type</span>
                   </div>
                   <p className="font-semibold">
-                    {profileData?.profile?.diabetesType || 'Not set'}
+                    {(profileData as any)?.profile?.diabetesType || 'Not set'}
                   </p>
                 </div>
                 
@@ -157,15 +158,15 @@ export default function HealthDataPage() {
                     <span>Medical Reports</span>
                   </div>
                   <p className="font-semibold">
-                    {reportsData?.reports?.length || 0} uploaded
+                    {(reportsData as any)?.reports?.length || 0} uploaded
                   </p>
                 </div>
               </div>
               
-              {profileData?.profile?.emergencyContact && (
+              {(profileData as any)?.profile?.emergencyContact && (
                 <div className="mt-4 pt-4 border-t border-border">
                   <p className="text-sm text-muted-foreground mb-2">Emergency Contact</p>
-                  <p className="font-semibold">{profileData.profile.emergencyContact}</p>
+                  <p className="font-semibold">{(profileData as any).profile.emergencyContact}</p>
                 </div>
               )}
             </Card>
@@ -306,7 +307,7 @@ export default function HealthDataPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {healthHistory?.healthData?.slice(0, 5).map((entry: any) => (
+                  {(healthHistory as any)?.healthData?.slice(0, 5).map((entry: any) => (
                     <div
                       key={entry._id}
                       className="p-4 rounded-lg bg-secondary/50 space-y-2"

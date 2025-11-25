@@ -32,11 +32,12 @@ export default function GlucosePage() {
 
   const { data: healthData, isLoading } = useQuery({
     queryKey: ['/api/health-data'],
-  });
+  }) as { data?: any[], isLoading: boolean };
 
   const createHealthDataMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/health-data', 'POST', data);
+      const response = await apiRequest('/api/health-data', { method: 'POST', body: JSON.stringify(data) });
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -59,12 +60,12 @@ export default function GlucosePage() {
     createHealthDataMutation.mutate(data);
   };
 
-  const latestGlucose = healthData?.data?.[0]?.glucose || 0;
-  const avgGlucose = healthData?.data?.length > 0 
-    ? Math.round(healthData.data.reduce((sum: number, item: any) => sum + item.glucose, 0) / healthData.data.length)
+  const latestGlucose = (healthData as any[])?.[0]?.glucose || 0;
+  const avgGlucose = ((healthData as any[])?.length ?? 0) > 0 
+    ? Math.round(((healthData as any[]).reduce((sum: number, item: any) => sum + item.glucose, 0) / (healthData?.length || 1)))
     : 0;
-  const highReadings = healthData?.data?.filter((item: any) => item.glucose > 180).length || 0;
-  const lowReadings = healthData?.data?.filter((item: any) => item.glucose < 70).length || 0;
+  const highReadings = (healthData as any[])?.filter((item: any) => item.glucose > 180).length || 0;
+  const lowReadings = (healthData as any[])?.filter((item: any) => item.glucose < 70).length || 0;
 
   const getGlucoseStatus = (glucose: number) => {
     if (glucose < 70) return { status: 'Low', color: '#FF6B6B' };
@@ -99,40 +100,40 @@ export default function GlucosePage() {
                 {/* Top Statistics */}
                 <div className="grid grid-cols-4 gap-4">
                   <MetricCard
-                    title={t('glucose.current')}
+                    titleKey="glucose.current"
                     value={latestGlucose > 0 ? latestGlucose.toString() : '--'}
                     unit="mg/dL"
-                    status={latestGlucose > 0 ? getGlucoseStatus(latestGlucose).status : t('dashboard.metrics.status.noData')}
+                    statusKey={latestGlucose > 0 ? `dashboard.metrics.status.${getGlucoseStatus(latestGlucose).status.toLowerCase().replace(' ', '')}` : 'dashboard.metrics.status.noData'}
                     icon={Droplet}
                     iconColor="#60A5FA"
                     badgeBgColor="rgba(96, 165, 250, 0.2)"
                     badgeTextColor="#60A5FA"
                   />
                   <MetricCard
-                    title={t('glucose.average')}
+                    titleKey="glucose.average"
                     value={avgGlucose > 0 ? avgGlucose.toString() : '--'}
                     unit="mg/dL"
-                    status={avgGlucose > 0 ? getGlucoseStatus(avgGlucose).status : t('dashboard.metrics.status.noData')}
+                    statusKey={avgGlucose > 0 ? `dashboard.metrics.status.${getGlucoseStatus(avgGlucose).status.toLowerCase().replace(' ', '')}` : 'dashboard.metrics.status.noData'}
                     icon={TrendingUp}
                     iconColor="#A78BFA"
                     badgeBgColor="rgba(167, 139, 250, 0.2)"
                     badgeTextColor="#A78BFA"
                   />
                   <MetricCard
-                    title={t('glucose.highReadings')}
+                    titleKey="glucose.highReadings"
                     value={highReadings.toString()}
                     unit=""
-                    status={highReadings > 0 ? t('dashboard.metrics.status.needsAttention') : t('dashboard.metrics.status.good')}
+                    statusKey={highReadings > 0 ? 'dashboard.metrics.status.needsAttention' : 'dashboard.metrics.status.good'}
                     icon={AlertCircle}
                     iconColor="#FB923C"
                     badgeBgColor="rgba(251, 146, 60, 0.2)"
                     badgeTextColor="#FB923C"
                   />
                   <MetricCard
-                    title={t('glucose.lowReadings')}
+                    titleKey="glucose.lowReadings"
                     value={lowReadings.toString()}
                     unit=""
-                    status={lowReadings > 0 ? t('dashboard.metrics.status.needsAttention') : t('dashboard.metrics.status.good')}
+                    statusKey={lowReadings > 0 ? 'dashboard.metrics.status.needsAttention' : 'dashboard.metrics.status.good'}
                     icon={AlertCircle}
                     iconColor="#2DD4BF"
                     badgeBgColor="rgba(45, 212, 191, 0.2)"
@@ -240,7 +241,7 @@ export default function GlucosePage() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        {healthData?.data?.slice(0, 8).map((reading: any, index: number) => {
+                        {((healthData as any[]) ?? [])?.slice(0, 8).map((reading: any, index: number) => {
                           const status = getGlucoseStatus(reading.glucose);
                           return (
                             <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">

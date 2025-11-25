@@ -15,22 +15,22 @@ export default function InsulinPage() {
 
   const { data: healthData } = useQuery({
     queryKey: ['/api/health-data'],
-  });
+  }) as { data?: any[] };
 
   const { data: profileData } = useQuery({
     queryKey: ['/api/profile'],
-  });
+  }) as { data?: any };
 
   const { data: reportsData } = useQuery({
     queryKey: ['/api/reports'],
-  });
+  }) as { data?: any };
 
   // AI-powered insulin prediction based on medical reports and health data
   const calculateAIPrediction = () => {
-    const latestGlucose = healthData?.data?.[0]?.glucose || 0;
-    const hba1c = profileData?.profile?.hba1c || 7.0;
-    const weight = profileData?.profile?.weight || 70;
-    const hasReports = reportsData?.reports?.length > 0;
+    const latestGlucose = (healthData as any[])?.[0]?.glucose || 0;
+    const hba1c = (profileData as any)?.profile?.hba1c || 7.0;
+    const weight = (profileData as any)?.profile?.weight || 70;
+    const hasReports = (reportsData as any)?.reports?.length > 0;
 
     // AI calculation based on clinical guidelines
     const basalInsulin = Math.round((weight * 0.4) / 2);
@@ -124,7 +124,7 @@ export default function InsulinPage() {
                           <p className="text-sm font-semibold text-blue-500 mb-1">{t('insulin.aiRecommendation')}</p>
                           <p className="text-xs text-muted-foreground">
                             {t('insulin.recommendationText')} 
-                            {reportsData?.reports?.length > 0 
+                            {(reportsData as any)?.reports?.length > 0 
                               ? ' ' + t('insulin.confidence.withReports')
                               : ' ' + t('insulin.confidence.withoutReports')}
                           </p>

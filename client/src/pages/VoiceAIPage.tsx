@@ -18,11 +18,16 @@ export default function VoiceAIPage() {
 
   const { data: profileData } = useQuery({
     queryKey: ['/api/profile'],
-  });
+  }) as { data: any };
 
   const createMealMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/meals', 'POST', data);
+      const response = await apiRequest('/api/meals', { 
+        method: 'POST', 
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' } 
+      });
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -116,7 +121,7 @@ export default function VoiceAIPage() {
     if (carbs >= 60) impact = 'high';
     else if (carbs <= 25) impact = 'low';
 
-    const type = profileData?.profile?.diabetesType || 'unknown';
+    const type = (profileData as any)?.profile?.diabetesType || 'unknown';
     let recommendation = 'Consider pre-bolus insulin and post-meal walk.';
     if (type === 'type 1') recommendation = 'Match insulin dose to carbs (ICR). Pre-bolus 10–15 min.';
     if (type === 'type 2') recommendation = 'Prefer lower GI foods; add protein/fiber to reduce spike.';
@@ -128,7 +133,7 @@ export default function VoiceAIPage() {
         impact,
         glycemicLoad,
         recommendation,
-        advisory: profileData?.profile?.typicalInsulin > 0 
+        advisory: (profileData as any)?.profile?.typicalInsulin > 0 
           ? 'Adjust dose per ICR/ISF if applicable.' 
           : 'Monitor post-meal glucose closely.',
       },
@@ -270,15 +275,15 @@ export default function VoiceAIPage() {
                       </Alert>
 
                       {/* Personalized Insights */}
-                      {profileData?.profile && (
+                      {(profileData as any)?.profile && (
                         <div className="bg-background/50 rounded p-3 space-y-1">
                           <p className="text-xs font-semibold text-muted-foreground">Personalized Insights:</p>
                           <p className="text-xs">
-                            • Diabetes Type: <strong>{profileData.profile.diabetesType || 'Not specified'}</strong>
+                            • Diabetes Type: <strong>{(profileData as any).profile.diabetesType || 'Not specified'}</strong>
                           </p>
-                          {profileData.profile.typicalInsulin > 0 && (
+                          {(profileData as any).profile.typicalInsulin > 0 && (
                             <p className="text-xs">
-                              • Typical Insulin: <strong>{profileData.profile.typicalInsulin} units</strong>
+                              • Typical Insulin: <strong>{(profileData as any).profile.typicalInsulin} units</strong>
                             </p>
                           )}
                           <p className="text-xs text-muted-foreground italic">

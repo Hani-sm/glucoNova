@@ -160,7 +160,7 @@ export class DrizzleStorage implements IStorage {
   async getAllUsers(): Promise<User[]> {
     const result = await db.select().from(users);
     
-    return result.map(user => ({
+    return result.map((user: any) => ({
       _id: user.id.toString(),
       name: user.name,
       email: user.email,
@@ -210,7 +210,7 @@ export class DrizzleStorage implements IStorage {
       .orderBy(desc(healthData.timestamp))
       .limit(limit);
     
-    return result.map(record => ({
+    return result.map((record: any) => ({
       _id: record.id.toString(),
       userId: userId,
       glucose: record.glucose,
@@ -287,7 +287,7 @@ export class DrizzleStorage implements IStorage {
       .orderBy(desc(meals.timestamp))
       .limit(limit);
     
-    return result.map(record => ({
+    return result.map((record: any) => ({
       _id: record.id.toString(),
       userId: userId,
       name: record.name,
@@ -311,7 +311,7 @@ export class DrizzleStorage implements IStorage {
       .where(eq(medicalReports.patientId, patientIdNum))
       .orderBy(desc(medicalReports.uploadedAt));
     
-    return result.map(record => ({
+    return result.map((record: any) => ({
       _id: record.id.toString(),
       patientId: record.patientId.toString(),
       fileName: record.fileName,
@@ -421,7 +421,7 @@ export class DrizzleStorage implements IStorage {
       .orderBy(desc(predictions.timestamp))
       .limit(limit);
     
-    return result.map(record => ({
+    return result.map((record: any) => ({
       _id: record.id.toString(),
       userId: userId,
       predictedInsulin: record.predictedInsulin,
@@ -588,7 +588,7 @@ export class DrizzleStorage implements IStorage {
       .where(eq(medications.userId, userIdNum))
       .orderBy(desc(medications.createdAt));
     
-    return result.map(record => ({
+    return result.map((record: any) => ({
       _id: record.id.toString(),
       userId: userId,
       name: record.name,

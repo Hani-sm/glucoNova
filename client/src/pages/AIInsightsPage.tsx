@@ -7,11 +7,11 @@ import { useQuery } from '@tanstack/react-query';
 export default function AIInsightsPage() {
   const { data: healthData } = useQuery({
     queryKey: ['/api/health-data'],
-  });
+  }) as { data?: { data?: any[] } };
 
   const { data: predictions } = useQuery({
     queryKey: ['/api/predictions/latest'],
-  });
+  }) as { data?: { prediction?: { predictedInsulin?: number } } };
 
   return (
     <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden">
@@ -43,7 +43,7 @@ export default function AIInsightsPage() {
                 <div className="space-y-4">
                   <div className="text-center py-6">
                     <div className="text-5xl font-bold text-primary mb-2">
-                      {predictions?.prediction?.predictedInsulin || 'N/A'}
+                      {((predictions as any)?.prediction?.predictedInsulin as number) || 'N/A'}
                     </div>
                     <p className="text-sm text-muted-foreground">Predicted next reading (mg/dL)</p>
                   </div>

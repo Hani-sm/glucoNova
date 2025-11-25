@@ -178,7 +178,7 @@ export default function DoctorDashboard() {
                                 <h3 className="font-semibold text-sm">{patient.name}</h3>
                                 <p className="text-xs text-muted-foreground truncate">{patient.email}</p>
                               </div>
-                              {patient.healthMetrics && patient.healthMetrics.lastGlucose > 0 && (
+                              {patient.healthMetrics && ((patient.healthMetrics.lastGlucose ?? 0) > 0) && (
                                 <div className="text-right">
                                   <p className="text-xs font-semibold">{patient.healthMetrics.lastGlucose}</p>
                                   <p className="text-xs text-muted-foreground">mg/dL</p>
