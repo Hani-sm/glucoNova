@@ -30,6 +30,8 @@ export default function MealLoggingPage() {
   const [inputMode, setInputMode] = useState<'voice' | 'manual'>('manual');
   const [portionSize, setPortionSize] = useState('');
   const [portionUnit, setPortionUnit] = useState('grams');
+  // Ref to store the latest transcript value to avoid timing issues
+  const latestTranscriptRef = useRef('');
 
   const { data: profileData } = useQuery<{ profile: any }>({
     queryKey: ['/api/profile'],
@@ -80,7 +82,7 @@ export default function MealLoggingPage() {
 
   const onSubmit = (data: InsertMeal) => {
     // Ensure voiceRecorded flag is properly set based on whether the meal was recorded via voice
-    const isVoiceRecorded = inputMode === 'voice' && (isRecording || (transcript && transcript.trim() !== ''));
+    const isVoiceRecorded = inputMode === 'voice' && (isRecording || (latestTranscriptRef.current && latestTranscriptRef.current.trim() !== ''));
     createMealMutation.mutate({ ...data, voiceRecorded: !!isVoiceRecorded });
   };
 
@@ -271,9 +273,9 @@ export default function MealLoggingPage() {
           // Fuzzy match for spelling errors (similarity > 85%)
           const words = lower.split(/\s+/);
           words.forEach(word => {
-            if (word.length > 3) { // Only fuzzy match words longer than 3 chars
+            if (word.length > 2) { // Only fuzzy match words longer than 2 chars
               const similarity = calculateSimilarity(word, foodName);
-              if (similarity > 0.85) {
+              if (similarity > 0.80) { // Lower threshold for better matching
                 add(foodName, food);
               }
             }
@@ -291,7 +293,7 @@ export default function MealLoggingPage() {
           foodDatabase.forEach(food => {
             food.names.forEach(foodName => {
               const similarity = calculateSimilarity(trimmed, foodName);
-              if (similarity > 0.75) {
+              if (similarity > 0.70) { // Lower threshold for better matching
                 add(foodName, food);
               }
             });
@@ -408,6 +410,7 @@ export default function MealLoggingPage() {
 
   // Voice recording handler
   const recognitionRef = useRef<any>(null);
+  const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -419,8 +422,16 @@ export default function MealLoggingPage() {
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = false;
       recognitionRef.current.interimResults = true;
+      recognitionRef.current.maxAlternatives = 3; // Get multiple alternatives for better accuracy
       // Set language based on current i18n language
-      recognitionRef.current.lang = getCurrentLanguage() || 'en-US';
+      // Map i18n language codes to speech recognition language codes
+      const languageMap: Record<string, string> = {
+        'en': 'en-US',
+        'hi': 'hi-IN',
+        'kn': 'kn-IN',
+        'te': 'te-IN',
+      };
+      recognitionRef.current.lang = languageMap[getCurrentLanguage()] || 'en-US';
 
       recognitionRef.current.onstart = () => {
         setIsRecording(true);
@@ -429,14 +440,30 @@ export default function MealLoggingPage() {
       recognitionRef.current.onresult = (event: any) => {
         let interim = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
+          // Use the best alternative (index 0) for highest confidence
           const transcript = event.results[i][0].transcript;
           interim += transcript;
         }
         setTranscript(interim);
         setDescription(interim);
+        // Update ref with latest transcript to avoid timing issues
+        latestTranscriptRef.current = interim;
+        
+        // Reset silence timeout on speech activity
+        if (silenceTimeoutRef.current) {
+          clearTimeout(silenceTimeoutRef.current);
+        }
+        
+        // Set timeout to stop recording after 3 seconds of silence
+        silenceTimeoutRef.current = setTimeout(() => {
+          if (recognitionRef.current && isRecording) {
+            recognitionRef.current.stop();
+          }
+        }, 3000);
       };
 
       recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
         toast({
           title: t('food.messages.speechNotSupported'),
           description: t('food.messages.speechError', { error: event.error }),
@@ -448,9 +475,9 @@ export default function MealLoggingPage() {
       recognitionRef.current.onend = () => {
         setIsRecording(false);
         // Only analyze if we have a transcript and we're in voice mode
-        // Use the latest transcript value from the onresult event
-        if (transcript && transcript.trim() && inputMode === 'voice') {
-          analyzeDescription(transcript);
+        // Use the latest transcript value from the ref to avoid timing issues
+        if (latestTranscriptRef.current && latestTranscriptRef.current.trim() && inputMode === 'voice') {
+          analyzeDescription(latestTranscriptRef.current);
         }
       };
     }
@@ -459,6 +486,10 @@ export default function MealLoggingPage() {
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
+      }
+      // Clear timeout on unmount
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
       }
     };
   }, [transcript, toast, t, inputMode, i18n.language]);
@@ -473,15 +504,42 @@ export default function MealLoggingPage() {
       return;
     }
 
+    // Check if browser supports speech recognition
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast({
+        title: t('food.messages.speechNotSupported'),
+        description: t('food.messages.speechNotSupportedDesc'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (isRecording) {
       recognitionRef.current.stop();
       setIsRecording(false);
+      // Clear timeout when manually stopping
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+      }
     } else {
       setTranscript('');
       setDescription('');
       setAnalysis(null);
+      latestTranscriptRef.current = '';
+      // Clear any existing timeout
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+      }
       // Update language before starting recognition
-      recognitionRef.current.lang = getCurrentLanguage() || 'en-US';
+      // Map i18n language codes to speech recognition language codes
+      const languageMap: Record<string, string> = {
+        'en': 'en-US',
+        'hi': 'hi-IN',
+        'kn': 'kn-IN',
+        'te': 'te-IN',
+      };
+      recognitionRef.current.lang = languageMap[getCurrentLanguage()] || 'en-US';
       recognitionRef.current.start();
     }
   };
