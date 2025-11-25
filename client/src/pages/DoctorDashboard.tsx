@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { Search, Users, BarChart3, TrendingUp, AlertCircle, Eye } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
 interface PatientData {
   id: string;
@@ -24,6 +25,7 @@ interface PatientData {
 }
 
 export default function DoctorDashboard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [patients, setPatients] = useState<PatientData[]>([]);
@@ -72,8 +74,8 @@ export default function DoctorDashboard() {
       setPatients(enrichedPatients);
     } catch (error: any) {
       toast({
-        title: 'Failed to load patients',
-        description: error.message || 'Please try refreshing the page',
+        title: t('admin.messages.loadUsersFailed'),
+        description: error.message || t('admin.messages.refreshPage'),
         variant: 'destructive',
       });
     } finally {
@@ -118,15 +120,15 @@ export default function DoctorDashboard() {
         <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
           <div className="flex items-center gap-4">
             <Users className="w-6 h-6 text-primary" />
-            <h2 className="text-xl font-semibold">Patient Management</h2>
+            <h2 className="text-xl font-semibold">{t('doctor.patientManagement')}</h2>
           </div>
         </header>
         
         <main className="flex-1 overflow-y-auto">
           <div className="w-full" style={{ padding: '24px 32px' }}>
             <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-1">Welcome, Dr. {user?.name}</h1>
-              <p className="text-muted-foreground">Manage your patients and review their health data</p>
+              <h1 className="text-3xl font-bold mb-1">{t('doctor.welcome', { name: user?.name || t('common.doctor') })}</h1>
+              <p className="text-muted-foreground">{t('doctor.subtitle')}</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -136,7 +138,7 @@ export default function DoctorDashboard() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Users className="h-5 w-5" />
-                      Your Patients ({patients.length})
+                      {t('doctor.yourPatients', { count: patients.length })}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -144,7 +146,7 @@ export default function DoctorDashboard() {
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         type="search"
-                        placeholder="Search patients..."
+                        placeholder={t('doctor.searchPlaceholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-10 bg-secondary/50"
@@ -153,10 +155,10 @@ export default function DoctorDashboard() {
                     </div>
 
                     {loading ? (
-                      <p className="text-muted-foreground text-center py-8 text-sm">Loading patients...</p>
+                      <p className="text-muted-foreground text-center py-8 text-sm">{t('doctor.loadingPatients')}</p>
                     ) : filteredPatients.length === 0 ? (
                       <p className="text-muted-foreground text-center py-8 text-sm">
-                        {searchTerm ? 'No patients found' : 'No patients assigned'}
+                        {searchTerm ? t('doctor.noPatientsFound') : t('doctor.noPatientsAssigned')}
                       </p>
                     ) : (
                       <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -200,27 +202,27 @@ export default function DoctorDashboard() {
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                           <Eye className="h-5 w-5" />
-                          Patient Profile
+                          {t('doctor.patientProfile')}
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <p className="text-sm text-muted-foreground">Name</p>
+                            <p className="text-sm text-muted-foreground">{t('doctor.name')}</p>
                             <p className="font-semibold text-foreground">{selectedPatient.name}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-muted-foreground">Email</p>
+                            <p className="text-sm text-muted-foreground">{t('doctor.email')}</p>
                             <p className="font-semibold text-foreground">{selectedPatient.email}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-muted-foreground">Registered</p>
+                            <p className="text-sm text-muted-foreground">{t('doctor.registered')}</p>
                             <p className="font-semibold text-foreground">
                               {new Date(selectedPatient.createdAt).toLocaleDateString()}
                             </p>
                           </div>
                           <div>
-                            <p className="text-sm text-muted-foreground">Recent Readings</p>
+                            <p className="text-sm text-muted-foreground">{t('doctor.recentReadings')}</p>
                             <p className="font-semibold text-foreground">
                               {selectedPatient.healthMetrics?.recentReadings || 0}
                             </p>
@@ -235,7 +237,7 @@ export default function DoctorDashboard() {
                         <CardContent className="pt-6">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-xs text-muted-foreground mb-1">Avg Glucose</p>
+                              <p className="text-xs text-muted-foreground mb-1">{t('doctor.avgGlucose')}</p>
                               <p className="text-2xl font-bold text-foreground">
                                 {selectedPatient.healthMetrics?.avgGlucose || '--'}
                               </p>
@@ -248,7 +250,7 @@ export default function DoctorDashboard() {
                         <CardContent className="pt-6">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-xs text-muted-foreground mb-1">Time in Range</p>
+                              <p className="text-xs text-muted-foreground mb-1">{t('doctor.timeInRange')}</p>
                               <p className="text-2xl font-bold text-foreground">
                                 {selectedPatient.healthMetrics?.timeInRange || '--'}%
                               </p>
@@ -261,7 +263,7 @@ export default function DoctorDashboard() {
                         <CardContent className="pt-6">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-xs text-muted-foreground mb-1">Current</p>
+                              <p className="text-xs text-muted-foreground mb-1">{t('doctor.current')}</p>
                               <p className="text-2xl font-bold text-foreground">
                                 {selectedPatient.healthMetrics?.lastGlucose || '--'}
                               </p>
@@ -276,13 +278,13 @@ export default function DoctorDashboard() {
                     {loadingPatientData ? (
                       <Card className="glass-card">
                         <CardContent className="pt-6">
-                          <p className="text-muted-foreground text-center">Loading health data...</p>
+                          <p className="text-muted-foreground text-center">{t('doctor.loadingHealthData')}</p>
                         </CardContent>
                       </Card>
                     ) : chartData.length > 0 ? (
                       <Card className="glass-card">
                         <CardHeader>
-                          <CardTitle>Glucose Trend</CardTitle>
+                          <CardTitle>{t('doctor.glucoseTrend')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                           <ResponsiveContainer width="100%" height={300}>
@@ -311,7 +313,7 @@ export default function DoctorDashboard() {
                     ) : (
                       <Card className="glass-card">
                         <CardContent className="pt-6">
-                          <p className="text-muted-foreground text-center">No health data available</p>
+                          <p className="text-muted-foreground text-center">{t('doctor.noHealthData')}</p>
                         </CardContent>
                       </Card>
                     )}
@@ -319,7 +321,7 @@ export default function DoctorDashboard() {
                 ) : (
                   <Card className="glass-card">
                     <CardContent className="pt-12 pb-12">
-                      <p className="text-muted-foreground text-center text-lg">Select a patient to view their health data</p>
+                      <p className="text-muted-foreground text-center text-lg">{t('doctor.selectPatient')}</p>
                     </CardContent>
                   </Card>
                 )}

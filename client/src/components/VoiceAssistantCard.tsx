@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Mic, Square } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 interface VoiceAssistantCardProps {
   title: string;
@@ -19,6 +20,7 @@ export default function VoiceAssistantCard({
   buttonVariant = 'default',
   onVoiceInput
 }: VoiceAssistantCardProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [recognizedText, setRecognizedText] = useState('');
   const [isListening, setIsListening] = useState(false);
@@ -47,8 +49,8 @@ export default function VoiceAssistantCard({
 
       recognitionRef.current.onerror = (event: any) => {
         toast({
-          title: 'Error',
-          description: `Speech recognition error: ${event.error}`,
+          title: t('common.error'),
+          description: t('food.messages.speechError', { error: event.error }),
           variant: 'destructive',
         });
       };
@@ -65,8 +67,8 @@ export default function VoiceAssistantCard({
   const handleVoiceInput = () => {
     if (!recognitionRef.current) {
       toast({
-        title: 'Error',
-        description: 'Speech Recognition is not supported in your browser',
+        title: t('food.messages.speechNotSupported'),
+        description: t('food.messages.speechNotSupportedDesc'),
         variant: 'destructive',
       });
       return;
@@ -107,12 +109,12 @@ export default function VoiceAssistantCard({
           data-testid="button-voice-record"
           size="sm"
         >
-          {isListening ? 'Stop Recording' : buttonText}
+          {isListening ? t('food.voiceInput.stopRecording') : buttonText}
         </Button>
       </div>
       {recognizedText && (
         <div className="bg-secondary/50 rounded-lg p-3 mt-3">
-          <p className="text-xs text-muted-foreground mb-1 font-medium">Recognized:</p>
+          <p className="text-xs text-muted-foreground mb-1 font-medium">{t('food.voiceInput.captured')}:</p>
           <p className="text-sm text-foreground" data-testid="text-recognized">{recognizedText}</p>
         </div>
       )}

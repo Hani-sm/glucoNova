@@ -1,7 +1,9 @@
 import { useLocation, Link } from 'wouter';
 import { User, Stethoscope } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function RoleSelectionPage() {
+  const { t } = useTranslation();
   const [, navigate] = useLocation();
 
   const handleRoleSelect = (role: 'patient' | 'doctor') => {
@@ -106,13 +108,13 @@ export default function RoleSelectionPage() {
           {/* Header Section */}
           <div className="text-center mb-12">
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-3 tracking-tight">
-              GlucoNova
+              {t('app.name')}
             </h1>
             <h2 className="text-3xl lg:text-4xl font-bold mb-4" style={{ color: '#2dd4bf' }}>
-              Select Your Role
+              {t('auth.selectRole.title')}
             </h2>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-              Choose how you'll use GlucoNova to manage your health journey
+              {t('auth.selectRole.description')}
             </p>
           </div>
 
@@ -163,17 +165,17 @@ export default function RoleSelectionPage() {
                     boxShadow: '0 4px 12px rgba(45, 212, 191, 0.15)'
                   }}
                 >
-                  For Patients
+                  {t('auth.selectRole.forPatients')}
                 </div>
 
                 {/* Title */}
                 <h3 className="text-2xl lg:text-3xl font-bold text-white mb-3 group-hover:text-emerald-300 transition-colors">
-                  Patient Account
+                  {t('auth.selectRole.patientAccount')}
                 </h3>
 
                 {/* Description */}
                 <p className="text-base text-gray-300 leading-relaxed mb-6">
-                  Track your glucose levels, receive AI-powered insights, and manage your diabetes with professional guidance from healthcare providers.
+                  {t('auth.selectRole.patientDescription')}
                 </p>
 
                 {/* Hover Text Below Card Content */}
@@ -182,7 +184,7 @@ export default function RoleSelectionPage() {
                     background: 'rgba(45, 212, 191, 0.1)',
                     border: '1px solid rgba(45, 212, 191, 0.3)'
                   }}>
-                    <span className="text-lg font-semibold text-emerald-300">Click to continue as Patient</span>
+                    <span className="text-lg font-semibold text-emerald-300">{t('auth.selectRole.clickToContinue', { role: t('common.patient') })}</span>
                   </div>
                 </div>
               </div>
@@ -228,17 +230,17 @@ export default function RoleSelectionPage() {
                     boxShadow: '0 4px 12px rgba(45, 212, 191, 0.15)'
                   }}
                 >
-                  For Providers
+                  {t('auth.selectRole.forProviders')}
                 </div>
 
                 {/* Title */}
                 <h3 className="text-2xl lg:text-3xl font-bold text-white mb-3 group-hover:text-emerald-300 transition-colors">
-                  Healthcare Provider
+                  {t('auth.selectRole.healthcareProvider')}
                 </h3>
 
                 {/* Description */}
                 <p className="text-base text-gray-300 leading-relaxed mb-6">
-                  Manage patient records, provide remote care, and monitor progress with advanced analytics and secure communication tools.
+                  {t('auth.selectRole.providerDescription')}
                 </p>
 
                 {/* Hover Text Below Card Content */}
@@ -247,7 +249,7 @@ export default function RoleSelectionPage() {
                     background: 'rgba(45, 212, 191, 0.1)',
                     border: '1px solid rgba(45, 212, 191, 0.3)'
                   }}>
-                    <span className="text-lg font-semibold text-emerald-300">Click to continue as Provider</span>
+                    <span className="text-lg font-semibold text-emerald-300">{t('auth.selectRole.clickToContinue', { role: t('auth.selectRole.healthcareProvider') })}</span>
                   </div>
                 </div>
               </div>
@@ -263,7 +265,7 @@ export default function RoleSelectionPage() {
               data-testid="link-back-to-login"
             >
               <span>←</span>
-              <span>Back to Login</span>
+              <span>{t('auth.backToLogin')}</span>
             </Link>
           </div>
         </div>

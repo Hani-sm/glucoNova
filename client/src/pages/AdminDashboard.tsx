@@ -8,8 +8,10 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { Shield, Check, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminDashboard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [users, setUsers] = useState<any[]>([]);
@@ -22,8 +24,8 @@ export default function AdminDashboard() {
     } catch (error: any) {
       console.error('Failed to fetch users:', error);
       toast({
-        title: 'Failed to load users',
-        description: error.message || 'Please try refreshing the page',
+        title: t('admin.messages.loadUsersFailed'),
+        description: error.message || t('admin.messages.refreshPage'),
         variant: 'destructive',
       });
     } finally {
@@ -39,14 +41,14 @@ export default function AdminDashboard() {
     try {
       await api.updateUserApproval(userId, isApproved);
       toast({
-        title: isApproved ? 'User approved' : 'User rejected',
-        description: `User has been ${isApproved ? 'approved' : 'rejected'} successfully`,
+        title: isApproved ? t('admin.messages.userApproved') : t('admin.messages.userRejected'),
+        description: isApproved ? t('admin.messages.userApprovedDesc') : t('admin.messages.userRejectedDesc'),
       });
       fetchUsers();
     } catch (error: any) {
       toast({
-        title: 'Action failed',
-        description: error.message || 'Failed to update user approval',
+        title: t('admin.messages.actionFailed'),
+        description: error.message || t('admin.messages.updateUserApprovalFailed'),
         variant: 'destructive',
       });
     }
@@ -71,21 +73,21 @@ export default function AdminDashboard() {
           
           <main className="flex-1 overflow-y-auto p-6 space-y-6">
             <div>
-              <h1 className="text-3xl font-bold mb-1">Admin Dashboard</h1>
-              <p className="text-muted-foreground">Manage user approvals and system settings</p>
+              <h1 className="text-3xl font-bold mb-1">{t('admin.title')}</h1>
+              <p className="text-muted-foreground">{t('admin.subtitle')}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card className="p-4">
-                <p className="text-sm text-muted-foreground mb-1">Total Users</p>
+                <p className="text-sm text-muted-foreground mb-1">{t('admin.totalUsers')}</p>
                 <p className="text-3xl font-bold">{users.length}</p>
               </Card>
               <Card className="p-4">
-                <p className="text-sm text-muted-foreground mb-1">Pending Approval</p>
+                <p className="text-sm text-muted-foreground mb-1">{t('admin.pendingApproval')}</p>
                 <p className="text-3xl font-bold text-orange-500">{pendingUsers.length}</p>
               </Card>
               <Card className="p-4">
-                <p className="text-sm text-muted-foreground mb-1">Approved Users</p>
+                <p className="text-sm text-muted-foreground mb-1">{t('admin.approvedUsers')}</p>
                 <p className="text-3xl font-bold text-primary">{approvedUsers.length}</p>
               </Card>
             </div>
@@ -94,7 +96,7 @@ export default function AdminDashboard() {
               <Card className="p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <Shield className="h-6 w-6 text-orange-500" />
-                  <h2 className="text-xl font-bold">Pending Approvals</h2>
+                  <h2 className="text-xl font-bold">{t('admin.pendingApprovals')}</h2>
                 </div>
 
                 <div className="space-y-3">
@@ -119,7 +121,7 @@ export default function AdminDashboard() {
                             data-testid={`button-approve-${user.id}`}
                           >
                             <Check className="h-4 w-4 mr-1" />
-                            Approve
+                            {t('admin.approve')}
                           </Button>
                           <Button
                             size="sm"
@@ -128,7 +130,7 @@ export default function AdminDashboard() {
                             data-testid={`button-reject-${user.id}`}
                           >
                             <X className="h-4 w-4 mr-1" />
-                            Reject
+                            {t('admin.reject')}
                           </Button>
                         </div>
                       </div>
@@ -139,12 +141,12 @@ export default function AdminDashboard() {
             )}
 
             <Card className="p-6">
-              <h2 className="text-xl font-bold mb-4">All Users</h2>
+              <h2 className="text-xl font-bold mb-4">{t('admin.allUsers')}</h2>
 
               {loading ? (
-                <p className="text-muted-foreground text-center py-8">Loading users...</p>
+                <p className="text-muted-foreground text-center py-8">{t('admin.loadingUsers')}</p>
               ) : users.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">No users found</p>
+                <p className="text-muted-foreground text-center py-8">{t('admin.noUsersFound')}</p>
               ) : (
                 <div className="space-y-3">
                   {users.map((user) => (
@@ -155,9 +157,9 @@ export default function AdminDashboard() {
                             <h3 className="font-semibold">{user.name}</h3>
                             <Badge variant="secondary">{user.role}</Badge>
                             {user.isApproved ? (
-                              <Badge className="bg-primary/20 text-primary">Approved</Badge>
+                              <Badge className="bg-primary/20 text-primary">{t('common.approved')}</Badge>
                             ) : (
-                              <Badge variant="destructive">Pending</Badge>
+                              <Badge variant="destructive">{t('common.pending')}</Badge>
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">{user.email}</p>

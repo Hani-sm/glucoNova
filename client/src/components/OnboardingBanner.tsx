@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { X, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface OnboardingBannerProps {
   onResume: () => void;
@@ -7,6 +8,8 @@ interface OnboardingBannerProps {
 }
 
 export default function OnboardingBanner({ onResume, onDismiss }: OnboardingBannerProps) {
+  const { t } = useTranslation();
+  
   return (
     <div 
       className="bg-emerald-400/10 border-b border-emerald-400/20 px-6 py-3 flex items-center justify-between"
@@ -15,9 +18,9 @@ export default function OnboardingBanner({ onResume, onDismiss }: OnboardingBann
       <div className="flex items-center gap-3">
         <AlertCircle className="w-5 h-5 text-emerald-400" />
         <div>
-          <p className="text-sm font-medium text-white">Complete your setup</p>
+          <p className="text-sm font-medium text-white">{t('onboarding.banner.completeSetup')}</p>
           <p className="text-xs text-gray-400">
-            Add your health information to get personalized AI-powered insights
+            {t('onboarding.banner.addHealthInfo')}
           </p>
         </div>
       </div>
@@ -28,7 +31,7 @@ export default function OnboardingBanner({ onResume, onDismiss }: OnboardingBann
           className="bg-emerald-400 hover:bg-emerald-500 text-white"
           data-testid="button-resume-setup"
         >
-          Resume Setup
+          {t('onboarding.banner.resumeSetup')}
         </Button>
         <Button
           size="sm"

@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Droplet, TrendingUp, Brain, Upload, Zap, Activity, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 export default function InsulinPage() {
+  const { t } = useTranslation();
   const [manualInsulin, setManualInsulin] = useState('');
   const [showAIPrediction, setShowAIPrediction] = useState(true);
 
@@ -54,15 +56,15 @@ export default function InsulinPage() {
         <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
           <div className="flex items-center gap-4">
             <Droplet className="w-6 h-6 text-primary" />
-            <h2 className="text-xl font-semibold">Insulin Tracking</h2>
+            <h2 className="text-xl font-semibold">{t('insulin.title')}</h2>
           </div>
         </header>
         
         <main className="flex-1 overflow-y-auto">
           <div className="w-full" style={{ padding: '24px 32px' }}>
             <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-1">Insulin Management</h1>
-              <p className="text-muted-foreground">AI-powered insulin predictions and tracking</p>
+              <h1 className="text-3xl font-bold mb-1">{t('insulin.title')}</h1>
+              <p className="text-muted-foreground">{t('insulin.subtitle')}</p>
             </div>
 
             {/* AI Insulin Prediction Card */}
@@ -71,10 +73,10 @@ export default function InsulinPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Brain className="w-5 h-5 text-primary" />
-                    AI Insulin Prediction
+                    {t('insulin.aiPrediction')}
                   </CardTitle>
                   <CardDescription>
-                    Based on your medical reports, current glucose levels, and health metrics
+                    {t('insulin.basedOnData')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -82,7 +84,7 @@ export default function InsulinPage() {
                     <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
                       <div className="flex items-center gap-2">
                         <Zap className="w-4 h-4 text-yellow-500" />
-                        <span className="text-sm font-medium">Data Source:</span>
+                        <span className="text-sm font-medium">{t('insulin.dataSource')}</span>
                       </div>
                       <Badge variant="outline" className="bg-primary/20">
                         {aiPrediction.dataSource}
@@ -91,7 +93,7 @@ export default function InsulinPage() {
                     <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
                       <div className="flex items-center gap-2">
                         <Activity className="w-4 h-4 text-green-500" />
-                        <span className="text-sm font-medium">AI Confidence:</span>
+                        <span className="text-sm font-medium">{t('insulin.aiConfidence')}</span>
                       </div>
                       <span className="text-lg font-bold text-green-500">{aiPrediction.confidence}%</span>
                     </div>
@@ -99,19 +101,19 @@ export default function InsulinPage() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                       <div className="text-center p-4 bg-secondary rounded-lg">
                         <p className="text-3xl font-bold text-primary">{aiPrediction.basal}</p>
-                        <p className="text-xs text-muted-foreground mt-1">Basal Insulin (units/dose)</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t('insulin.basalInsulin')}</p>
                       </div>
                       <div className="text-center p-4 bg-secondary rounded-lg">
                         <p className="text-3xl font-bold text-primary">{aiPrediction.bolus}</p>
-                        <p className="text-xs text-muted-foreground mt-1">Suggested Bolus (units)</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t('insulin.suggestedBolus')}</p>
                       </div>
                       <div className="text-center p-4 bg-secondary rounded-lg">
                         <p className="text-3xl font-bold text-primary">{aiPrediction.totalDaily}</p>
-                        <p className="text-xs text-muted-foreground mt-1">Total Daily (units)</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t('insulin.totalDaily')}</p>
                       </div>
                       <div className="text-center p-4 bg-secondary rounded-lg">
                         <p className="text-3xl font-bold text-primary">1:{aiPrediction.insulinToCarbRatio}</p>
-                        <p className="text-xs text-muted-foreground mt-1">ICR (Insulin:Carb)</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t('insulin.icr')}</p>
                       </div>
                     </div>
 
@@ -119,12 +121,12 @@ export default function InsulinPage() {
                       <div className="flex items-start gap-2">
                         <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-sm font-semibold text-blue-500 mb-1">AI Recommendation</p>
+                          <p className="text-sm font-semibold text-blue-500 mb-1">{t('insulin.aiRecommendation')}</p>
                           <p className="text-xs text-muted-foreground">
-                            The AI has analyzed your latest medical reports and current health data. 
+                            {t('insulin.recommendationText')} 
                             {reportsData?.reports?.length > 0 
-                              ? ' Predictions are based on your uploaded lab results, HbA1c levels, and real-time glucose monitoring.' 
-                              : ' Upload medical reports for more accurate predictions.'}
+                              ? ' ' + t('insulin.confidence.withReports')
+                              : ' ' + t('insulin.confidence.withoutReports')}
                           </p>
                         </div>
                       </div>
@@ -133,10 +135,10 @@ export default function InsulinPage() {
                     <div className="mt-4 flex gap-2">
                       <Button variant="outline" size="sm" className="flex-1">
                         <Upload className="w-4 h-4 mr-2" />
-                        Upload Medical Report
+                        {t('insulin.uploadMedicalReport')}
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => setShowAIPrediction(false)}>
-                        Dismiss
+                        {t('insulin.dismiss')}
                       </Button>
                     </div>
                   </div>
@@ -149,22 +151,22 @@ export default function InsulinPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Droplet className="w-5 h-5 text-primary" />
-                    Today's Insulin
+                    {t('insulin.todaysInsulin')}
                   </CardTitle>
-                  <CardDescription>Total units administered</CardDescription>
+                  <CardDescription>{t('insulin.totalUnitsAdministered')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-4xl font-bold text-primary">12.5 units</p>
                   <div className="mt-4">
-                    <label className="text-sm text-muted-foreground mb-2 block">Manual Entry:</label>
+                    <label className="text-sm text-muted-foreground mb-2 block">{t('insulin.manualEntry')}:</label>
                     <div className="flex gap-2">
                       <Input 
                         type="number" 
-                        placeholder="Enter units" 
+                        placeholder={t('insulin.enterUnits')} 
                         value={manualInsulin}
                         onChange={(e) => setManualInsulin(e.target.value)}
                       />
-                      <Button size="sm">Log</Button>
+                      <Button size="sm">{t('insulin.log')}</Button>
                     </div>
                   </div>
                 </CardContent>
@@ -174,14 +176,14 @@ export default function InsulinPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-primary" />
-                    Weekly Average
+                    {t('insulin.weeklyAverage')}
                   </CardTitle>
-                  <CardDescription>Average daily insulin</CardDescription>
+                  <CardDescription>{t('insulin.averageDailyInsulin')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-4xl font-bold text-primary">14.2 units</p>
                   <div className="mt-4">
-                    <p className="text-sm text-muted-foreground">Trend: Stable</p>
+                    <p className="text-sm text-muted-foreground">{t('insulin.trend')}</p>
                     <div className="w-full bg-secondary h-2 rounded-full mt-2">
                       <div className="bg-primary h-2 rounded-full" style={{ width: '75%' }}></div>
                     </div>
@@ -193,7 +195,7 @@ export default function InsulinPage() {
             {/* Insulin History */}
             <Card>
               <CardHeader>
-                <CardTitle>Recent Insulin Logs</CardTitle>
+                <CardTitle>{t('insulin.recentInsulinLogs')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">

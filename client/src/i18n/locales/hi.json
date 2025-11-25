@@ -23,7 +23,15 @@
     "reset": "रीसेट",
     "logout": "लॉगआउट",
     "settings": "सेटिंग्स",
-    "profile": "प्रोफ़ाइल"
+    "profile": "प्रोफ़ाइल",
+    "patient": "रोगी",
+    "doctor": "डॉक्टर",
+    "admin": "व्यवस्थापक",
+    "approved": "अनुमोदित",
+    "pending": "लंबित",
+    "user": "उपयोगकर्ता",
+    "initials": "एचएस",
+    "defaultName": "हनीशा एसएम"
   },
   "navigation": {
     "overview": "अवलोकन",
@@ -38,7 +46,207 @@
     "appointments": "अपॉइंटमेंट",
     "documentsOCR": "दस्तावेज़ और ओसीआर",
     "myDoctors": "मेरे डॉक्टर",
-    "voiceAI": "वॉयस एआई"
+    "voiceAI": "वॉयस एआई",
+    "patientDirectory": "रोगी निर्देशिका",
+    "patientDetails": "रोगी विवरण",
+    "clinicalAlerts": "क्लिनिकल अलर्ट",
+    "treatmentPlans": "उपचार योजनाएं",
+    "reportsAnalytics": "रिपोर्ट और विश्लेषण",
+    "messages": "संदेश",
+    "users": "उपयोगकर्ता",
+    "reports": "रिपोर्ट",
+    "settings": "सेटिंग्स"
+  },
+  "dashboard": {
+    "title": "डैशबोर्ड",
+    "welcomeBack": "वापसी पर स्वागत है, {{name}}",
+    "healthOverview": "आज के लिए आपका स्वास्थ्य अवलोकन",
+    "loadingData": "आपका स्वास्थ्य डेटा लोड हो रहा है...",
+    "tabs": {
+      "overview": "अवलोकन",
+      "aiInsights": "एआई अंतर्दृष्टि",
+      "trends": "प्रवृत्तियाँ"
+    },
+    "metrics": {
+      "glucose": "ग्लूकोज",
+      "timeInRange": "सीमा में समय",
+      "carbsToday": "आज के कार्ब्स",
+      "activeInsulin": "सक्रिय इंसुलिन",
+      "status": {
+        "noData": "कोई डेटा नहीं",
+        "tracked": "ट्रैक किया गया",
+        "active": "सक्रिय",
+        "excellent": "उत्कृष्ट",
+        "good": "अच्छा",
+        "needsImprovement": "सुधार की आवश्यकता है"
+      }
+    },
+    "quickActions": {
+      "title": "त्वरित कार्य",
+      "bloodSugarTracking": "रक्त शर्करा ट्रैकिंग",
+      "logAndMonitor": "अपने ग्लूकोज स्तर को लॉग और निगरानी करें",
+      "mealLogging": "भोजन लॉगिंग",
+      "trackNutrition": "अपने पोषण और कार्ब्स को ट्रैक करें",
+      "healthReports": "स्वास्थ्य रिपोर्ट",
+      "viewReports": "अपनी रिपोर्ट देखें और डाउनलोड करें",
+      "doctorCommunication": "डॉक्टर संचार",
+      "messageDoctor": "अपने स्वास्थ्य सेवा प्रदाता को संदेश भेजें"
+    },
+    "healthScore": {
+      "title": "आपका स्वास्थ्य स्कोर",
+      "outOf": "100 में से",
+      "excellent": "उत्कृष्ट मधुमेह प्रबंधन! शानदार काम जारी रखें।",
+      "good": "अच्छी प्रगति। बेहतर परिणामों के लिए सुसंगतता पर ध्यान केंद्रित करें।",
+      "improve": "चलिए आपके ग्लूकोज नियंत्रण में सुधार करने पर काम करते हैं। नियमित निगरानी से शुरू करें।"
+    },
+    "achievements": {
+      "title": "उपलब्धियाँ",
+      "timeChampion": "समय चैंपियन",
+      "timeChampionDesc": "70%+ सीमा में",
+      "consistentLogger": "सुसंगत लॉगर",
+      "consistentLoggerDesc": "10+ प्रविष्टियाँ",
+      "perfectRange": "उत्कृष्ट सीमा",
+      "perfectRangeDesc": "वर्तमान ग्लूकोज सीमा में",
+      "mealTracker": "भोजन ट्रैकर",
+      "mealTrackerDesc": "5+ भोजन दर्ज किए गए"
+    },
+    "progress": {
+      "goalsAndStreaks": "लक्ष्य और स्ट्रीक",
+      "daysInRange": "दिन सीमा में",
+      "daysInRangeDetail": "{{days}} दिन – {{percent}}%",
+      "weeklyLogging": "साप्ताहिक लॉगिंग",
+      "weeklyLoggingDetail": "{{percent}}%",
+      "activityGoal": "गतिविधि लक्ष्य",
+      "activityGoalDetail": "{{percent}}%"
+    },
+    "aiInsights": {
+      "title": "एआई-संचालित अंतर्दृष्टि",
+      "glucosePattern": "ग्लूकोज पैटर्न का पता चला",
+      "patternExcellent": "उत्कृष्ट ग्लूकोज नियंत्रण! आपके स्तर अधिकांश समय लक्ष्य सीमा के भीतर रहते हैं।",
+      "patternFluctuate": "आपका ग्लूकोज अस्थिर रहता है। भोजन के समय और इंसुलिन खुराक को समायोजित करने पर विचार करें।",
+      "recommendation": "सिफारिश",
+      "aiGenerated": "एआई-जनित",
+      "nutritionAnalysis": "पोषण विश्लेषण",
+      "avgCarbs": "औसत दैनिक कार्ब्स: {{carbs}}ग्रा।",
+      "reduceCarbs": " बेहतर नियंत्रण के लिए कार्ब प्रवेश को कम करने पर विचार करें।",
+      "goodCarbs": " अच्छा कार्बोहाइड्रेट प्रबंधन!",
+      "insight": "अंतर्दृष्टि",
+      "dataDriven": "डेटा-संचालित",
+      "startTracking": "एआई अंतर्दृष्टि के लिए ट्रैकिंग शुरू करें",
+      "logForInsights": "व्यक्तिगत एआई अनुशंसाएं प्राप्त करने के लिए अपने ग्लूकोज और भोजन को लॉग करें",
+      "activityRecommendation": "गतिविधि अनुशंसा",
+      "walking": "भोजन के बाद 15-20 मिनट की पैदल यात्रा ग्लूकोज स्पाइक को 25% तक कम करने में मदद कर सकती है। अपने सबसे बड़े भोजन के बाद चलने का प्रयास करें।",
+      "suggestion": "सुझाव",
+      "evidenceBased": "साक्ष्य-आधारित"
+    },
+    "insulinRecommendation": {
+      "title": "इंसुलिन अनुशंसा",
+      "basedOnData": "नवीनतम डेटा के आधार पर",
+      "recommendedDose": "अनुशंसित खुराक",
+      "confidence": "आत्मविश्वास",
+      "logDose": "खुराक लॉग करें",
+      "factorsConsidered": "विचाराधीन कारक",
+      "noFactors": "कोई कारक उपलब्ध नहीं है"
+    },
+    "trends": {
+      "glucoseTrends": "7-दिन की ग्लूकोज प्रवृत्तियाँ",
+      "glucosePatterns": "पिछले सप्ताह में आपके ग्लूकोज पैटर्न",
+      "nutritionTrends": "पोषण प्रवृत्तियाँ",
+      "carbPatterns": "आपके कार्बोहाइड्रेट प्रवेश के पैटर्न",
+      "breakfast": "नाश्ता",
+      "lunch": "दोपहर का भोजन",
+      "dinner": "रात का भोजन"
+    },
+    "profile": {
+      "title": "स्वास्थ्य प्रोफ़ाइल",
+      "view": "देखें",
+      "loading": "प्रोफ़ाइल लोड हो रहा है...",
+      "weight": "वजन",
+      "height": "ऊँचाई",
+      "lastA1c": "अंतिम एचबीए1सी",
+      "typicalInsulin": "विशिष्ट इंसुलिन",
+      "setupComplete": "आपकी प्रोफ़ाइल सफलतापूर्वक कॉन्फ़िगर कर दी गई है"
+    },
+    "aiPrediction": {
+      "title": "एआई इंसुलिन पूर्वानुमान",
+      "loading": "लोड हो रहा है...",
+      "noData": "कोई डेटा नहीं",
+      "units": "इकाइयां",
+      "confidence": "आत्मविश्वास"
+    }
+  },
+  "glucose": {
+    "title": "ग्लूकोज निगरानी",
+    "subtitle": "अपने रक्त ग्लूकोज स्तर और प्रवृत्तियों की निगरानी करें",
+    "recordNewReading": "नया रीडिंग दर्ज करें",
+    "glucose": "ग्लूकोज (mg/dL)",
+    "glucosePlaceholder": "ग्लूकोज रीडिंग दर्ज करें",
+    "insulin": "इंसुलिन (इकाइयां)",
+    "insulinPlaceholder": "इंसुलिन खुराक दर्ज करें",
+    "carbs": "कार्ब्स (ग्राम)",
+    "carbsPlaceholder": "कार्ब प्रवेश दर्ज करें",
+    "notes": "नोट्स (वैकल्पिक)",
+    "notesPlaceholder": "कोई भी नोट्स जोड़ें",
+    "recordReading": "रीडिंग दर्ज करें",
+    "recentReadings": "हाल के रीडिंग",
+    "noReadings": "अभी तक कोई रीडिंग नहीं। अपना पहला रीडिंग दर्ज करें!",
+    "recording": "रिकॉर्डिंग...",
+    "success": "सफलता",
+    "readingRecorded": "ग्लूकोज रीडिंग सफलतापूर्वक दर्ज किया गया",
+    "error": "त्रुटि",
+    "failedToRecord": "ग्लूकोज रीडिंग दर्ज करने में विफल",
+    "current": "वर्तमान",
+    "average": "औसत",
+    "highReadings": "उच्च रीडिंग",
+    "lowReadings": "निम्न रीडिंग",
+    "status": {
+      "noData": "कोई डेटा नहीं",
+      "inRange": "सीमा में",
+      "high": "उच्च",
+      "low": "निम्न",
+      "needsAttention": "ध्यान आवश्यक",
+      "good": "अच्छा"
+    },
+    "trends": {
+      "title": "ग्लूकोज प्रवृत्तियाँ",
+      "currentStatus": "वर्तमान स्थिति"
+    }
+  },
+  "insulin": {
+    "title": "इंसुलिन ट्रैकिंग",
+    "subtitle": "एआई-संचालित इंसुलिन पूर्वानुमान और ट्रैकिंग",
+    "aiPrediction": "एआई इंसुलिन पूर्वानुमान",
+    "dataSource": "डेटा स्रोत:",
+    "aiConfidence": "एआई आत्मविश्वास:",
+    "basedOnData": "आपकी चिकित्सा रिपोर्ट, वर्तमान ग्लूकोज स्तर और स्वास्थ्य मेट्रिक्स के आधार पर",
+    "basalInsulin": "बेसल इंसुलिन",
+    "suggestedBolus": "सुझाया गया बोलस",
+    "totalDaily": "कुल दैनिक",
+    "icr": "आईसीआर (इंसुलिन:कार्ब)",
+    "isf": "आईएसएफ (इंसुलिन संवेदनशीलता कारक)",
+    "aiRecommendation": "एआई अनुशंसा",
+    "recommendationText": "एआई ने आपकी नवीनतम चिकित्सा रिपोर्ट और वर्तमान स्वास्थ्य डेटा का विश्लेषण किया है।",
+    "uploadMedicalReport": "चिकित्सा रिपोर्ट अपलोड करें",
+    "dismiss": "खारिज करें",
+    "todaysInsulin": "आज का इंसुलिन",
+    "totalUnitsAdministered": "कुल इकाइयां प्रशासित",
+    "manualEntry": "मैन्युअल प्रविष्टि:",
+    "enterUnits": "इकाइयां दर्ज करें",
+    "log": "लॉग",
+    "weeklyAverage": "साप्ताहिक औसत",
+    "averageDailyInsulin": "औसत दैनिक इंसुलिन",
+    "trend": "प्रवृत्ति: स्थिर",
+    "recentInsulinLogs": "हाल के इंसुलिन लॉग",
+    "confidence": {
+      "withReports": "चिकित्सा रिपोर्ट + वास्तविक समय डेटा",
+      "withoutReports": "केवल वास्तविक समय डेटा"
+    },
+    "prediction": {
+      "generated": "पूर्वानुमान उत्पन्न",
+      "ready": "आपकी इंसुलिन अनुशंसा तैयार है",
+      "failed": "पूर्वानुमान विफल",
+      "unable": "पूर्वानुमान उत्पन्न करने में असमर्थ"
+    }
   },
   "food": {
     "title": "भोजन दर्ज करें",
@@ -151,11 +359,34 @@
     "language": "भाषा",
     "selectLanguage": "भाषा चुनें",
     "appearance": "दिखावट",
+    "theme": "थीम",
+    "light": "हल्का",
+    "dark": "गहरा",
     "notifications": "सूचनाएं",
+    "enableNotifications": "सूचनाएं सक्षम करें",
     "privacy": "गोपनीयता",
     "preferences": "प्राथमिकताएं",
     "changeLanguage": "भाषा बदलें",
-    "languageChanged": "भाषा सफलतापूर्वक बदली गई"
+    "languageChanged": "भाषा सफलतापूर्वक बदली गई",
+    "units": "इकाइयां",
+    "mgdl": "mg/dL",
+    "mmol": "mmol/L",
+    "dataPrivacy": "डेटा और गोपनीयता",
+    "exportData": "मेरा डेटा निर्यात करें",
+    "onboarding": "ऑनबोर्डिंग",
+    "resetTutorial": "ट्यूटोरियल रीसेट करें",
+    "rerunTutorial": "अगली बार पृष्ठ लोड होने पर पहली बार सेटअप ट्यूटोरियल को फिर से चलाएं",
+    "savedAutomatically": "सेटिंग्स स्वचालित रूप से सहेजी जाती हैं",
+    "themeUpdated": "थीम अपडेट की गई",
+    "switchedToMode": "{{theme}} मोड में स्विच किया गया",
+    "notificationsEnabled": "सूचनाएं सक्षम की गईं",
+    "notificationsDisabled": "सूचनाएं अक्षम की गईं",
+    "unitsUpdated": "इकाइयां अपडेट की गईं",
+    "changedToUnits": "{{units}} में बदल दिया गया",
+    "exportStarted": "निर्यात शुरू हुआ",
+    "dataExportBegin": "आपका डेटा निर्यात जल्द ही शुरू हो जाएगा",
+    "onboardingReset": "ऑनबोर्डिंग रीसेट",
+    "tutorialRerun": "अब आप अगली बार पृष्ठ लोड होने पर ट्यूटोरियल को फिर से चला सकते हैं"
   },
   "auth": {
     "login": "लॉगिन",
@@ -166,6 +397,191 @@
     "rememberMe": "मुझे याद रखें",
     "loginSuccess": "लॉगिन सफल",
     "loginError": "लॉगिन विफल",
-    "welcomeBack": "वापसी पर स्वागत है!"
+    "welcomeBack": "वापसी पर स्वागत है!",
+    "selectRole": {
+      "title": "अपनी भूमिका का चयन करें",
+      "description": "चुनें कि आप किस भूमिका का अन्वेषण करना चाहेंगे",
+      "patientDescription": "अपने ग्लूकोज स्तर और स्वास्थ्य डेटा का प्रबंधन करें",
+      "healthcareProvider": "स्वास्थ्य सेवा प्रदाता",
+      "providerDescription": "रोगी रिकॉर्ड प्रबंधित करें और देखभाल प्रदान करें",
+      "forPatients": "रोगियों के लिए",
+      "patientAccount": "रोगी खाता",
+      "forProviders": "प्रदाताओं के लिए",
+      "clickToContinue": "{{role}} के रूप में जारी रखने के लिए क्लिक करें"
+    },
+    "passwordMismatch": "पासवर्ड मेल नहीं खाते",
+    "registrationSuccess": "पंजीकरण सफल",
+    "welcomeMessage": "ग्लूकोनोवा में आपका स्वागत है! शुरू करने के लिए कृपया लॉगिन करें।",
+    "registrationFailed": "पंजीकरण विफल",
+    "tryAgain": "कृपया पुनः प्रयास करें",
+    "backToRoles": "भूमिकाओं पर वापस जाएं",
+    "createAccount": "खाता बनाएं",
+    "fullName": "पूरा नाम",
+    "enterFullName": "अपना पूरा नाम दर्ज करें",
+    "emailPlaceholder": "ईमेल@उदाहरण.कॉम",
+    "createPassword": "एक मजबूत पासवर्ड बनाएं",
+    "confirmPassword": "पासवर्ड की पुष्टि करें",
+    "reEnterPassword": "अपना पासवर्ड पुनः दर्ज करें",
+    "accountReviewNotice": "आपका खाता हमारी व्यवस्थापक टीम द्वारा समीक्षा किया जाएगा। स्वीकृति पर आपको एक ईमेल सूचना प्राप्त होगी।",
+    "creatingAccount": "खाता बनाया जा रहा है...",
+    "alreadyHaveAccount": "क्या आपके पास पहले से एक खाता है?",
+    "backToLogin": "लॉगिन पर वापस जाएं"
+  },
+  "doctor": {
+    "patientManagement": "रोगी प्रबंधन",
+    "welcome": "स्वागत है, डॉ. {{name}}",
+    "subtitle": "अपने रोगियों का प्रबंधन करें और उनके स्वास्थ्य डेटा की समीक्षा करें",
+    "yourPatients": "आपके रोगी ({{count}})",
+    "searchPlaceholder": "रोगियों की खोज करें...",
+    "loadingPatients": "रोगी लोड हो रहे हैं...",
+    "noPatientsFound": "कोई रोगी नहीं मिला",
+    "noPatientsAssigned": "कोई रोगी निरुपित नहीं है",
+    "patientProfile": "रोगी प्रोफ़ाइल",
+    "name": "नाम",
+    "email": "ईमेल",
+    "registered": "पंजीकृत",
+    "recentReadings": "हाल के रीडिंग",
+    "avgGlucose": "औसत ग्लूकोज",
+    "timeInRange": "सीमा में समय",
+    "current": "वर्तमान",
+    "glucoseTrend": "ग्लूकोज प्रवृत्ति",
+    "loadingHealthData": "स्वास्थ्य डेटा लोड हो रहा है...",
+    "noHealthData": "कोई स्वास्थ्य डेटा उपलब्ध नहीं है",
+    "selectPatient": "उनके स्वास्थ्य डेटा को देखने के लिए एक रोगी का चयन करें"
+  },
+  "admin": {
+    "title": "व्यवस्थापक डैशबोर्ड",
+    "subtitle": "उपयोगकर्ता अनुमोदन और सिस्टम सेटिंग्स प्रबंधित करें",
+    "totalUsers": "कुल उपयोगकर्ता",
+    "pendingApproval": "लंबित अनुमोदन",
+    "approvedUsers": "अनुमोदित उपयोगकर्ता",
+    "pendingApprovals": "लंबित अनुमोदन",
+    "approve": "अनुमोदन करें",
+    "reject": "अस्वीकार करें",
+    "allUsers": "सभी उपयोगकर्ता",
+    "loadingUsers": "उपयोगकर्ता लोड हो रहे हैं...",
+    "noUsersFound": "कोई उपयोगकर्ता नहीं मिला",
+    "messages": {
+      "loadUsersFailed": "उपयोगकर्ताओं को लोड करने में विफल",
+      "refreshPage": "कृपया पृष्ठ को रीफ्रेश करने का प्रयास करें",
+      "userApproved": "उपयोगकर्ता अनुमोदित",
+      "userRejected": "उपयोगकर्ता अस्वीकृत",
+      "userApprovedDesc": "उपयोगकर्ता को सफलतापूर्वक अनुमोदित कर दिया गया है",
+      "userRejectedDesc": "उपयोगकर्ता को सफलतापूर्वक अस्वीकृत कर दिया गया है",
+      "actionFailed": "कार्य विफल",
+      "updateUserApprovalFailed": "उपयोगकर्ता अनुमोदन को अपडेट करने में विफल"
+    }
+  },
+  "onboarding": {
+    "stepTitle": "ऑनबोर्डिंग - चरण {{step}} {{total}} में से",
+    "stepDescription": "व्यक्तिगत स्वास्थ्य अंतर्दृष्टि प्राप्त करने के लिए अपनी प्रोफ़ाइल सेटअप पूरी करें",
+    "stepProgress": "चरण {{step}} {{total}} में से",
+    "skipForNow": "अभी के लिए छोड़ें",
+    "welcome": {
+      "title": "ग्लूकोनोवा में आपका स्वागत है",
+      "description": "आपका एआई-संचालित मधुमेह प्रबंधन प्लेटफ़ॉर्म। आइए जल्दी से देखें कि आप क्या कर सकते हैं!",
+      "startTour": "टूर शुरू करें"
+    },
+    "features": {
+      "title": "उपलब्ध सुविधाएं",
+      "description": "आपको अपने मधुमेह को प्रभावी ढंग से प्रबंधित करने के लिए सब कुछ",
+      "glucose": {
+        "title": "ग्लूकोज निगरानी",
+        "description": "दृश्य प्रवृत्तियों और अंतर्दृष्टि के साथ अपने रक्त ग्लूकोज स्तर को ट्रैक करें"
+      },
+      "insulin": {
+        "title": "एआई इंसुलिन पूर्वानुमान",
+        "description": "एआई द्वारा संचालित व्यक्तिगत इंसुलिन अनुशंसाएं प्राप्त करें"
+      },
+      "meal": {
+        "title": "भोजन ट्रैकिंग",
+        "description": "आसान ट्रैकिंग के लिए मैन्युअल रूप से या वॉयस इनपुट का उपयोग करके भोजन दर्ज करें"
+      },
+      "medication": {
+        "title": "दवा प्रबंधन",
+        "description": "अपनी दवाओं और अनुसूचियों का ट्रैक रखें"
+      },
+      "doctor": {
+        "title": "डॉक्टर सहयोग",
+        "description": "अपने स्वास्थ्य सेवा टीम के साथ सुरक्षित रूप से अपना डेटा साझा करें"
+      },
+      "voice": {
+        "title": "वॉयस सहायक",
+        "description": "आवाज़ कमांड का उपयोग करके हाथ मुक्त भोजन दर्ज करें"
+      },
+      "continueSetup": "सेटअप जारी रखें"
+    },
+    "upload": {
+      "title": "स्वास्थ्य रिकॉर्ड अपलोड करें",
+      "description": "अपनी जानकारी को स्वचालित रूप से निकालने के लिए अपने स्वास्थ्य सारांश का पीडीएफ अपलोड करें",
+      "dragDrop": "अपना पीडीएफ यहां खींचें और छोड़ें",
+      "or": "या",
+      "browseFiles": "फ़ाइलें ब्राउज़ करें",
+      "selectExisting": "मौजूदा का चयन करें",
+      "useDemoData": "डेमो डेटा का उपयोग करें",
+      "enterManually": "मैन्युअल रूप से दर्ज करें"
+    },
+    "existing": {
+      "title": "मौजूदा रिपोर्ट का चयन करें",
+      "description": "अपने पहले से अपलोड किए गए चिकित्सा रिपोर्ट में से चुनें",
+      "back": "वापस",
+      "loading": "रिपोर्ट लोड हो रही है...",
+      "noReports": "कोई रिपोर्ट नहीं मिली",
+      "uploadToStart": "आरंभ करने के लिए एक चिकित्सा रिपोर्ट अपलोड करें",
+      "uploadNew": "नई रिपोर्ट अपलोड करें"
+    },
+    "confirm": {
+      "title": "अपनी जानकारी की पुष्टि करें",
+      "description": "निकाले गए डेटा की समीक्षा और संपादन करें",
+      "button": "पुष्टि करें और जारी रखें"
+    },
+    "manual": {
+      "title": "अपना विवरण दर्ज करें",
+      "description": "मैन्युअल रूप से अपनी स्वास्थ्य जानकारी भरें",
+      "continue": "जारी रखें"
+    },
+    "finish": {
+      "title": "सब सेट!",
+      "description": "आपका खाता तैयार है। अब आप व्यक्तिगत स्वास्थ्य अंतर्दृष्टि और एआई-संचालित इंसुलिन पूर्वानुमान तक पहुंच सकते हैं।",
+      "goToDashboard": "डैशबोर्ड पर जाएं"
+    },
+    "banner": {
+      "completeSetup": "अपना सेटअप पूरा करें",
+      "addHealthInfo": "व्यक्तिगत एआई-संचालित अंतर्दृष्टि प्राप्त करने के लिए अपनी स्वास्थ्य जानकारी जोड़ें",
+      "resumeSetup": "सेटअप फिर से शुरू करें"
+    },
+    "form": {
+      "name": "नाम",
+      "dob": "जन्म की तारीख",
+      "weight": "वजन (किलोग्राम)",
+      "height": "ऊँचाई (सेमी)",
+      "a1c": "अंतिम एचबीए1सी (%)",
+      "insulin": "विशिष्ट इंसुलिन (यू)",
+      "medications": "दवाएं",
+      "targetRange": "लक्ष्य सीमा"
+    },
+    "messages": {
+      "fileTooLarge": "फ़ाइल बहुत बड़ी है",
+      "fileSizeLimit": "कृपया 20एमबी से छोटी फ़ाइल अपलोड करें",
+      "parsingFailed": "पार्सिंग विफल",
+      "parsingFailedDesc": "दस्तावेज़ से डेटा निकालने में विफल। कृपया मैन्युअल रूप से विवरण दर्ज करें।",
+      "invalidFileType": "अमान्य फ़ाइल प्रकार",
+      "supportedFileTypes": "कृपया पीडीएफ, जेपीईजी, या पीएनजी फ़ाइल अपलोड करें",
+      "reportLoaded": "रिपोर्ट लोड की गई",
+      "reportLoadedDesc": "रोगी की जानकारी भर दी गई है। कृपया समीक्षा करें और पुष्टि करें।",
+      "loadPatientFailed": "रिपोर्ट से रोगी विवरण लोड करने में विफल",
+      "nameRequired": "नाम आवश्यक है",
+      "nameRequiredDesc": "कृपया अपना नाम दर्ज करें",
+      "dobRequired": "जन्म की तारीख आवश्यक है",
+      "dobRequiredDesc": "कृपया अपनी जन्म की तारीख दर्ज करें",
+      "validWeightRequired": "मान्य वजन आवश्यक है",
+      "validWeightRequiredDesc": "कृपया किलोग्राम में मान्य वजन दर्ज करें",
+      "validHeightRequired": "मान्य ऊँचाई आवश्यक है",
+      "validHeightRequiredDesc": "कृपया सेमी में मान्य ऊँचाई दर्ज करें",
+      "profileCreated": "प्रोफ़ाइल सफलतापूर्वक बनाई गई",
+      "healthDataSaved": "आपका स्वास्थ्य डेटा सहेज लिया गया है",
+      "saveProfileError": "प्रोफ़ाइल सहेजने में त्रुटि",
+      "saveProfileErrorDesc": "कृपया पुनः प्रयास करें या समर्थन से संपर्क करें"
+    }
   }
 }

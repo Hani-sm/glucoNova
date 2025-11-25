@@ -24,14 +24,8 @@
     "logout": "Logout",
     "settings": "Settings",
     "profile": "Profile",
-    "patient": "Patient",
-    "doctor": "Doctor",
-    "admin": "Admin",
     "approved": "Approved",
-    "pending": "Pending",
-    "user": "User",
-    "initials": "HS",
-    "defaultName": "Hanisha SM"
+    "pending": "Pending"
   },
   "navigation": {
     "overview": "Overview",
@@ -46,16 +40,7 @@
     "appointments": "Appointments",
     "documentsOCR": "Documents & OCR",
     "myDoctors": "My Doctors",
-    "voiceAI": "Voice AI",
-    "patientDirectory": "Patient Directory",
-    "patientDetails": "Patient Details",
-    "clinicalAlerts": "Clinical Alerts",
-    "treatmentPlans": "Treatment Plans",
-    "reportsAnalytics": "Reports & Analytics",
-    "messages": "Messages",
-    "users": "Users",
-    "reports": "Reports",
-    "settings": "Settings"
+    "voiceAI": "Voice AI"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -100,27 +85,7 @@
       "improve": "Let's work on improving your glucose control. Start with regular monitoring."
     },
     "achievements": {
-      "title": "Achievements",
-      "timeChampion": "Time Champion",
-      "timeChampionDesc": "70%+ in range",
-      "consistentLogger": "Consistent Logger",
-      "consistentLoggerDesc": "10+ entries",
-      "perfectRange": "Perfect Range",
-      "perfectRangeDesc": "Current glucose in range",
-      "mealTracker": "Meal Tracker",
-      "mealTrackerDesc": "5+ meals logged"
-    },
-    "progress": {
-      "goalsAndStreaks": "Goals & Streaks",
-      "daysInRange": "Days in Range",
-      "daysInRangeDetail": "{{days}} Days – {{percent}}%",
-      "weeklyLogging": "Weekly Logging",
-      "weeklyLoggingDetail": "{{percent}}%",
-      "activityGoal": "Activity Goal",
-      "activityGoalDetail": "{{percent}}%"
-    },
-    "profile": {
-      "setupComplete": "Your profile has been configured successfully"
+      "title": "Achievements"
     },
     "aiInsights": {
       "title": "AI-Powered Insights",
@@ -208,10 +173,6 @@
       "low": "Low",
       "needsAttention": "Needs Attention",
       "good": "Good"
-    },
-    "trends": {
-      "title": "Glucose Trends",
-      "currentStatus": "Current Status"
     }
   },
   "insulin": {
@@ -242,12 +203,6 @@
     "confidence": {
       "withReports": "Medical Reports + Real-time Data",
       "withoutReports": "Real-time Data Only"
-    },
-    "prediction": {
-      "generated": "Prediction Generated",
-      "ready": "Your insulin recommendation is ready",
-      "failed": "Prediction Failed",
-      "unable": "Unable to generate prediction"
     }
   },
   "food": {
@@ -361,34 +316,11 @@
     "language": "Language",
     "selectLanguage": "Select Language",
     "appearance": "Appearance",
-    "theme": "Theme",
-    "light": "Light",
-    "dark": "Dark",
     "notifications": "Notifications",
-    "enableNotifications": "Enable notifications",
     "privacy": "Privacy",
     "preferences": "Preferences",
     "changeLanguage": "Change Language",
-    "languageChanged": "Language changed successfully",
-    "units": "Units",
-    "mgdl": "mg/dL",
-    "mmol": "mmol/L",
-    "dataPrivacy": "Data & Privacy",
-    "exportData": "Export My Data",
-    "onboarding": "Onboarding",
-    "resetTutorial": "Reset Tutorial",
-    "rerunTutorial": "Re-run the first-time setup tutorial on next page load",
-    "savedAutomatically": "Settings are saved automatically",
-    "themeUpdated": "Theme Updated",
-    "switchedToMode": "Switched to {{theme}} mode",
-    "notificationsEnabled": "Notifications Enabled",
-    "notificationsDisabled": "Notifications Disabled",
-    "unitsUpdated": "Units Updated",
-    "changedToUnits": "Changed to {{units}}",
-    "exportStarted": "Export Started",
-    "dataExportBegin": "Your data export will begin shortly",
-    "onboardingReset": "Onboarding Reset",
-    "tutorialRerun": "You can now re-run the tutorial on next page load"
+    "languageChanged": "Language changed successfully"
   },
   "auth": {
     "login": "Login",
@@ -399,35 +331,7 @@
     "rememberMe": "Remember Me",
     "loginSuccess": "Login successful",
     "loginError": "Login failed",
-    "welcomeBack": "Welcome back!",
-    "selectRole": {
-      "title": "Select Your Role",
-      "description": "Choose which role you'd like to explore",
-      "patientDescription": "Manage your glucose levels and health data",
-      "healthcareProvider": "Healthcare Provider",
-      "providerDescription": "Manage patient records and provide care",
-      "forPatients": "For Patients",
-      "patientAccount": "Patient Account",
-      "forProviders": "For Providers",
-      "clickToContinue": "Click to continue as {{role}}"
-    },
-    "passwordMismatch": "Passwords do not match",
-    "registrationSuccess": "Registration successful",
-    "welcomeMessage": "Welcome to GlucoNova! Please login to get started.",
-    "registrationFailed": "Registration failed",
-    "tryAgain": "Please try again",
-    "backToRoles": "Back to Roles",
-    "createAccount": "Create Account",
-    "fullName": "Full Name",
-    "enterFullName": "Enter your full name",
-    "emailPlaceholder": "email@example.com",
-    "createPassword": "Create a strong password",
-    "confirmPassword": "Confirm Password",
-    "reEnterPassword": "Re-enter your password",
-    "accountReviewNotice": "Your account will be reviewed by our admin team. You'll receive an email notification upon approval.",
-    "creatingAccount": "Creating Account...",
-    "alreadyHaveAccount": "Already have an account?",
-    "backToLogin": "Back to Login"
+    "welcomeBack": "Welcome back!"
   },
   "doctor": {
     "patientManagement": "Patient Management",
@@ -472,118 +376,6 @@
       "userRejectedDesc": "User has been rejected successfully",
       "actionFailed": "Action failed",
       "updateUserApprovalFailed": "Failed to update user approval"
-    }
-  },
-  "onboarding": {
-    "stepTitle": "Onboarding - Step {{step}} of {{total}}",
-    "stepDescription": "Complete your profile setup to get personalized health insights",
-    "stepProgress": "Step {{step}} of {{total}}",
-    "skipForNow": "Skip for now",
-    "welcome": {
-      "title": "Welcome to GlucoNova",
-      "description": "Your AI-powered diabetes management platform. Let's take a quick tour of what you can do!",
-      "startTour": "Start Tour"
-    },
-    "features": {
-      "title": "Available Features",
-      "description": "Everything you need to manage your diabetes effectively",
-      "glucose": {
-        "title": "Glucose Monitoring",
-        "description": "Track your blood glucose levels with visual trends and insights"
-      },
-      "insulin": {
-        "title": "AI Insulin Prediction",
-        "description": "Get personalized insulin recommendations powered by AI"
-      },
-      "meal": {
-        "title": "Meal Tracking",
-        "description": "Log meals manually or use voice input for easy tracking"
-      },
-      "medication": {
-        "title": "Medication Management",
-        "description": "Keep track of your medications and schedules"
-      },
-      "doctor": {
-        "title": "Doctor Collaboration",
-        "description": "Share your data with your healthcare team securely"
-      },
-      "voice": {
-        "title": "Voice Assistant",
-        "description": "Log meals hands-free using voice commands"
-      },
-      "continueSetup": "Continue to Setup"
-    },
-    "upload": {
-      "title": "Upload Health Records",
-      "description": "Upload a PDF of your health summary to auto-extract your information",
-      "dragDrop": "Drag and drop your PDF here",
-      "or": "or",
-      "browseFiles": "Browse Files",
-      "selectExisting": "Select Existing",
-      "useDemoData": "Use Demo Data",
-      "enterManually": "Enter Manually"
-    },
-    "existing": {
-      "title": "Select Existing Report",
-      "description": "Choose from your previously uploaded medical reports",
-      "back": "Back",
-      "loading": "Loading reports...",
-      "noReports": "No reports found",
-      "uploadToStart": "Upload a medical report to get started",
-      "uploadNew": "Upload New Report"
-    },
-    "confirm": {
-      "title": "Confirm Your Information",
-      "description": "Review and edit the extracted data",
-      "button": "Confirm & Continue"
-    },
-    "manual": {
-      "title": "Enter Your Details",
-      "description": "Fill in your health information manually",
-      "continue": "Continue"
-    },
-    "finish": {
-      "title": "All Set!",
-      "description": "Your account is ready. You can now access personalized health insights and AI-powered insulin predictions.",
-      "goToDashboard": "Go to Dashboard"
-    },
-    "form": {
-      "name": "Name",
-      "dob": "Date of Birth",
-      "weight": "Weight (kg)",
-      "height": "Height (cm)",
-      "a1c": "Last A1c (%)",
-      "insulin": "Typical Insulin (U)",
-      "medications": "Medications",
-      "targetRange": "Target Range"
-    },
-    "banner": {
-      "completeSetup": "Complete your setup",
-      "addHealthInfo": "Add your health information to get personalized AI-powered insights",
-      "resumeSetup": "Resume Setup"
-    },
-    "messages": {
-      "fileTooLarge": "File too large",
-      "fileSizeLimit": "Please upload a file smaller than 20MB",
-      "parsingFailed": "Parsing failed",
-      "parsingFailedDesc": "Could not extract data from document. Please enter details manually.",
-      "invalidFileType": "Invalid file type",
-      "supportedFileTypes": "Please upload a PDF, JPEG, or PNG file",
-      "reportLoaded": "Report loaded",
-      "reportLoadedDesc": "Patient information has been populated. Please review and confirm.",
-      "loadPatientFailed": "Failed to load patient details from report",
-      "nameRequired": "Name required",
-      "nameRequiredDesc": "Please enter your name",
-      "dobRequired": "Date of birth required",
-      "dobRequiredDesc": "Please enter your date of birth",
-      "validWeightRequired": "Valid weight required",
-      "validWeightRequiredDesc": "Please enter a valid weight in kg",
-      "validHeightRequired": "Valid height required",
-      "validHeightRequiredDesc": "Please enter a valid height in cm",
-      "profileCreated": "Profile created successfully",
-      "healthDataSaved": "Your health data has been saved",
-      "saveProfileError": "Error saving profile",
-      "saveProfileErrorDesc": "Please try again or contact support"
     }
   }
 }

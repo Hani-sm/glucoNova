@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 const timeRanges = ['6h', '24h', '7d', '30d'] as const;
 type TimeRange = typeof timeRanges[number];
@@ -42,6 +43,7 @@ function formatChartData(data: any[], range: TimeRange) {
 }
 
 export default function GlucoseTrendChart() {
+  const { t } = useTranslation();
   const [selectedRange, setSelectedRange] = useState<TimeRange>('24h');
   const { data: healthData } = useQuery({
     queryKey: ['/api/health-data'],
@@ -52,6 +54,12 @@ export default function GlucoseTrendChart() {
   }, [healthData, selectedRange]);
 
   const currentGlucose = chartData.length > 0 ? chartData[chartData.length - 1].glucose : 0;
+  
+  const getStatusText = (glucose: number) => {
+    if (glucose < 70) return t('glucose.status.low');
+    if (glucose > 180) return t('glucose.status.high');
+    return t('glucose.status.inRange');
+  };
 
   return (
     <Card 
@@ -60,7 +68,7 @@ export default function GlucoseTrendChart() {
       data-testid="card-glucose-trends"
     >
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-lg font-bold text-foreground">Glucose Trends</h2>
+        <h2 className="text-lg font-bold text-foreground">{t('glucose.trends.title')}</h2>
         <div className="flex gap-1 bg-secondary rounded-lg p-1">
           {timeRanges.map((range) => (
             <Button
@@ -128,11 +136,11 @@ export default function GlucoseTrendChart() {
 
       <div className="flex items-center justify-between bg-secondary/50 rounded-lg px-4 py-3">
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground font-medium">Current Status</span>
+          <span className="text-sm text-muted-foreground font-medium">{t('glucose.trends.currentStatus')}</span>
           <span className="font-bold text-xl text-foreground">{currentGlucose} mg/dL</span>
         </div>
         <Badge className="bg-primary/20 text-primary px-3 py-1" data-testid="badge-status">
-          {currentGlucose < 70 ? 'Low' : currentGlucose > 180 ? 'High' : 'Within Target'}
+          {getStatusText(currentGlucose)}
         </Badge>
       </div>
     </Card>

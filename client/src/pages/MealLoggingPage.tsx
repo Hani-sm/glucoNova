@@ -17,10 +17,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTranslation } from 'react-i18next';
+import { getCurrentLanguage } from '@/i18n/config';
 import LanguageSelector from '@/components/LanguageSelector';
 
 export default function MealLoggingPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const [isRecording, setIsRecording] = useState(false);
   const [description, setDescription] = useState('');
@@ -78,7 +79,9 @@ export default function MealLoggingPage() {
   });
 
   const onSubmit = (data: InsertMeal) => {
-    createMealMutation.mutate({ ...data, voiceRecorded: isRecording });
+    // Ensure voiceRecorded flag is properly set based on whether the meal was recorded via voice
+    const isVoiceRecorded = inputMode === 'voice' && (isRecording || (transcript && transcript.trim() !== ''));
+    createMealMutation.mutate({ ...data, voiceRecorded: !!isVoiceRecorded });
   };
 
   // Fuzzy string matching helper - calculates similarity between strings
@@ -409,10 +412,15 @@ export default function MealLoggingPage() {
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
+      // Reinitialize speech recognition when language changes
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = false;
       recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'en-US';
+      // Set language based on current i18n language
+      recognitionRef.current.lang = getCurrentLanguage() || 'en-US';
 
       recognitionRef.current.onstart = () => {
         setIsRecording(true);
@@ -430,7 +438,7 @@ export default function MealLoggingPage() {
 
       recognitionRef.current.onerror = (event: any) => {
         toast({
-          title: t('food.messages.logError'),
+          title: t('food.messages.speechNotSupported'),
           description: t('food.messages.speechError', { error: event.error }),
           variant: 'destructive',
         });
@@ -439,12 +447,21 @@ export default function MealLoggingPage() {
 
       recognitionRef.current.onend = () => {
         setIsRecording(false);
-        if (transcript) {
+        // Only analyze if we have a transcript and we're in voice mode
+        // Use the latest transcript value from the onresult event
+        if (transcript && transcript.trim() && inputMode === 'voice') {
           analyzeDescription(transcript);
         }
       };
     }
-  }, [transcript, toast]);
+    
+    // Cleanup function to stop recognition when component unmounts
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [transcript, toast, t, inputMode, i18n.language]);
 
   const handleVoiceRecording = () => {
     if (!recognitionRef.current) {
@@ -463,6 +480,8 @@ export default function MealLoggingPage() {
       setTranscript('');
       setDescription('');
       setAnalysis(null);
+      // Update language before starting recognition
+      recognitionRef.current.lang = getCurrentLanguage() || 'en-US';
       recognitionRef.current.start();
     }
   };

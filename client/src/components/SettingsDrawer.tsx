@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { X, Moon, Sun, Bell, BellOff, Database, RotateCcw, Activity } from 'lucide-react';
+import { X, Moon, Sun, Bell, BellOff, Database, RotateCcw, Activity, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import LanguageSelector from '@/components/LanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 interface SettingsDrawerProps {
   isOpen: boolean;
@@ -13,6 +15,7 @@ interface SettingsDrawerProps {
 }
 
 export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [theme, setTheme] = useState('dark');
   const [notifications, setNotifications] = useState(true);
@@ -33,8 +36,8 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
     toast({
-      title: 'Theme Updated',
-      description: `Switched to ${newTheme} mode`,
+      title: t('settings.themeUpdated'),
+      description: t('settings.switchedToMode', { theme: newTheme }),
     });
   };
 
@@ -42,7 +45,7 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
     setNotifications(enabled);
     localStorage.setItem('notifications', enabled.toString());
     toast({
-      title: enabled ? 'Notifications Enabled' : 'Notifications Disabled',
+      title: enabled ? t('settings.notificationsEnabled') : t('settings.notificationsDisabled'),
     });
   };
 
@@ -50,15 +53,15 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
     setUnits(newUnits);
     localStorage.setItem('units', newUnits);
     toast({
-      title: 'Units Updated',
-      description: `Changed to ${newUnits}`,
+      title: t('settings.unitsUpdated'),
+      description: t('settings.changedToUnits', { units: newUnits }),
     });
   };
 
   const handleExportData = () => {
     toast({
-      title: 'Export Started',
-      description: 'Your data export will begin shortly',
+      title: t('settings.exportStarted'),
+      description: t('settings.dataExportBegin'),
     });
   };
 
@@ -66,8 +69,8 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
     localStorage.removeItem('onboardingCompleted');
     localStorage.removeItem('onboardingSkipped');
     toast({
-      title: 'Onboarding Reset',
-      description: 'You can now re-run the tutorial on next page load',
+      title: t('settings.onboardingReset'),
+      description: t('settings.tutorialRerun'),
     });
   };
 
@@ -93,7 +96,7 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/10">
-          <h2 className="text-xl font-bold text-white">Settings</h2>
+          <h2 className="text-xl font-bold text-white">{t('settings.title')}</h2>
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-[#CAD6D4] hover:text-white hover:bg-white/5 transition-colors"
@@ -111,16 +114,16 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               {theme === 'dark' ? <Moon className="w-4 h-4 text-primary" /> : <Sun className="w-4 h-4 text-primary" />}
-              <h3 className="text-sm font-semibold text-white">Theme</h3>
+              <h3 className="text-sm font-semibold text-white">{t('settings.theme')}</h3>
             </div>
             <RadioGroup value={theme} onValueChange={handleThemeChange}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="light" id="light" data-testid="radio-theme-light" />
-                <Label htmlFor="light" className="text-[#CAD6D4] cursor-pointer">Light</Label>
+                <Label htmlFor="light" className="text-[#CAD6D4] cursor-pointer">{t('settings.light')}</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="dark" id="dark" data-testid="radio-theme-dark" />
-                <Label htmlFor="dark" className="text-[#CAD6D4] cursor-pointer">Dark</Label>
+                <Label htmlFor="dark" className="text-[#CAD6D4] cursor-pointer">{t('settings.dark')}</Label>
               </div>
             </RadioGroup>
           </div>
@@ -131,10 +134,10 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               {notifications ? <Bell className="w-4 h-4 text-primary" /> : <BellOff className="w-4 h-4 text-primary" />}
-              <h3 className="text-sm font-semibold text-white">Notifications</h3>
+              <h3 className="text-sm font-semibold text-white">{t('settings.notifications')}</h3>
             </div>
             <div className="flex items-center justify-between">
-              <Label htmlFor="notifications" className="text-[#CAD6D4]">Enable notifications</Label>
+              <Label htmlFor="notifications" className="text-[#CAD6D4]">{t('settings.enableNotifications')}</Label>
               <Switch 
                 id="notifications" 
                 checked={notifications} 
@@ -150,18 +153,31 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-primary" />
-              <h3 className="text-sm font-semibold text-white">Units</h3>
+              <h3 className="text-sm font-semibold text-white">{t('settings.units')}</h3>
             </div>
             <RadioGroup value={units} onValueChange={handleUnitsChange}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="mg/dL" id="mgdl" data-testid="radio-units-mgdl" />
-                <Label htmlFor="mgdl" className="text-[#CAD6D4] cursor-pointer">mg/dL</Label>
+                <Label htmlFor="mgdl" className="text-[#CAD6D4] cursor-pointer">{t('settings.mgdl')}</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="mmol/L" id="mmol" data-testid="radio-units-mmol" />
-                <Label htmlFor="mmol" className="text-[#CAD6D4] cursor-pointer">mmol/L</Label>
+                <Label htmlFor="mmol" className="text-[#CAD6D4] cursor-pointer">{t('settings.mmol')}</Label>
               </div>
             </RadioGroup>
+          </div>
+
+          <Separator className="bg-white/10" />
+
+          {/* Language Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-primary" />
+              <h3 className="text-sm font-semibold text-white">{t('settings.language')}</h3>
+            </div>
+            <div className="flex justify-end">
+              <LanguageSelector />
+            </div>
           </div>
 
           <Separator className="bg-white/10" />
@@ -170,7 +186,7 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Database className="w-4 h-4 text-primary" />
-              <h3 className="text-sm font-semibold text-white">Data & Privacy</h3>
+              <h3 className="text-sm font-semibold text-white">{t('settings.dataPrivacy')}</h3>
             </div>
             <Button 
               onClick={handleExportData}
@@ -178,7 +194,7 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
               className="w-full justify-start bg-white/5 border-white/10 text-[#CAD6D4] hover:bg-white/10 hover:text-white"
               data-testid="button-export-data"
             >
-              Export My Data
+              {t('settings.exportData')}
             </Button>
           </div>
 
@@ -188,7 +204,7 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <RotateCcw className="w-4 h-4 text-primary" />
-              <h3 className="text-sm font-semibold text-white">Onboarding</h3>
+              <h3 className="text-sm font-semibold text-white">{t('settings.onboarding')}</h3>
             </div>
             <Button 
               onClick={handleResetOnboarding}
@@ -196,10 +212,10 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
               className="w-full justify-start bg-white/5 border-white/10 text-[#CAD6D4] hover:bg-white/10 hover:text-white"
               data-testid="button-reset-onboarding"
             >
-              Reset Tutorial
+              {t('settings.resetTutorial')}
             </Button>
             <p className="text-xs text-[#9AA8A6]">
-              Re-run the first-time setup tutorial on next page load
+              {t('settings.rerunTutorial')}
             </p>
           </div>
         </div>
@@ -207,7 +223,7 @@ export default function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps)
         {/* Footer */}
         <div className="p-6 border-t border-white/10">
           <p className="text-xs text-[#9AA8A6] text-center">
-            Settings are saved automatically
+            {t('settings.savedAutomatically')}
           </p>
         </div>
       </div>

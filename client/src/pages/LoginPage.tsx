@@ -3,8 +3,10 @@ import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   console.log('LoginPage component rendering...');
   
   useEffect(() => {
@@ -64,8 +66,8 @@ export default function LoginPage() {
       await login(email, password);
       
       toast({
-        title: 'Login successful',
-        description: 'Welcome back to GlucoNova!',
+        title: t('auth.loginSuccess'),
+        description: t('auth.welcomeBack'),
       });
       
       // Navigate to dashboard after successful login
@@ -74,7 +76,7 @@ export default function LoginPage() {
       const errorMessage = err.message || 'Login failed';
       setError(errorMessage);
       toast({
-        title: 'Login failed',
+        title: t('auth.loginError'),
         description: errorMessage,
         variant: 'destructive',
       });
@@ -98,7 +100,7 @@ export default function LoginPage() {
           WebkitBackdropFilter: 'blur(10px)'
         }}
       >
-        Skip for Now →
+        {t('onboarding.skipForNow')} →
       </button>
 
       {/* Role Selection Modal */}
@@ -112,8 +114,8 @@ export default function LoginPage() {
               boxShadow: '0 8px 32px rgba(45, 212, 191, 0.12)'
             }}
           >
-            <h2 className="text-2xl font-bold text-white mb-2 text-center">Select Your Role</h2>
-            <p className="text-gray-300 text-center mb-8 text-sm">Choose which role you'd like to explore</p>
+            <h2 className="text-2xl font-bold text-white mb-2 text-center">{t('auth.selectRole.title')}</h2>
+            <p className="text-gray-300 text-center mb-8 text-sm">{t('auth.selectRole.description')}</p>
 
             <div className="space-y-4">
               {/* Patient Option */}
@@ -140,9 +142,9 @@ export default function LoginPage() {
                         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">Patient</h3>
+                    <h3 className="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">{t('common.patient')}</h3>
                   </div>
-                  <p className="text-sm text-gray-400">Manage your glucose levels and health data</p>
+                  <p className="text-sm text-gray-400">{t('auth.selectRole.patientDescription')}</p>
                 </div>
               </button>
 
@@ -170,9 +172,9 @@ export default function LoginPage() {
                         <path d="M10.5 1.5H5.75A2.25 2.25 0 003.5 3.75v12.5A2.25 2.25 0 005.75 18.5h8.5a2.25 2.25 0 002.25-2.25V6.75m-10-3v3m5-3v3m-8 3h14" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </div>
-                    <h3 className="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">Healthcare Provider</h3>
+                    <h3 className="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">{t('auth.selectRole.healthcareProvider')}</h3>
                   </div>
-                  <p className="text-sm text-gray-400">Manage patient records and provide care</p>
+                  <p className="text-sm text-gray-400">{t('auth.selectRole.providerDescription')}</p>
                 </div>
               </button>
             </div>
@@ -182,7 +184,7 @@ export default function LoginPage() {
               onClick={() => setShowRoleModal(false)}
               className="w-full mt-6 px-4 py-2 text-sm font-medium text-gray-400 hover:text-gray-300 transition-colors border border-gray-600/30 rounded-lg hover:bg-gray-600/10"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </div>

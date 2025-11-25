@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { queryClient } from '@/lib/queryClient';
 import { apiRequest } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 interface HealthDataEntry {
   glucose: number;
@@ -46,6 +47,7 @@ interface ProfileData {
 }
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -67,8 +69,8 @@ export default function DashboardPage() {
     setShowOnboarding(false);
     setShowBanner(false);
     toast({
-      title: 'Setup Complete!',
-      description: 'Your profile has been configured successfully',
+      title: t('common.success'),
+      description: t('dashboard.profile.setupComplete'),
     });
   };
 
@@ -114,14 +116,14 @@ export default function DashboardPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/predictions/latest'] });
       toast({
-        title: 'Prediction Generated',
-        description: 'Your insulin recommendation is ready',
+        title: t('insulin.prediction.generated'),
+        description: t('insulin.prediction.ready'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Prediction Failed',
-        description: error.message || 'Unable to generate prediction',
+        title: t('insulin.prediction.failed'),
+        description: error.message || t('insulin.prediction.unable'),
         variant: 'destructive',
       });
     },
@@ -146,9 +148,9 @@ export default function DashboardPage() {
   const timeInRange = calculateTimeInRange();
 
   const getGlucoseStatus = (glucose: number) => {
-    if (glucose < 70) return 'Low';
-    if (glucose > 180) return 'High';
-    return 'In Range';
+    if (glucose < 70) return t('medical.hypoglycemia');
+    if (glucose > 180) return t('medical.hyperglycemia');
+    return t('medical.timeInRange');
   };
 
   // Calculate health score based on multiple factors
@@ -183,10 +185,10 @@ export default function DashboardPage() {
 
   // Determine achievements
   const achievements = [];
-  if (timeInRange >= 70) achievements.push({ title: 'Time Champion', desc: '70%+ in range', icon: '🏆' });
-  if (healthData?.data && Array.isArray(healthData.data) && healthData.data.length >= 10) achievements.push({ title: 'Consistent Logger', desc: '10+ entries', icon: '📊' });
-  if (latestGlucose >= 70 && latestGlucose <= 180) achievements.push({ title: 'Perfect Range', desc: 'Current glucose in range', icon: '🎯' });
-  if (mealsData?.data && Array.isArray(mealsData.data) && mealsData.data.length >= 5) achievements.push({ title: 'Meal Tracker', desc: '5+ meals logged', icon: '🍽️' });
+  if (timeInRange >= 70) achievements.push({ title: t('dashboard.achievements.timeChampion'), desc: t('dashboard.achievements.timeChampionDesc'), icon: '🏆' });
+  if (healthData?.data && Array.isArray(healthData.data) && healthData.data.length >= 10) achievements.push({ title: t('dashboard.achievements.consistentLogger'), desc: t('dashboard.achievements.consistentLoggerDesc'), icon: '📊' });
+  if (latestGlucose >= 70 && latestGlucose <= 180) achievements.push({ title: t('dashboard.achievements.perfectRange'), desc: t('dashboard.achievements.perfectRangeDesc'), icon: '🎯' });
+  if (mealsData?.data && Array.isArray(mealsData.data) && mealsData.data.length >= 5) achievements.push({ title: t('dashboard.achievements.mealTracker'), desc: t('dashboard.achievements.mealTrackerDesc'), icon: '🍽️' });
 
   // Floating emerald green dots
   const floatingDots = [
@@ -336,20 +338,20 @@ export default function DashboardPage() {
           )}
           <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
             <div className="flex items-center gap-4">
-              <h2 className="text-xl font-semibold">Dashboard</h2>
+              <h2 className="text-xl font-semibold">{t('dashboard.title')}</h2>
             </div>
           </header>
           
           <main className="flex-1 overflow-y-auto">
             <div className="w-full" style={{ padding: '24px 32px' }}>
             <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-1">Welcome back, {user?.name || 'User'}</h1>
-              <p className="text-muted-foreground">Here's your health overview for today</p>
+              <h1 className="text-3xl font-bold mb-1">{t('dashboard.welcomeBack', { name: user?.name || t('common.user') })}</h1>
+              <p className="text-muted-foreground">{t('dashboard.healthOverview')}</p>
             </div>
 
             {isLoadingHealth || isLoadingMeals ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">Loading your health data...</p>
+                <p className="text-muted-foreground">{t('dashboard.loadingData')}</p>
               </div>
             ) : (
               <>
@@ -363,20 +365,20 @@ export default function DashboardPage() {
                         onClick={() => setActiveTab('overview')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'overview' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}
                       >
-                        Overview
+                        {t('dashboard.tabs.overview')}
                       </button>
                       <button 
                         onClick={() => setActiveTab('ai-insights')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${activeTab === 'ai-insights' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}
                       >
                         <Sparkles className="w-4 h-4" />
-                        AI Insights
+                        {t('dashboard.tabs.aiInsights')}
                       </button>
                       <button 
                         onClick={() => setActiveTab('trends')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'trends' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}
                       >
-                        Trends
+                        {t('dashboard.tabs.trends')}
                       </button>
                     </div>
                 
@@ -386,40 +388,40 @@ export default function DashboardPage() {
                         {/* Top Stats Row - 4 cards across with colorful variety */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           <MetricCard
-                            title="Glucose"
+                            titleKey="dashboard.metrics.glucose"
                             value={latestGlucose > 0 ? latestGlucose.toString() : '--'}
                             unit="mg/dL"
-                            status={latestGlucose > 0 ? getGlucoseStatus(latestGlucose) : 'No Data'}
+                            statusKey={latestGlucose > 0 ? (latestGlucose < 70 ? 'medical.hypoglycemia' : latestGlucose > 180 ? 'medical.hyperglycemia' : 'medical.timeInRange') : 'dashboard.metrics.status.noData'}
                             icon={Droplet}
                             iconColor="#60A5FA"
                             badgeBgColor="rgba(96, 165, 250, 0.2)"
                             badgeTextColor="#60A5FA"
                           />
                           <MetricCard
-                            title="Time in Range"
+                            titleKey="dashboard.metrics.timeInRange"
                             value={`${timeInRange}%`}
                             unit=""
-                            status={timeInRange >= 70 ? 'Excellent' : timeInRange >= 50 ? 'Good' : 'Needs Improvement'}
+                            statusKey={timeInRange >= 70 ? 'dashboard.metrics.status.excellent' : timeInRange >= 50 ? 'dashboard.metrics.status.good' : 'dashboard.metrics.status.needsImprovement'}
                             icon={Target}
                             iconColor="#A78BFA"
                             badgeBgColor="rgba(167, 139, 250, 0.2)"
                             badgeTextColor="#A78BFA"
                           />
                           <MetricCard
-                            title="Carbs Today"
+                            titleKey="dashboard.metrics.carbsToday"
                             value={totalCarbs > 0 ? `${totalCarbs}g` : '--'}
                             unit=""
-                            status={totalCarbs > 0 ? 'Tracked' : 'No Data'}
+                            statusKey={totalCarbs > 0 ? 'dashboard.metrics.status.tracked' : 'dashboard.metrics.status.noData'}
                             icon={Utensils}
                             iconColor="#FB923C"
                             badgeBgColor="rgba(251, 146, 60, 0.2)"
                             badgeTextColor="#FB923C"
                           />
                           <MetricCard
-                            title="Active Insulin"
+                            titleKey="dashboard.metrics.activeInsulin"
                             value={latestInsulin > 0 ? `${latestInsulin}U` : '--'}
                             unit=""
-                            status={latestInsulin > 0 ? 'Active' : 'No Data'}
+                            statusKey={latestInsulin > 0 ? 'dashboard.metrics.status.active' : 'dashboard.metrics.status.noData'}
                             icon={Syringe}
                             iconColor="#2DD4BF"
                             badgeBgColor="rgba(45, 212, 191, 0.2)"
@@ -432,14 +434,14 @@ export default function DashboardPage() {
 
                     {/* Quick Actions at bottom with colorful variety */}
                     <div>
-                      <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
+                      <h2 className="text-xl font-bold mb-4">{t('dashboard.quickActions.title')}</h2>
                       <div className="grid grid-cols-2 gap-4">
                         <Link href="/health-data">
                           <div className="cursor-pointer">
                             <QuickActionCard
                               icon={Heart}
-                              title="Blood Sugar Tracking"
-                              description="Log and monitor your glucose levels"
+                              titleKey="dashboard.quickActions.bloodSugarTracking"
+                              descriptionKey="dashboard.quickActions.logAndMonitor"
                               iconBgColor="rgba(244, 114, 182, 0.2)"
                               iconColor="#F472B6"
                             />
@@ -449,8 +451,8 @@ export default function DashboardPage() {
                           <div className="cursor-pointer">
                             <QuickActionCard
                               icon={Utensils}
-                              title="Meal Logging"
-                              description="Track your nutrition and carbs"
+                              titleKey="dashboard.quickActions.mealLogging"
+                              descriptionKey="dashboard.quickActions.trackNutrition"
                               iconBgColor="rgba(251, 146, 60, 0.2)"
                               iconColor="#FB923C"
                             />
@@ -460,16 +462,16 @@ export default function DashboardPage() {
                           <div className="cursor-pointer">
                             <QuickActionCard
                               icon={FileText}
-                              title="Health Reports"
-                              description="View and download your reports"
+                              titleKey="dashboard.quickActions.healthReports"
+                              descriptionKey="dashboard.quickActions.viewReports"
                             />
                           </div>
                         </Link>
                         <div className="cursor-pointer">
                           <QuickActionCard
                             icon={MessageCircle}
-                            title="Doctor Communication"
-                            description="Message your healthcare provider"
+                            titleKey="dashboard.quickActions.doctorCommunication"
+                            descriptionKey="dashboard.quickActions.messageDoctor"
                           />
                         </div>
                       </div>
@@ -486,11 +488,11 @@ export default function DashboardPage() {
                           <div className="p-2 rounded-lg bg-primary/20">
                             <Heart className="w-5 h-5 text-primary" />
                           </div>
-                          <h2 className="text-xl font-bold">Your Health Score</h2>
+                          <h2 className="text-xl font-bold">{t('dashboard.healthScore.title')}</h2>
                         </div>
                         <div className="text-right">
                           <div className="text-4xl font-bold text-primary">{healthScore}</div>
-                          <div className="text-xs text-muted-foreground">out of 100</div>
+                          <div className="text-xs text-muted-foreground">{t('dashboard.healthScore.outOf')}</div>
                         </div>
                       </div>
                       <div className="w-full bg-secondary rounded-full h-3">
@@ -500,9 +502,9 @@ export default function DashboardPage() {
                         />
                       </div>
                       <p className="text-sm text-muted-foreground mt-3">
-                        {healthScore >= 80 ? 'Excellent diabetes management! Keep up the great work.' :
-                         healthScore >= 60 ? 'Good progress. Focus on consistency for better results.' :
-                         'Let\'s work on improving your glucose control. Start with regular monitoring.'}
+                        {healthScore >= 80 ? t('dashboard.healthScore.excellent') :
+                         healthScore >= 60 ? t('dashboard.healthScore.good') :
+                         t('dashboard.healthScore.improve')}
                       </p>
                     </Card>
 
@@ -513,7 +515,7 @@ export default function DashboardPage() {
                           <div className="p-2 rounded-lg bg-amber-500/20">
                             <Sparkles className="w-5 h-5 text-amber-500" />
                           </div>
-                          <h2 className="text-xl font-bold">Achievements</h2>
+                          <h2 className="text-xl font-bold">{t('dashboard.achievements.title')}</h2>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           {achievements.map((achievement, idx) => (
@@ -532,7 +534,7 @@ export default function DashboardPage() {
                         <div className="p-2 rounded-lg bg-primary/20">
                           <Sparkles className="w-5 h-5 text-primary" />
                         </div>
-                        <h2 className="text-xl font-bold">AI-Powered Insights</h2>
+                        <h2 className="text-xl font-bold">{t('dashboard.aiInsights.title')}</h2>
                       </div>
                       
                       <div className="space-y-4">
@@ -544,15 +546,15 @@ export default function DashboardPage() {
                                   <Target className="w-4 h-4 text-emerald-500" />
                                 </div>
                                 <div>
-                                  <h3 className="font-medium text-foreground">Glucose Pattern Detected</h3>
+                                  <h3 className="font-medium text-foreground">{t('dashboard.aiInsights.glucosePattern')}</h3>
                                   <p className="text-sm text-muted-foreground mt-1">
                                     {timeInRange >= 70 
-                                      ? 'Excellent glucose control! Your levels stay within target range most of the time.'
-                                      : 'Your glucose tends to fluctuate. Consider adjusting meal timing and insulin doses.'}
+                                      ? t('dashboard.aiInsights.patternExcellent')
+                                      : t('dashboard.aiInsights.patternFluctuate')}
                                   </p>
                                   <div className="flex items-center gap-2 mt-2">
-                                    <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-500">Recommendation</span>
-                                    <span className="text-xs text-muted-foreground">AI-Generated</span>
+                                    <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-500">{t('dashboard.aiInsights.recommendation')}</span>
+                                    <span className="text-xs text-muted-foreground">{t('dashboard.aiInsights.aiGenerated')}</span>
                                   </div>
                                 </div>
                               </div>
@@ -565,14 +567,14 @@ export default function DashboardPage() {
                                     <Utensils className="w-4 h-4 text-blue-500" />
                                   </div>
                                   <div>
-                                    <h3 className="font-medium text-foreground">Nutrition Analysis</h3>
+                                    <h3 className="font-medium text-foreground">{t('dashboard.aiInsights.nutritionAnalysis')}</h3>
                                     <p className="text-sm text-muted-foreground mt-1">
-                                      Average daily carbs: {Math.round(totalCarbs / Math.max(1, mealsData.data.length))}g. 
-                                      {totalCarbs > 200 ? ' Consider reducing carb intake for better control.' : ' Good carbohydrate management!'}
+                                      {t('dashboard.aiInsights.avgCarbs', { carbs: Math.round(totalCarbs / Math.max(1, mealsData.data.length)) })}
+                                      {totalCarbs > 200 ? t('dashboard.aiInsights.reduceCarbs') : t('dashboard.aiInsights.goodCarbs')}
                                     </p>
                                     <div className="flex items-center gap-2 mt-2">
-                                      <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-500">Insight</span>
-                                      <span className="text-xs text-muted-foreground">Data-Driven</span>
+                                      <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-500">{t('dashboard.aiInsights.insight')}</span>
+                                      <span className="text-xs text-muted-foreground">{t('dashboard.aiInsights.dataDriven')}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -582,8 +584,8 @@ export default function DashboardPage() {
                         ) : (
                           <div className="p-8 text-center">
                             <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                            <h3 className="font-medium text-foreground mb-1">Start Tracking for AI Insights</h3>
-                            <p className="text-sm text-muted-foreground">Log your glucose and meals to receive personalized AI recommendations</p>
+                            <h3 className="font-medium text-foreground mb-1">{t('dashboard.aiInsights.startTracking')}</h3>
+                            <p className="text-sm text-muted-foreground">{t('dashboard.aiInsights.logForInsights')}</p>
                           </div>
                         )}
                         
@@ -593,11 +595,11 @@ export default function DashboardPage() {
                               <Activity className="w-4 h-4 text-purple-500" />
                             </div>
                             <div>
-                              <h3 className="font-medium text-foreground">Activity Recommendation</h3>
-                              <p className="text-sm text-muted-foreground mt-1">Post-meal walks of 15-20 minutes can help reduce glucose spikes by up to 25%. Try walking after your largest meal.</p>
+                              <h3 className="font-medium text-foreground">{t('dashboard.aiInsights.activityRecommendation')}</h3>
+                              <p className="text-sm text-muted-foreground mt-1">{t('dashboard.aiInsights.walking')}</p>
                               <div className="flex items-center gap-2 mt-2">
-                                <span className="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-500">Suggestion</span>
-                                <span className="text-xs text-muted-foreground">Evidence-Based</span>
+                                <span className="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-500">{t('dashboard.aiInsights.suggestion')}</span>
+                                <span className="text-xs text-muted-foreground">{t('dashboard.aiInsights.evidenceBased')}</span>
                               </div>
                             </div>
                           </div>

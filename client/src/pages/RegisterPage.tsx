@@ -3,8 +3,10 @@ import { useLocation, Link } from 'wouter';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { User, Stethoscope, Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function RegisterPage() {
+  const { t } = useTranslation();
   const [, navigate] = useLocation();
   const { register } = useAuth();
   const { toast } = useToast();
@@ -60,7 +62,7 @@ export default function RegisterPage() {
     
     if (password !== confirmPassword) {
       toast({
-        title: 'Passwords do not match',
+        title: t('auth.passwordMismatch'),
         variant: 'destructive',
       });
       return;
@@ -71,14 +73,14 @@ export default function RegisterPage() {
     try {
       await register(name, email, password, role);
       toast({
-        title: 'Registration successful',
-        description: 'Welcome to GlucoNova! Please login to get started.',
+        title: t('auth.registrationSuccess'),
+        description: t('auth.welcomeMessage'),
       });
       navigate('/login');
     } catch (error: any) {
       toast({
-        title: 'Registration failed',
-        description: error.message || 'Please try again',
+        title: t('auth.registrationFailed'),
+        description: error.message || t('auth.tryAgain'),
         variant: 'destructive',
       });
     } finally {
@@ -105,7 +107,7 @@ export default function RegisterPage() {
         }}
       >
         <span>←</span>
-        <span>Back to Roles</span>
+        <span>{t('auth.backToRoles')}</span>
       </Link>
 
       {/* Animated Light Waves */}
@@ -187,8 +189,8 @@ export default function RegisterPage() {
         }}
       >
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">GlucoNova</h1>
-          <p className="text-sm font-semibold text-emerald-400">Create Account</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">{t('app.name')}</h1>
+          <p className="text-sm font-semibold text-emerald-400">{t('auth.createAccount')}</p>
         </div>
         
         {/* Role Badge */}
@@ -206,7 +208,7 @@ export default function RegisterPage() {
               <Stethoscope className="h-5 w-5 text-emerald-400" />
             )}
             <span className="text-sm font-medium text-emerald-400">
-              {role === 'patient' ? 'Patient Account' : 'Healthcare Provider Account'}
+              {role === 'patient' ? t('common.patient') : t('auth.selectRole.healthcareProvider')}
             </span>
           </div>
         </div>
@@ -215,7 +217,7 @@ export default function RegisterPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="name" className="text-gray-200 text-sm font-medium mb-2 block">
-                Full Name
+                {t('auth.fullName')}
               </label>
               <input
                 id="name"
@@ -223,7 +225,7 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-400 transition-all duration-300 placeholder-gray-500 text-white text-sm"
-                placeholder="Enter your full name"
+                placeholder={t('auth.enterFullName')}
                 required
                 disabled={isLoading}
                 style={{
@@ -238,7 +240,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="email" className="text-gray-200 text-sm font-medium mb-2 block">
-                Email Address
+                {t('auth.email')}
               </label>
               <input
                 id="email"
@@ -246,7 +248,7 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-400 transition-all duration-300 placeholder-gray-500 text-white text-sm"
-                placeholder="email@example.com"
+                placeholder={t('auth.emailPlaceholder')}
                 required
                 disabled={isLoading}
                 style={{
@@ -261,7 +263,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="password" className="text-gray-200 text-sm font-medium mb-2 block">
-                Password
+                {t('auth.password')}
               </label>
               <div className="relative">
                 <input
@@ -270,7 +272,7 @@ export default function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-2.5 pr-12 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-400 transition-all duration-300 placeholder-gray-500 text-white text-sm"
-                  placeholder="Create a strong password"
+                  placeholder={t('auth.createPassword')}
                   required
                   disabled={isLoading}
                   style={{
@@ -294,7 +296,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="confirmPassword" className="text-gray-200 text-sm font-medium mb-2 block">
-                Confirm Password
+                {t('auth.confirmPassword')}
               </label>
               <div className="relative">
                 <input
@@ -303,7 +305,7 @@ export default function RegisterPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full px-4 py-2.5 pr-12 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-400 transition-all duration-300 placeholder-gray-500 text-white text-sm"
-                  placeholder="Re-enter your password"
+                  placeholder={t('auth.reEnterPassword')}
                   required
                   disabled={isLoading}
                   style={{
@@ -335,7 +337,7 @@ export default function RegisterPage() {
             }}
           >
             <p className="text-xs text-gray-300">
-              Your account will be reviewed by our admin team. You'll receive an email notification upon approval.
+              {t('auth.accountReviewNotice')}
             </p>
           </div>
 
@@ -352,17 +354,17 @@ export default function RegisterPage() {
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                Creating Account...
+                {t('auth.creatingAccount')}
               </span>
-            ) : 'Create Account'}
+            ) : t('auth.createAccount')}
           </button>
         </form>
 
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-400">
-            Already have an account?{' '}
+            {t('auth.alreadyHaveAccount')}{' '}
             <Link href="/login" className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium" data-testid="link-login">
-              Log in
+              {t('auth.login')}
             </Link>
           </p>
         </div>

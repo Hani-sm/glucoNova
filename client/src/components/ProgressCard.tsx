@@ -1,5 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { useTranslation } from 'react-i18next';
 
 interface ProgressItemProps {
   label: string;
@@ -20,15 +21,17 @@ function ProgressItem({ label, value, detail }: ProgressItemProps) {
 }
 
 export default function ProgressCard() {
+  const { t } = useTranslation();
+  
   return (
     <Card 
       className="p-5 card-interactive glass-card" 
       data-testid="card-progress"
     >
-      <h3 className="font-bold text-base text-foreground mb-5">Goals & Streaks</h3>
-      <ProgressItem label="Days in Range" value={100} detail="3 Days – 100%" />
-      <ProgressItem label="Weekly Logging" value={85} detail="85%" />
-      <ProgressItem label="Activity Goal" value={70} detail="70%" />
+      <h3 className="font-bold text-base text-foreground mb-5">{t('dashboard.progress.goalsAndStreaks')}</h3>
+      <ProgressItem label={t('dashboard.progress.daysInRange')} value={100} detail={t('dashboard.progress.daysInRangeDetail', { days: 3, percent: 100 })} />
+      <ProgressItem label={t('dashboard.progress.weeklyLogging')} value={85} detail={t('dashboard.progress.weeklyLoggingDetail', { percent: 85 })} />
+      <ProgressItem label={t('dashboard.progress.activityGoal')} value={70} detail={t('dashboard.progress.activityGoalDetail', { percent: 70 })} />
     </Card>
   );
 }

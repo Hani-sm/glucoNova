@@ -14,8 +14,10 @@ import { insertHealthDataSchema } from '@shared/schema';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function GlucosePage() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const form = useForm({
     resolver: zodResolver(insertHealthDataSchema),
@@ -38,16 +40,16 @@ export default function GlucosePage() {
     },
     onSuccess: () => {
       toast({
-        title: 'Success',
-        description: 'Glucose reading recorded successfully',
+        title: t('glucose.success'),
+        description: t('glucose.readingRecorded'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/health-data'] });
       form.reset();
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to record glucose reading',
+        title: t('glucose.error'),
+        description: error.message || t('glucose.failedToRecord'),
         variant: 'destructive',
       });
     },
@@ -77,60 +79,60 @@ export default function GlucosePage() {
         <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
           <div className="flex items-center gap-4">
             <Activity className="w-6 h-6 text-primary" />
-            <h2 className="text-xl font-semibold">Glucose Monitoring</h2>
+            <h2 className="text-xl font-semibold">{t('glucose.title')}</h2>
           </div>
         </header>
         
         <main className="flex-1 overflow-y-auto">
           <div className="w-full" style={{ padding: '24px 32px' }}>
             <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-1">Glucose Tracking</h1>
-              <p className="text-muted-foreground">Monitor your blood glucose levels and trends</p>
+              <h1 className="text-3xl font-bold mb-1">{t('glucose.title')}</h1>
+              <p className="text-muted-foreground">{t('glucose.subtitle')}</p>
             </div>
 
             {isLoading ? (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">Loading glucose data...</p>
+                <p className="text-muted-foreground">{t('glucose.loadingData')}</p>
               </div>
             ) : (
               <div className="space-y-6">
                 {/* Top Statistics */}
                 <div className="grid grid-cols-4 gap-4">
                   <MetricCard
-                    title="Current"
+                    title={t('glucose.current')}
                     value={latestGlucose > 0 ? latestGlucose.toString() : '--'}
                     unit="mg/dL"
-                    status={latestGlucose > 0 ? getGlucoseStatus(latestGlucose).status : 'No Data'}
+                    status={latestGlucose > 0 ? getGlucoseStatus(latestGlucose).status : t('dashboard.metrics.status.noData')}
                     icon={Droplet}
                     iconColor="#60A5FA"
                     badgeBgColor="rgba(96, 165, 250, 0.2)"
                     badgeTextColor="#60A5FA"
                   />
                   <MetricCard
-                    title="Average"
+                    title={t('glucose.average')}
                     value={avgGlucose > 0 ? avgGlucose.toString() : '--'}
                     unit="mg/dL"
-                    status={avgGlucose > 0 ? getGlucoseStatus(avgGlucose).status : 'No Data'}
+                    status={avgGlucose > 0 ? getGlucoseStatus(avgGlucose).status : t('dashboard.metrics.status.noData')}
                     icon={TrendingUp}
                     iconColor="#A78BFA"
                     badgeBgColor="rgba(167, 139, 250, 0.2)"
                     badgeTextColor="#A78BFA"
                   />
                   <MetricCard
-                    title="High Readings"
+                    title={t('glucose.highReadings')}
                     value={highReadings.toString()}
                     unit=""
-                    status={highReadings > 0 ? 'Needs Attention' : 'Good'}
+                    status={highReadings > 0 ? t('dashboard.metrics.status.needsAttention') : t('dashboard.metrics.status.good')}
                     icon={AlertCircle}
                     iconColor="#FB923C"
                     badgeBgColor="rgba(251, 146, 60, 0.2)"
                     badgeTextColor="#FB923C"
                   />
                   <MetricCard
-                    title="Low Readings"
+                    title={t('glucose.lowReadings')}
                     value={lowReadings.toString()}
                     unit=""
-                    status={lowReadings > 0 ? 'Needs Attention' : 'Good'}
+                    status={lowReadings > 0 ? t('dashboard.metrics.status.needsAttention') : t('dashboard.metrics.status.good')}
                     icon={AlertCircle}
                     iconColor="#2DD4BF"
                     badgeBgColor="rgba(45, 212, 191, 0.2)"
@@ -145,7 +147,7 @@ export default function GlucosePage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Card className="p-6 glass-card">
                     <CardHeader>
-                      <CardTitle>Record New Reading</CardTitle>
+                      <CardTitle>{t('glucose.recordNewReading')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <Form {...form}>
@@ -155,11 +157,11 @@ export default function GlucosePage() {
                             name="glucose"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Glucose (mg/dL)</FormLabel>
+                                <FormLabel>{t('glucose.glucose')} (mg/dL)</FormLabel>
                                 <FormControl>
                                   <Input
                                     type="number"
-                                    placeholder="Enter glucose reading"
+                                    placeholder={t('glucose.glucosePlaceholder')}
                                     {...field}
                                     onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                   />
@@ -173,11 +175,11 @@ export default function GlucosePage() {
                             name="insulin"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Insulin (units)</FormLabel>
+                                <FormLabel>{t('glucose.insulin')} (units)</FormLabel>
                                 <FormControl>
                                   <Input
                                     type="number"
-                                    placeholder="Enter insulin dose"
+                                    placeholder={t('glucose.insulinPlaceholder')}
                                     {...field}
                                     onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                   />
@@ -191,11 +193,11 @@ export default function GlucosePage() {
                             name="carbs"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Carbs (grams)</FormLabel>
+                                <FormLabel>{t('glucose.carbs')} (grams)</FormLabel>
                                 <FormControl>
                                   <Input
                                     type="number"
-                                    placeholder="Enter carb intake"
+                                    placeholder={t('glucose.carbsPlaceholder')}
                                     {...field}
                                     onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                   />
@@ -209,10 +211,10 @@ export default function GlucosePage() {
                             name="notes"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Notes (optional)</FormLabel>
+                                <FormLabel>{t('glucose.notes')} (optional)</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder="Add any notes"
+                                    placeholder={t('glucose.notesPlaceholder')}
                                     {...field}
                                   />
                                 </FormControl>
@@ -225,7 +227,7 @@ export default function GlucosePage() {
                             className="w-full"
                             disabled={createHealthDataMutation.isPending}
                           >
-                            {createHealthDataMutation.isPending ? 'Recording...' : 'Record Reading'}
+                            {createHealthDataMutation.isPending ? t('glucose.recording') : t('glucose.recordReading')}
                           </Button>
                         </form>
                       </Form>
@@ -234,7 +236,7 @@ export default function GlucosePage() {
 
                   <Card className="p-6 glass-card">
                     <CardHeader>
-                      <CardTitle>Recent Readings</CardTitle>
+                      <CardTitle>{t('glucose.recentReadings')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
@@ -259,7 +261,7 @@ export default function GlucosePage() {
                           );
                         }) || (
                           <p className="text-sm text-muted-foreground text-center py-8">
-                            No readings yet. Record your first reading!
+                            {t('glucose.noReadings')}
                           </p>
                         )}
                       </div>

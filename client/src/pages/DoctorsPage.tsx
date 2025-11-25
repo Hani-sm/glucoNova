@@ -1,8 +1,10 @@
 import AppSidebar from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Phone, Mail, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function DoctorsPage() {
+  const { t } = useTranslation();
   const doctors = [
     {
       id: 1,
@@ -29,15 +31,15 @@ export default function DoctorsPage() {
         <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
           <div className="flex items-center gap-4">
             <Heart className="w-6 h-6 text-primary" />
-            <h2 className="text-xl font-semibold">My Doctors</h2>
+            <h2 className="text-xl font-semibold">{t('doctor.patientManagement')}</h2>
           </div>
         </header>
         
         <main className="flex-1 overflow-y-auto">
           <div className="w-full" style={{ padding: '24px 32px' }}>
             <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-1">Healthcare Team</h1>
-              <p className="text-muted-foreground">Your diabetes care specialists</p>
+              <h1 className="text-3xl font-bold mb-1">{t('doctor.patientManagement')}</h1>
+              <p className="text-muted-foreground">{t('doctor.subtitle')}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

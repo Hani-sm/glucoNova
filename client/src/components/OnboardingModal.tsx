@@ -10,6 +10,7 @@ import { Upload, FileText, X, Check, Activity, Droplet, Pill, Mic, Heart, Utensi
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ interface HealthData {
 }
 
 export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }: OnboardingModalProps) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -60,8 +62,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
     if (file.type === 'application/pdf' || file.type === 'image/jpeg' || file.type === 'image/png') {
       if (file.size > 20 * 1024 * 1024) {
         toast({
-          title: 'File too large',
-          description: 'Please upload a file smaller than 20MB',
+          title: t('onboarding.messages.fileTooLarge'),
+          description: t('onboarding.messages.fileSizeLimit'),
           variant: 'destructive',
         });
         return;
@@ -105,8 +107,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         } catch (error) {
           console.error('PDF parsing error:', error);
           toast({
-            title: 'Parsing failed',
-            description: 'Could not extract data from document. Please enter details manually.',
+            title: t('onboarding.messages.parsingFailed'),
+            description: t('onboarding.messages.parsingFailedDesc'),
             variant: 'destructive',
           });
         }
@@ -115,8 +117,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
       parseFile();
     } else {
       toast({
-        title: 'Invalid file type',
-        description: 'Please upload a PDF, JPEG, or PNG file',
+        title: t('onboarding.messages.invalidFileType'),
+        description: t('onboarding.messages.supportedFileTypes'),
         variant: 'destructive',
       });
     }
@@ -254,14 +256,14 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
       setShowExistingReports(false);
       
       toast({
-        title: 'Report loaded',
-        description: 'Patient information has been populated. Please review and confirm.',
+        title: t('onboarding.messages.reportLoaded'),
+        description: t('onboarding.messages.reportLoadedDesc'),
       });
     } catch (error) {
       console.error('Error loading report:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to load patient details from report',
+        title: t('common.error'),
+        description: t('onboarding.messages.loadPatientFailed'),
         variant: 'destructive',
       });
     }
@@ -270,32 +272,32 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
   const validateData = () => {
     if (!healthData.name.trim()) {
       toast({
-        title: 'Name required',
-        description: 'Please enter your name',
+        title: t('onboarding.messages.nameRequired'),
+        description: t('onboarding.messages.nameRequiredDesc'),
         variant: 'destructive',
       });
       return false;
     }
     if (!healthData.dob) {
       toast({
-        title: 'Date of birth required',
-        description: 'Please enter your date of birth',
+        title: t('onboarding.messages.dobRequired'),
+        description: t('onboarding.messages.dobRequiredDesc'),
         variant: 'destructive',
       });
       return false;
     }
     if (!healthData.weight || parseFloat(healthData.weight) <= 0) {
       toast({
-        title: 'Valid weight required',
-        description: 'Please enter a valid weight in kg',
+        title: t('onboarding.messages.validWeightRequired'),
+        description: t('onboarding.messages.validWeightRequiredDesc'),
         variant: 'destructive',
       });
       return false;
     }
     if (!healthData.height || parseFloat(healthData.height) <= 0) {
       toast({
-        title: 'Valid height required',
-        description: 'Please enter a valid height in cm',
+        title: t('onboarding.messages.validHeightRequired'),
+        description: t('onboarding.messages.validHeightRequiredDesc'),
         variant: 'destructive',
       });
       return false;
@@ -369,15 +371,15 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         await queryClient.invalidateQueries({ queryKey: ['/api/health-data'] });
         
         toast({
-          title: 'Profile created successfully',
-          description: 'Your health data has been saved',
+          title: t('onboarding.messages.profileCreated'),
+          description: t('onboarding.messages.healthDataSaved'),
         });
         
         onComplete();
       } catch (error) {
         toast({
-          title: 'Error saving profile',
-          description: 'Please try again or contact support',
+          title: t('onboarding.messages.saveProfileError'),
+          description: t('onboarding.messages.saveProfileErrorDesc'),
           variant: 'destructive',
         });
       }
@@ -406,14 +408,14 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         data-testid="dialog-onboarding"
       >
         <VisuallyHidden>
-          <DialogTitle>Onboarding - Step {step} of 4</DialogTitle>
-          <DialogDescription>Complete your profile setup to get personalized health insights</DialogDescription>
+          <DialogTitle>{t('onboarding.stepTitle', { step, total: 5 })}</DialogTitle>
+          <DialogDescription>{t('onboarding.stepDescription')}</DialogDescription>
         </VisuallyHidden>
         
         {/* Progress Bar */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-foreground">Step {step} of 5</span>
+            <span className="text-sm font-medium text-foreground">{t('onboarding.stepProgress', { step, total: 5 })}</span>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -421,7 +423,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
               className="text-xs text-muted-foreground hover:text-foreground"
               data-testid="button-skip"
             >
-              Skip for now
+              {t('onboarding.skipForNow')}
             </Button>
           </div>
           <Progress value={progress} className="h-2" />
@@ -433,16 +435,16 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
             <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
               <Check className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold mb-3 text-foreground">Welcome to GlucoNova</h2>
+            <h2 className="text-2xl font-bold mb-3 text-foreground">{t('onboarding.welcome.title')}</h2>
             <p className="text-muted-foreground mb-8 max-w-md">
-              Your AI-powered diabetes management platform. Let's take a quick tour of what you can do!
+              {t('onboarding.welcome.description')}
             </p>
             <Button 
               onClick={handleNextStep}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
               data-testid="button-next-step"
             >
-              Start Tour
+              {t('onboarding.welcome.startTour')}
             </Button>
           </div>
         )}
@@ -450,8 +452,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         {/* Step 2: Features Walkthrough */}
         {step === 2 && (
           <div className="flex flex-col flex-1">
-            <h2 className="text-xl font-bold mb-2 text-foreground">Available Features</h2>
-            <p className="text-sm text-muted-foreground mb-4">Everything you need to manage your diabetes effectively</p>
+            <h2 className="text-xl font-bold mb-2 text-foreground">{t('onboarding.features.title')}</h2>
+            <p className="text-sm text-muted-foreground mb-4">{t('onboarding.features.description')}</p>
             
             <div className="flex-1 overflow-y-auto space-y-3">
               <Card className="p-3 bg-secondary/50 border-border">
@@ -460,8 +462,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                     <Activity className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-sm text-foreground mb-1">Glucose Monitoring</h3>
-                    <p className="text-xs text-muted-foreground">Track your blood glucose levels with visual trends and insights</p>
+                    <h3 className="font-semibold text-sm text-foreground mb-1">{t('onboarding.features.glucose.title')}</h3>
+                    <p className="text-xs text-muted-foreground">{t('onboarding.features.glucose.description')}</p>
                   </div>
                 </div>
               </Card>
@@ -472,8 +474,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                     <Droplet className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-sm text-foreground mb-1">AI Insulin Prediction</h3>
-                    <p className="text-xs text-muted-foreground">Get personalized insulin recommendations powered by AI</p>
+                    <h3 className="font-semibold text-sm text-foreground mb-1">{t('onboarding.features.insulin.title')}</h3>
+                    <p className="text-xs text-muted-foreground">{t('onboarding.features.insulin.description')}</p>
                   </div>
                 </div>
               </Card>
@@ -484,8 +486,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                     <Utensils className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-sm text-foreground mb-1">Meal Tracking</h3>
-                    <p className="text-xs text-muted-foreground">Log meals manually or use voice input for easy tracking</p>
+                    <h3 className="font-semibold text-sm text-foreground mb-1">{t('onboarding.features.meal.title')}</h3>
+                    <p className="text-xs text-muted-foreground">{t('onboarding.features.meal.description')}</p>
                   </div>
                 </div>
               </Card>
@@ -496,8 +498,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                     <Pill className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-sm text-foreground mb-1">Medication Management</h3>
-                    <p className="text-xs text-muted-foreground">Keep track of your medications and schedules</p>
+                    <h3 className="font-semibold text-sm text-foreground mb-1">{t('onboarding.features.medication.title')}</h3>
+                    <p className="text-xs text-muted-foreground">{t('onboarding.features.medication.description')}</p>
                   </div>
                 </div>
               </Card>
@@ -508,8 +510,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                     <Heart className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-sm text-foreground mb-1">Doctor Collaboration</h3>
-                    <p className="text-xs text-muted-foreground">Share your data with your healthcare team securely</p>
+                    <h3 className="font-semibold text-sm text-foreground mb-1">{t('onboarding.features.doctor.title')}</h3>
+                    <p className="text-xs text-muted-foreground">{t('onboarding.features.doctor.description')}</p>
                   </div>
                 </div>
               </Card>
@@ -520,8 +522,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                     <Mic className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-sm text-foreground mb-1">Voice Assistant</h3>
-                    <p className="text-xs text-muted-foreground">Log meals hands-free using voice commands</p>
+                    <h3 className="font-semibold text-sm text-foreground mb-1">{t('onboarding.features.voice.title')}</h3>
+                    <p className="text-xs text-muted-foreground">{t('onboarding.features.voice.description')}</p>
                   </div>
                 </div>
               </Card>
@@ -532,7 +534,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
               className="bg-primary hover:bg-primary/90 text-primary-foreground mt-4"
               data-testid="button-next-features"
             >
-              Continue to Setup
+              {t('onboarding.features.continueSetup')}
             </Button>
           </div>
         )}
@@ -540,8 +542,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         {/* Step 3: Upload Health Records OR Select Existing */}
         {step === 3 && !showParser && !showExistingReports && (
           <div className="flex flex-col flex-1">
-            <h2 className="text-xl font-bold mb-2 text-foreground">Upload Health Records</h2>
-            <p className="text-sm text-muted-foreground mb-4">Upload a PDF of your health summary to auto-extract your information</p>
+            <h2 className="text-xl font-bold mb-2 text-foreground">{t('onboarding.upload.title')}</h2>
+            <p className="text-sm text-muted-foreground mb-4">{t('onboarding.upload.description')}</p>
             
             <div
               className={`flex-1 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-colors ${
@@ -571,11 +573,11 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
               ) : (
                 <>
                   <Upload className="w-12 h-12 text-muted-foreground mb-3" />
-                  <p className="text-sm text-foreground mb-2">Drag and drop your PDF here</p>
-                  <p className="text-xs text-muted-foreground mb-4">or</p>
+                  <p className="text-sm text-foreground mb-2">{t('onboarding.upload.dragDrop')}</p>
+                  <p className="text-xs text-muted-foreground mb-4">{t('onboarding.upload.or')}</p>
                   <label htmlFor="file-upload">
                     <Button variant="outline" size="sm" asChild data-testid="button-browse">
-                      <span>Browse Files</span>
+                      <span>{t('onboarding.upload.browseFiles')}</span>
                     </Button>
                   </label>
                   <input
@@ -597,7 +599,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                 data-testid="button-select-existing"
               >
                 <FileText className="w-4 h-4 mr-2" />
-                Select Existing
+                {t('onboarding.upload.selectExisting')}
               </Button>
               <Button
                 variant="outline"
@@ -605,7 +607,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                 className="flex-1"
                 data-testid="button-use-sample"
               >
-                Use Demo Data
+                {t('onboarding.upload.useDemoData')}
               </Button>
               <Button
                 variant="outline"
@@ -613,7 +615,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                 className="flex-1"
                 data-testid="button-manual-entry"
               >
-                Enter Manually
+                {t('onboarding.upload.enterManually')}
               </Button>
             </div>
           </div>
@@ -624,8 +626,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
           <div className="flex flex-col flex-1">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-xl font-bold text-foreground">Select Existing Report</h2>
-                <p className="text-sm text-muted-foreground">Choose from your previously uploaded medical reports</p>
+                <h2 className="text-xl font-bold text-foreground">{t('onboarding.existing.title')}</h2>
+                <p className="text-sm text-muted-foreground">{t('onboarding.existing.description')}</p>
               </div>
               <Button
                 variant="ghost"
@@ -633,14 +635,14 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                 onClick={() => setShowExistingReports(false)}
                 data-testid="button-back-to-upload"
               >
-                Back
+                {t('onboarding.existing.back')}
               </Button>
             </div>
             
             <div className="flex-1 overflow-y-auto space-y-3">
               {isLoadingReports ? (
                 <div className="flex items-center justify-center py-8">
-                  <p className="text-sm text-muted-foreground">Loading reports...</p>
+                  <p className="text-sm text-muted-foreground">{t('onboarding.existing.loading')}</p>
                 </div>
               ) : reportsData && reportsData.reports && reportsData.reports.length > 0 ? (
                 reportsData.reports.map((report: any) => (
@@ -679,15 +681,15 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
               ) : (
                 <div className="flex flex-col items-center justify-center py-8">
                   <FileText className="w-12 h-12 text-muted-foreground mb-3" />
-                  <p className="text-sm text-foreground mb-2">No reports found</p>
-                  <p className="text-xs text-muted-foreground mb-4">Upload a medical report to get started</p>
+                  <p className="text-sm text-foreground mb-2">{t('onboarding.existing.noReports')}</p>
+                  <p className="text-xs text-muted-foreground mb-4">{t('onboarding.existing.uploadToStart')}</p>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setShowExistingReports(false)}
                     data-testid="button-upload-new"
                   >
-                    Upload New Report
+                    {t('onboarding.existing.uploadNew')}
                   </Button>
                 </div>
               )}
@@ -698,13 +700,13 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         {/* Step 3: Parser Results */}
         {step === 3 && showParser && (
           <div className="flex flex-col flex-1">
-            <h2 className="text-xl font-bold mb-2 text-foreground">Confirm Your Information</h2>
-            <p className="text-sm text-muted-foreground mb-4">Review and edit the extracted data</p>
+            <h2 className="text-xl font-bold mb-2 text-foreground">{t('onboarding.confirm.title')}</h2>
+            <p className="text-sm text-muted-foreground mb-4">{t('onboarding.confirm.description')}</p>
             
             <div className="flex-1 overflow-y-auto space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">Name</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.name')}</Label>
                   <Input
                     value={healthData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
@@ -713,7 +715,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">Date of Birth</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.dob')}</Label>
                   <Input
                     type="date"
                     value={healthData.dob}
@@ -723,7 +725,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">Weight (kg)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.weight')}</Label>
                   <Input
                     type="number"
                     value={healthData.weight}
@@ -733,7 +735,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">Height (cm)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.height')}</Label>
                   <Input
                     type="number"
                     value={healthData.height}
@@ -743,7 +745,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">Last A1c (%)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.a1c')}</Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -754,7 +756,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">Typical Insulin (U)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.insulin')}</Label>
                   <Input
                     type="number"
                     value={healthData.typicalInsulin}
@@ -765,7 +767,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                 </div>
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground mb-1">Medications</Label>
+                <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.medications')}</Label>
                 <Input
                   value={healthData.medications}
                   onChange={(e) => handleInputChange('medications', e.target.value)}
@@ -780,7 +782,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
               className="bg-primary hover:bg-primary/90 text-primary-foreground mt-4"
               data-testid="button-confirm"
             >
-              Confirm & Continue
+              {t('onboarding.confirm.button')}
             </Button>
           </div>
         )}
@@ -788,13 +790,13 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         {/* Step 4: Manual Entry */}
         {step === 4 && (
           <div className="flex flex-col flex-1">
-            <h2 className="text-xl font-bold mb-2 text-foreground">Enter Your Details</h2>
-            <p className="text-sm text-muted-foreground mb-4">Fill in your health information manually</p>
+            <h2 className="text-xl font-bold mb-2 text-foreground">{t('onboarding.manual.title')}</h2>
+            <p className="text-sm text-muted-foreground mb-4">{t('onboarding.manual.description')}</p>
             
             <div className="flex-1 overflow-y-auto space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">Name</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.name')}</Label>
                   <Input
                     value={healthData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
@@ -803,7 +805,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">Date of Birth</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.dob')}</Label>
                   <Input
                     type="date"
                     value={healthData.dob}
@@ -813,7 +815,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">Weight (kg)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.weight')}</Label>
                   <Input
                     type="number"
                     value={healthData.weight}
@@ -823,7 +825,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">Height (cm)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.height')}</Label>
                   <Input
                     type="number"
                     value={healthData.height}
@@ -833,7 +835,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">Typical Insulin (U)</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.insulin')}</Label>
                   <Input
                     type="number"
                     value={healthData.typicalInsulin}
@@ -844,7 +846,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">Target Range</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.targetRange')}</Label>
                   <Input
                     value={healthData.targetRange}
                     onChange={(e) => handleInputChange('targetRange', e.target.value)}
@@ -861,7 +863,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
               className="bg-primary hover:bg-primary/90 text-primary-foreground mt-4"
               data-testid="button-next-manual"
             >
-              Continue
+              {t('onboarding.manual.continue')}
             </Button>
           </div>
         )}
@@ -872,16 +874,16 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
             <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
               <Check className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold mb-3 text-foreground">All Set!</h2>
+            <h2 className="text-2xl font-bold mb-3 text-foreground">{t('onboarding.finish.title')}</h2>
             <p className="text-muted-foreground mb-8 max-w-md">
-              Your account is ready. You can now access personalized health insights and AI-powered insulin predictions.
+              {t('onboarding.finish.description')}
             </p>
             <Button 
               onClick={handleNextStep}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
               data-testid="button-go-dashboard"
             >
-              Go to Dashboard
+              {t('onboarding.finish.goToDashboard')}
             </Button>
           </div>
         )}

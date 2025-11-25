@@ -23,46 +23,48 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/lib/auth-context';
 import SettingsDrawer from '@/components/SettingsDrawer';
+import { useTranslation } from 'react-i18next';
 
 // Patient navigation menu items - Complete feature set
 const patientMenuItems = [
-  { title: 'Overview', icon: LayoutDashboard, url: '/dashboard' },
-  { title: 'Glucose Monitoring', icon: Activity, url: '/glucose' },
-  { title: 'Insulin & Medication', icon: Droplet, url: '/insulin' },
-  { title: 'Food & Nutrition', icon: Utensils, url: '/meals' },
-  { title: 'Activity & Lifestyle', icon: TrendingUp, url: '/activity' },
-  { title: 'AI Insights', icon: Zap, url: '/ai-insights' },
-  { title: 'Reports & Progress', icon: FileText, url: '/reports' },
-  { title: 'Alerts & Notifications', icon: Bell, url: '/alerts' },
-  { title: 'Messages / Chat', icon: MessageCircle, url: '/messages' },
-  { title: 'Appointments', icon: Calendar, url: '/appointments' },
-  { title: 'Documents & OCR', icon: Camera, url: '/documents' },
-  { title: 'My Doctors', icon: Heart, url: '/doctors' },
-  { title: 'Voice AI', icon: Mic, url: '/voice' },
+  { title: 'navigation.overview', icon: LayoutDashboard, url: '/dashboard' },
+  { title: 'navigation.glucoseMonitoring', icon: Activity, url: '/glucose' },
+  { title: 'navigation.insulinMedication', icon: Droplet, url: '/insulin' },
+  { title: 'navigation.foodNutrition', icon: Utensils, url: '/meals' },
+  { title: 'navigation.activityLifestyle', icon: TrendingUp, url: '/activity' },
+  { title: 'navigation.aiInsights', icon: Zap, url: '/ai-insights' },
+  { title: 'navigation.reportsProgress', icon: FileText, url: '/reports' },
+  { title: 'navigation.alertsNotifications', icon: Bell, url: '/alerts' },
+  { title: 'navigation.messagesChat', icon: MessageCircle, url: '/messages' },
+  { title: 'navigation.appointments', icon: Calendar, url: '/appointments' },
+  { title: 'navigation.documentsOCR', icon: Camera, url: '/documents' },
+  { title: 'navigation.myDoctors', icon: Heart, url: '/doctors' },
+  { title: 'navigation.voiceAI', icon: Mic, url: '/voice' },
 ];
 
 // Doctor navigation menu items - Complete clinical feature set
 const doctorMenuItems = [
-  { title: 'Dashboard Overview', icon: LayoutDashboard, url: '/dashboard' },
-  { title: 'Patient Directory', icon: User, url: '/patients' },
-  { title: 'Patient Details', icon: FileText, url: '/patient-details' },
-  { title: 'Clinical Alerts', icon: Bell, url: '/alerts' },
-  { title: 'AI Insights & Risk', icon: Zap, url: '/ai-insights' },
-  { title: 'Treatment Plans', icon: Pill, url: '/treatment-plans' },
-  { title: 'Reports & Analytics', icon: TrendingUp, url: '/reports' },
-  { title: 'Messages', icon: MessageCircle, url: '/messages' },
-  { title: 'Appointments', icon: Calendar, url: '/appointments' },
-  { title: 'Documents & OCR', icon: Camera, url: '/documents' },
+  { title: 'navigation.overview', icon: LayoutDashboard, url: '/dashboard' },
+  { title: 'navigation.patientDirectory', icon: User, url: '/patients' },
+  { title: 'navigation.patientDetails', icon: FileText, url: '/patient-details' },
+  { title: 'navigation.clinicalAlerts', icon: Bell, url: '/alerts' },
+  { title: 'navigation.aiInsights', icon: Zap, url: '/ai-insights' },
+  { title: 'navigation.treatmentPlans', icon: Pill, url: '/treatment-plans' },
+  { title: 'navigation.reportsAnalytics', icon: TrendingUp, url: '/reports' },
+  { title: 'navigation.messages', icon: MessageCircle, url: '/messages' },
+  { title: 'navigation.appointments', icon: Calendar, url: '/appointments' },
+  { title: 'navigation.documentsOCR', icon: Camera, url: '/documents' },
 ];
 
 const adminMenuItems = [
-  { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard' },
-  { title: 'Users', icon: User, url: '/users' },
-  { title: 'Reports', icon: FileText, url: '/reports' },
-  { title: 'Settings', icon: Settings, url: '/settings' },
+  { title: 'navigation.overview', icon: LayoutDashboard, url: '/dashboard' },
+  { title: 'navigation.users', icon: User, url: '/users' },
+  { title: 'navigation.reports', icon: FileText, url: '/reports' },
+  { title: 'navigation.settings', icon: Settings, url: '/settings' },
 ];
 
 export default function AppSidebar() {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const [location] = useLocation();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -134,7 +136,7 @@ export default function AppSidebar() {
               GN
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white tracking-tight">GlucoNova</h1>
+              <h1 className="text-xl font-bold text-white tracking-tight">{t('app.name')}</h1>
               <p className="text-xs text-primary" style={{ marginTop: '2px' }}>v2.0 Redesigned</p>
             </div>
           </div>
@@ -165,21 +167,21 @@ export default function AppSidebar() {
                     fontSize: '18px',
                   }}
                 >
-                  {user?.name ? getInitials(user.name) : 'HS'}
+                  {user?.name ? getInitials(user.name) : t('common.initials')}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-white truncate" style={{ fontSize: '15px' }}>
-                  {user?.name || 'Hanisha SM'}
+                  {user?.name || t('common.defaultName')}
                 </p>
-                <p className="text-gray-400" style={{ fontSize: '13px' }}>Patient</p>
+                <p className="text-gray-400" style={{ fontSize: '13px' }}>{user?.role === 'doctor' ? t('common.doctor') : user?.role === 'admin' ? t('common.admin') : t('common.patient')}</p>
               </div>
             </div>
             <div 
               className="pt-3 border-t border-primary/10"
               style={{ fontSize: '13px' }}
             >
-              <span className="text-gray-400">Time in Range: </span>
+              <span className="text-gray-400">{t('medical.timeInRange')}: </span>
               <span className="text-primary font-semibold">{timeInRange}%</span>
             </div>
           </div>
@@ -239,7 +241,7 @@ export default function AppSidebar() {
                           color: isActive ? '#21C89B' : 'currentColor',
                         }} 
                       />
-                      <span className="flex-1 text-left">{item.title}</span>
+                      <span className="flex-1 text-left">{t(item.title)}</span>
                       
                       {isActive && (
                         <div 
@@ -279,7 +281,7 @@ export default function AppSidebar() {
                 data-testid="button-settings"
               >
                 <Settings className="flex-shrink-0" style={{ width: '20px', height: '20px', strokeWidth: 2.5 }} />
-                <span className="flex-1 text-left">Settings</span>
+                <span className="flex-1 text-left">{t('common.settings')}</span>
               </button>
             </div>
           </nav>
@@ -374,7 +376,7 @@ export default function AppSidebar() {
             data-testid="button-logout"
           >
             <LogOut style={{ width: '16px', height: '16px' }} />
-            <span>Logout</span>
+            <span>{t('common.logout')}</span>
           </button>
         </div>
       </aside>
