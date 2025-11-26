@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: gluconova-db
+    environment:
+      POSTGRES_USER: gluconova_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure-password-change-in-prod}
+      POSTGRES_DB: gluconova
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gluconova_user -d gluconova"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gluconova-network
+
+  # GlucoNova Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gluconova-app
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://gluconova_user:${DB_PASSWORD:-secure-password-change-in-prod}@postgres:5432/gluconova
+      JWT_SECRET: ${JWT_SECRET:-change-this-in-production}
+      SESSION_SECRET: ${SESSION_SECRET:-change-this-in-production}
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8080/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - gluconova-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  gluconova-network:
+    driver: bridge
