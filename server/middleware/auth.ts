@@ -58,7 +58,42 @@ export function approvalMiddleware(req: AuthRequest, res: Response, next: NextFu
   next();
 }
 
+// Optional auth middleware - allows unauthenticated requests but validates token if provided
+export function optionalAuthMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; role: UserRole; isApproved: boolean };
+        req.user = decoded;
+      } catch (error) {
+        // Token invalid, but that's okay for optional auth
+        console.log('Invalid token in optional auth middleware:', error);
+      }
+    }
+    // Generate a temporary user ID for unauthenticated requests
+    if (!req.user) {
+      req.user = {
+        userId: `skip-auth-${Date.now()}`,
+        role: 'patient',
+        isApproved: true,
+      };
+    }
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Authentication error' });
+  }
+}
+
+// Optional approval middleware - allows access even if not approved (for skip-auth mode)
+export function optionalApprovalMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
+  // Always allow access - authentication and approval are optional
+  next();
+}
+
 export const authWithApproval = [authMiddleware, approvalMiddleware];
+export const optionalAuthWithApproval = [optionalAuthMiddleware, optionalApprovalMiddleware];
 
 export function generateToken(userId: string, role: UserRole, isApproved: boolean): string {
   return jwt.sign(

@@ -35,6 +35,14 @@
   },
   "navigation": {
     "overview": "Overview",
+    "glucoseInsulin": "Glucose & Insulin",
+    "aiFoodLog": "AI Food Log",
+    "suggestionsActivity": "Suggestions & Activity",
+    "foodActivity": "Food & Activity",
+    "reportsDocuments": "Reports & Documents",
+    "aiCoach": "AI Health Coach",
+    "careTeam": "Care Team",
+    "settings": "Settings",
     "glucoseMonitoring": "Glucose Monitoring",
     "insulinMedication": "Insulin & Medication",
     "foodNutrition": "Food & Nutrition",
@@ -54,8 +62,7 @@
     "reportsAnalytics": "Reports & Analytics",
     "messages": "Messages",
     "users": "Users",
-    "reports": "Reports",
-    "settings": "Settings"
+    "reports": "Reports"
   },
   "dashboard": {
     "title": "Dashboard",

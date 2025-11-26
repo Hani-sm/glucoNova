@@ -17,6 +17,7 @@ interface OnboardingModalProps {
   onClose: () => void;
   onComplete: () => void;
   onSkip: () => void;
+  isMandatory?: boolean; // New prop to control if modal can be closed/skipped
 }
 
 interface HealthData {
@@ -30,7 +31,7 @@ interface HealthData {
   targetRange: string;
 }
 
-export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }: OnboardingModalProps) {
+export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip, isMandatory = false }: OnboardingModalProps) {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -48,7 +49,19 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
     typicalInsulin: '',
     targetRange: '70-180',
   });
+  // Track which fields were auto-filled from the report
+  const [extractedFields, setExtractedFields] = useState<Set<keyof HealthData>>(new Set());
+  // Track extraction failure
+  const [extractionFailed, setExtractionFailed] = useState(false);
   const { toast } = useToast();
+
+  // Debug logging
+  useEffect(() => {
+    console.log('=== OnboardingModal Render ===' );
+    console.log('isOpen:', isOpen);
+    console.log('isMandatory:', isMandatory);
+    console.log('step:', step);
+  }, [isOpen, isMandatory, step]);
 
   // Fetch existing medical reports
   const { data: reportsData, isLoading: isLoadingReports } = useQuery<{ reports: any[] }>({
@@ -69,11 +82,15 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         return;
       }
       setUploadedFile(file);
-      setShowParser(true);
       
       // Send file to server for actual PDF parsing
       const parseFile = async () => {
         try {
+          console.log('=== Uploading and parsing file ===');
+          console.log('File name:', file.name);
+          console.log('File type:', file.type);
+          console.log('File size:', file.size, 'bytes');
+          
           const formData = new FormData();
           formData.append('file', file);
           
@@ -91,24 +108,92 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
           }
           
           const parsedData = await response.json();
+          console.log('=== Parsed data received ===');
+          console.log('Parsed data:', parsedData);
           
-          // Update health data with parsed values from the document
-          setHealthData(prev => ({
-            ...prev,
-            ...(parsedData.name && { name: parsedData.name }),
-            ...(parsedData.dob && { dob: parsedData.dob }),
-            ...(parsedData.weight && { weight: parsedData.weight }),
-            ...(parsedData.height && { height: parsedData.height }),
-            ...(parsedData.lastA1c && { lastA1c: parsedData.lastA1c }),
-            ...(parsedData.medications && { medications: parsedData.medications }),
-            ...(parsedData.typicalInsulin && { typicalInsulin: parsedData.typicalInsulin }),
-            ...(parsedData.targetRange && { targetRange: parsedData.targetRange }),
-          }));
+          // Track which fields were successfully extracted (confidence >= 0.6)
+          const extracted = new Set<keyof HealthData>();
+          const CONFIDENCE_THRESHOLD = 0.6;
+          
+          // Check if extraction completely failed
+          const hasAnyData = Object.values(parsedData).some(
+            (field: any) => field?.value && field?.confidence >= CONFIDENCE_THRESHOLD
+          );
+          
+          if (!hasAnyData) {
+            console.warn('No data could be extracted from the report');
+            setExtractionFailed(true);
+          } else {
+            setExtractionFailed(false);
+          }
+          
+          // Build updated data object from extracted fields
+          const updatedData = { ...healthData };
+          
+          if (parsedData.name?.value && parsedData.name.confidence >= CONFIDENCE_THRESHOLD) {
+            updatedData.name = parsedData.name.value;
+            extracted.add('name');
+          }
+          if (parsedData.dob?.value && parsedData.dob.confidence >= CONFIDENCE_THRESHOLD) {
+            updatedData.dob = parsedData.dob.value;
+            extracted.add('dob');
+          }
+          if (parsedData.weight?.value && parsedData.weight.confidence >= CONFIDENCE_THRESHOLD) {
+            updatedData.weight = parsedData.weight.value;
+            extracted.add('weight');
+          }
+          if (parsedData.height?.value && parsedData.height.confidence >= CONFIDENCE_THRESHOLD) {
+            updatedData.height = parsedData.height.value;
+            extracted.add('height');
+          }
+          if (parsedData.lastA1c?.value && parsedData.lastA1c.confidence >= CONFIDENCE_THRESHOLD) {
+            updatedData.lastA1c = parsedData.lastA1c.value;
+            extracted.add('lastA1c');
+          }
+          if (parsedData.medications?.value && parsedData.medications.confidence >= CONFIDENCE_THRESHOLD) {
+            updatedData.medications = parsedData.medications.value;
+            extracted.add('medications');
+          }
+          if (parsedData.typicalInsulin?.value && parsedData.typicalInsulin.confidence >= CONFIDENCE_THRESHOLD) {
+            updatedData.typicalInsulin = parsedData.typicalInsulin.value;
+            extracted.add('typicalInsulin');
+          }
+          if (parsedData.targetRange?.value && parsedData.targetRange.confidence >= CONFIDENCE_THRESHOLD) {
+            updatedData.targetRange = parsedData.targetRange.value;
+            extracted.add('targetRange');
+          }
+          
+          setExtractedFields(extracted);
+          
+          // Save extracted name to localStorage for dashboard welcome message
+          if (parsedData.name?.value && parsedData.name.confidence >= CONFIDENCE_THRESHOLD) {
+            localStorage.setItem('extractedPatientName', parsedData.name.value);
+            console.log('Saved extracted patient name:', parsedData.name.value);
+          }
+          
+          console.log('=== Updated health data ===');
+          console.log('Updated data:', updatedData);
+          console.log('Extracted fields:', Array.from(extracted));
+          
+          setHealthData(updatedData);
+          setShowParser(true); // Show confirmation form
+          
+          // Count how many fields were extracted
+          const extractedFieldCount = extracted.size;
+          
+          toast({
+            title: extractionFailed ? t('onboarding.messages.parsingFailed') : t('onboarding.messages.parsingSuccess'),
+            description: extractionFailed 
+              ? 'Could not extract data from report. Please fill in the fields manually.'
+              : `Extracted ${extractedFieldCount} field(s) from your report. Please review and confirm.`,
+            variant: extractionFailed ? 'destructive' : 'default',
+          });
         } catch (error) {
           console.error('PDF parsing error:', error);
+          setShowParser(true); // Still show form but without pre-filled data
           toast({
             title: t('onboarding.messages.parsingFailed'),
-            description: t('onboarding.messages.parsingFailedDesc'),
+            description: 'Could not extract data from report. Please fill in the fields manually.',
             variant: 'destructive',
           });
         }
@@ -122,7 +207,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         variant: 'destructive',
       });
     }
-  }, [toast]);
+  }, [toast, t, healthData]);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -327,21 +412,49 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
           targetRange: healthData.targetRange || undefined,
         };
 
+        console.log('=== Saving Profile Data ===');
+        console.log('Profile data:', profileData);
+
         // Save user profile data to the database
+        let savedProfile;
         try {
-          const profileResponse = await apiRequest('/api/profile', {
+          const token = localStorage.getItem('token');
+          const skipAuth = localStorage.getItem('skipAuth');
+          
+          const profileResponse = await fetch('/api/profile', {
             method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token && { 'Authorization': `Bearer ${token}` }),
+            },
             body: JSON.stringify(profileData),
           });
-          await profileResponse.json();
+          
+          if (!profileResponse.ok) {
+            throw new Error(`Profile save failed: ${profileResponse.status}`);
+          }
+          
+          savedProfile = await profileResponse.json();
+          console.log('Profile created:', savedProfile);
         } catch (error: any) {
           // If profile already exists (409), update it instead
           if (error.message.includes('409')) {
-            const updateResponse = await apiRequest('/api/profile', {
+            const token = localStorage.getItem('token');
+            const updateResponse = await fetch('/api/profile', {
               method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` }),
+              },
               body: JSON.stringify(profileData),
             });
-            await updateResponse.json();
+            
+            if (!updateResponse.ok) {
+              throw new Error(`Profile update failed: ${updateResponse.status}`);
+            }
+            
+            savedProfile = await updateResponse.json();
+            console.log('Profile updated:', savedProfile);
           } else {
             throw error;
           }
@@ -349,8 +462,13 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
 
         // Also save initial health data reading
         try {
-          const healthResponse = await apiRequest('/api/health-data', {
+          const token = localStorage.getItem('token');
+          const healthResponse = await fetch('/api/health-data', {
             method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token && { 'Authorization': `Bearer ${token}` }),
+            },
             body: JSON.stringify({
               glucose: 100,
               insulin: parseFloat(healthData.typicalInsulin) || 0,
@@ -359,16 +477,61 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
               notes: 'Initial reading after onboarding',
             }),
           });
-          await healthResponse.json();
+          
+          if (healthResponse.ok) {
+            await healthResponse.json();
+          }
         } catch (error) {
           console.warn('Failed to save initial health reading:', error);
         }
 
         localStorage.setItem('onboardingCompleted', 'true');
         
-        // Invalidate all queries to refresh dashboard data
+        console.log('=== Invalidating Dashboard Queries ===');
+        // Invalidate all queries to refresh dashboard data in real-time
         await queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
         await queryClient.invalidateQueries({ queryKey: ['/api/health-data'] });
+        console.log('Dashboard queries invalidated - data will refresh automatically');
+        
+        // Generate AI diabetes summary based on profile data
+        try {
+          console.log('=== Generating AI Diabetes Summary ===');
+          const token = localStorage.getItem('token');
+          const aiSummaryData = {
+            patient_name: healthData.name,
+            date_of_birth: healthData.dob,
+            weight_kg: healthData.weight ? parseFloat(healthData.weight) : undefined,
+            height_cm: healthData.height ? parseFloat(healthData.height) : undefined,
+            hba1c_percent: healthData.lastA1c ? parseFloat(healthData.lastA1c) : undefined,
+            lastA1c: healthData.lastA1c ? parseFloat(healthData.lastA1c) : undefined,
+            typical_daily_insulin_units: healthData.typicalInsulin ? parseFloat(healthData.typicalInsulin) : undefined,
+            medications: healthData.medications ? [healthData.medications] : [],
+            target_range: healthData.targetRange,
+          };
+          
+          const aiSummaryResponse = await fetch('/api/ai/diabetes-summary', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token && { 'Authorization': `Bearer ${token}` }),
+            },
+            body: JSON.stringify(aiSummaryData),
+          });
+          
+          if (aiSummaryResponse.ok) {
+            const diabetesSummary = await aiSummaryResponse.json();
+            console.log('AI Diabetes Summary Generated:', diabetesSummary);
+            // Store the summary in localStorage for the dashboard to display
+            localStorage.setItem('diabetesSummary', JSON.stringify(diabetesSummary));
+            // Invalidate AI insights queries
+            await queryClient.invalidateQueries({ queryKey: ['/api/insights'] });
+          } else {
+            console.warn('Failed to generate AI summary:', await aiSummaryResponse.json());
+          }
+        } catch (error) {
+          console.warn('Error generating AI diabetes summary:', error);
+          // Don't block the onboarding flow if AI summary fails
+        }
         
         toast({
           title: t('onboarding.messages.profileCreated'),
@@ -396,16 +559,20 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
   };
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={isMandatory ? undefined : onClose}>
       <DialogContent 
         className="glass-card"
+        hideCloseButton={isMandatory}
         style={{ 
           width: '640px', 
           height: '460px', 
           maxWidth: '90vw', 
-          padding: '28px'
+          padding: '28px',
+          zIndex: isMandatory ? 9999 : 1000 // Ensure modal is always on top, higher when mandatory
         }}
         data-testid="dialog-onboarding"
+        onPointerDownOutside={(e) => isMandatory && e.preventDefault()}
+        onEscapeKeyDown={(e) => isMandatory && e.preventDefault()}
       >
         <VisuallyHidden>
           <DialogTitle>{t('onboarding.stepTitle', { step, total: 5 })}</DialogTitle>
@@ -416,15 +583,17 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-foreground">{t('onboarding.stepProgress', { step, total: 5 })}</span>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleSkip}
-              className="text-xs text-muted-foreground hover:text-foreground"
-              data-testid="button-skip"
-            >
-              {t('onboarding.skipForNow')}
-            </Button>
+            {!isMandatory && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleSkip}
+                className="text-xs text-muted-foreground hover:text-foreground"
+                data-testid="button-skip"
+              >
+                {t('onboarding.skipForNow')}
+              </Button>
+            )}
           </div>
           <Progress value={progress} className="h-2" />
         </div>
@@ -701,79 +870,143 @@ export default function OnboardingModal({ isOpen, onClose, onComplete, onSkip }:
         {step === 3 && showParser && (
           <div className="flex flex-col flex-1">
             <h2 className="text-xl font-bold mb-2 text-foreground">{t('onboarding.confirm.title')}</h2>
-            <p className="text-sm text-muted-foreground mb-4">{t('onboarding.confirm.description')}</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              {uploadedFile ? 
+                `Review the extracted data from "${uploadedFile.name}". Fields highlighted are auto-filled. Please confirm or edit.` : 
+                'Please review and confirm your information.'}
+            </p>
+            
+            {/* Extraction failure banner */}
+            {extractionFailed && (
+              <div className="mb-4 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+                <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                  ⚠️ We couldn't extract data from this report. Please fill in your details manually.
+                </p>
+              </div>
+            )}
             
             <div className="flex-1 overflow-y-auto space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.name')}</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">
+                    {t('onboarding.form.name')} {extractedFields.has('name') ? '✓' : '*'}
+                  </Label>
                   <Input
                     value={healthData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="h-9 bg-secondary border-input text-foreground text-sm"
+                    className={`h-9 border-input text-foreground text-sm ${
+                      extractedFields.has('name') ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-secondary'
+                    }`}
+                    placeholder="Enter your full name"
                     data-testid="input-name"
                   />
+                  {extractedFields.has('name') && (
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">✓ Auto-filled from report</p>
+                  )}
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.dob')}</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">
+                    {t('onboarding.form.dob')} {extractedFields.has('dob') ? '✓' : '*'}
+                  </Label>
                   <Input
                     type="date"
                     value={healthData.dob}
                     onChange={(e) => handleInputChange('dob', e.target.value)}
-                    className="h-9 bg-secondary border-input text-foreground text-sm"
+                    className={`h-9 border-input text-foreground text-sm ${
+                      extractedFields.has('dob') ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-secondary'
+                    }`}
                     data-testid="input-dob"
                   />
+                  {extractedFields.has('dob') && (
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">✓ Auto-filled from report</p>
+                  )}
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.weight')}</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">
+                    {t('onboarding.form.weight')} (kg) {extractedFields.has('weight') ? '✓' : '*'}
+                  </Label>
                   <Input
                     type="number"
                     value={healthData.weight}
                     onChange={(e) => handleInputChange('weight', e.target.value)}
-                    className="h-9 bg-secondary border-input text-foreground text-sm"
+                    className={`h-9 border-input text-foreground text-sm ${
+                      extractedFields.has('weight') ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-secondary'
+                    }`}
+                    placeholder="e.g., 70"
                     data-testid="input-weight"
                   />
+                  {extractedFields.has('weight') && (
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">✓ Auto-filled from report</p>
+                  )}
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.height')}</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">
+                    {t('onboarding.form.height')} (cm) {extractedFields.has('height') ? '✓' : '*'}
+                  </Label>
                   <Input
                     type="number"
                     value={healthData.height}
                     onChange={(e) => handleInputChange('height', e.target.value)}
-                    className="h-9 bg-secondary border-input text-foreground text-sm"
+                    className={`h-9 border-input text-foreground text-sm ${
+                      extractedFields.has('height') ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-secondary'
+                    }`}
+                    placeholder="e.g., 170"
                     data-testid="input-height"
                   />
+                  {extractedFields.has('height') && (
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">✓ Auto-filled from report</p>
+                  )}
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.a1c')}</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">
+                    {t('onboarding.form.a1c')} (%) {extractedFields.has('lastA1c') ? '✓' : ''}
+                  </Label>
                   <Input
                     type="number"
                     step="0.1"
                     value={healthData.lastA1c}
                     onChange={(e) => handleInputChange('lastA1c', e.target.value)}
-                    className="h-9 bg-secondary border-input text-foreground text-sm"
+                    className={`h-9 border-input text-foreground text-sm ${
+                      extractedFields.has('lastA1c') ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-secondary'
+                    }`}
+                    placeholder="e.g., 7.2"
                     data-testid="input-a1c"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.insulin')}</Label>
+                  <Label className="text-xs text-muted-foreground mb-1">
+                    {t('onboarding.form.insulin')} (U) {extractedFields.has('typicalInsulin') ? '✓' : ''}
+                  </Label>
                   <Input
                     type="number"
                     value={healthData.typicalInsulin}
                     onChange={(e) => handleInputChange('typicalInsulin', e.target.value)}
-                    className="h-9 bg-secondary border-input text-foreground text-sm"
+                    className={`h-9 border-input text-foreground text-sm ${
+                      extractedFields.has('typicalInsulin') ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-secondary'
+                    }`}
+                    placeholder="Daily units"
                     data-testid="input-insulin"
                   />
                 </div>
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground mb-1">{t('onboarding.form.medications')}</Label>
+                <Label className="text-xs text-muted-foreground mb-1">
+                  {t('onboarding.form.medications')} {extractedFields.has('medications') ? '✓' : ''}
+                </Label>
                 <Input
                   value={healthData.medications}
                   onChange={(e) => handleInputChange('medications', e.target.value)}
-                  className="h-9 bg-secondary border-input text-foreground text-sm"
+                  className={`h-9 border-input text-foreground text-sm ${
+                    extractedFields.has('medications') ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-secondary'
+                  }`}
+                  placeholder="List your current medications"
                   data-testid="input-medications"
                 />
+              </div>
+              
+              <div className="text-xs text-muted-foreground mt-2">
+                <span className="text-emerald-400">✓</span> = Auto-filled from report | 
+                <span className="text-red-400">*</span> = Required field
               </div>
             </div>
 

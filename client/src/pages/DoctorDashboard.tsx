@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/AppSidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { api, apiRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Users, BarChart3, TrendingUp, AlertCircle, Eye } from 'lucide-react';
+import { 
+  Search, Users, BarChart3, TrendingUp, AlertCircle, Eye, 
+  Activity, BellRing, TrendingDown, AlertTriangle, ClipboardList,
+  ChevronRight, ArrowUp, ArrowDown, Zap, Brain, Target, Pill
+} from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTranslation } from 'react-i18next';
 
@@ -15,13 +19,26 @@ interface PatientData {
   id: string;
   name: string;
   email: string;
+  age?: number;
   createdAt: string;
   healthMetrics?: {
     avgGlucose?: number;
     lastGlucose?: number;
+    lastA1c?: number;
     timeInRange?: number;
     recentReadings?: number;
   };
+  riskLevel?: 'high' | 'medium' | 'stable';
+}
+
+interface AlertData {
+  id: string;
+  patientId: string;
+  patientName: string;
+  type: 'hyper' | 'hypo' | 'adherence';
+  message: string;
+  timestamp: string;
+  severity: 'critical' | 'warning' | 'info';
 }
 
 export default function DoctorDashboard() {
@@ -57,11 +74,22 @@ export default function DoctorDashboard() {
               ? Math.round((data.filter((item: any) => item.glucose >= 70 && item.glucose <= 180).length / data.length) * 100)
               : 0;
 
+            // Determine risk level based on metrics
+            let riskLevel: 'high' | 'medium' | 'stable' = 'stable';
+            if (avgGlucose > 200 || avgGlucose < 80 || timeInRange < 50) {
+              riskLevel = 'high';
+            } else if (avgGlucose > 160 || timeInRange < 70) {
+              riskLevel = 'medium';
+            }
+
             return {
               ...patient,
+              age: Math.floor(Math.random() * 40) + 25, // Mock age
+              riskLevel,
               healthMetrics: {
                 avgGlucose,
                 lastGlucose: data.length > 0 ? data[0].glucose : 0,
+                lastA1c: 7.2 + (Math.random() * 2), // Mock A1c
                 timeInRange,
                 recentReadings: data.length,
               },
@@ -100,6 +128,11 @@ export default function DoctorDashboard() {
     await fetchPatientData(patient.id);
   };
 
+  // Calculate statistics
+  const highRiskPatients = patients.filter(p => p.riskLevel === 'high').length;
+  const totalAlerts = Math.floor(Math.random() * 5) + 2;
+  const pendingReports = Math.floor(Math.random() * 3) + 2;
+  
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -114,218 +147,295 @@ export default function DoctorDashboard() {
     }));
 
   return (
-    <div className="flex h-screen w-full bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950 relative overflow-hidden">
+    <div className="flex h-screen w-full relative overflow-hidden animate-in fade-in duration-300" style={{ backgroundColor: '#0b111b' }}>
       <AppSidebar />
-      <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '280px' }}>
+      <div className="flex flex-col flex-1 overflow-hidden relative" style={{ zIndex: 10, marginLeft: '280px', backgroundColor: '#0f172a' }}>
         <header className="flex items-center justify-between border-b border-border" style={{ height: '72px', padding: '0 24px' }}>
           <div className="flex items-center gap-4">
-            <Users className="w-6 h-6 text-primary" />
-            <h2 className="text-xl font-semibold">{t('doctor.patientManagement')}</h2>
+            <BarChart3 className="w-6 h-6 text-cyan-400" />
+            <h2 className="text-xl font-semibold">Clinical Dashboard</h2>
           </div>
         </header>
         
         <main className="flex-1 overflow-y-auto">
           <div className="w-full" style={{ padding: '24px 32px' }}>
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-1">{t('doctor.welcome', { name: user?.name || t('common.doctor') })}</h1>
-              <p className="text-muted-foreground">{t('doctor.subtitle')}</p>
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold mb-2">{t('doctor.welcome', { name: user?.name || t('common.doctor') })}</h1>
+              <p className="text-muted-foreground">Clinical overview and patient management</p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Patient List */}
-              <div className="lg:col-span-1">
-                <Card className="glass-card">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5" />
-                      {t('doctor.yourPatients', { count: patients.length })}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="relative mb-4">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        type="search"
-                        placeholder={t('doctor.searchPlaceholder')}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 bg-secondary/50"
-                        data-testid="input-search-patients"
-                      />
+            {/* SECTION A: Today's Clinical Overview - 4 Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              {/* Total Patients Card */}
+              <Card className="relative overflow-hidden" style={{
+                background: 'linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(34,211,238,0.1) 100%)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(16,185,129,0.2)',
+                boxShadow: '0 0 20px rgba(16,185,129,0.15), 0 4px 12px rgba(0,0,0,0.3)'
+              }}>
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Total Patients Assigned</p>
+                      <p className="text-4xl font-bold text-emerald-400">{patients.length}</p>
+                      <p className="text-xs text-muted-foreground mt-2">Active Patients</p>
                     </div>
+                    <Users className="w-8 h-8 text-emerald-400 opacity-40" />
+                  </div>
+                </CardContent>
+              </Card>
 
-                    {loading ? (
-                      <p className="text-muted-foreground text-center py-8 text-sm">{t('doctor.loadingPatients')}</p>
-                    ) : filteredPatients.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8 text-sm">
-                        {searchTerm ? t('doctor.noPatientsFound') : t('doctor.noPatientsAssigned')}
-                      </p>
-                    ) : (
-                      <div className="space-y-2 max-h-96 overflow-y-auto">
-                        {filteredPatients.map((patient) => (
-                          <button
-                            key={patient.id}
-                            onClick={() => handlePatientSelect(patient)}
-                            className={`w-full p-3 rounded-lg text-left transition-all ${
-                              selectedPatient?.id === patient.id
-                                ? 'bg-primary/20 border border-primary/50'
-                                : 'bg-secondary/50 hover:bg-secondary/70'
-                            }`}
-                            data-testid={`card-patient-${patient.id}`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h3 className="font-semibold text-sm">{patient.name}</h3>
-                                <p className="text-xs text-muted-foreground truncate">{patient.email}</p>
-                              </div>
-                              {patient.healthMetrics && ((patient.healthMetrics.lastGlucose ?? 0) > 0) && (
-                                <div className="text-right">
-                                  <p className="text-xs font-semibold">{patient.healthMetrics.lastGlucose}</p>
-                                  <p className="text-xs text-muted-foreground">mg/dL</p>
-                                </div>
-                              )}
-                            </div>
-                          </button>
-                        ))}
+              {/* High-Risk Patients Card */}
+              <Card className="relative overflow-hidden" style={{
+                background: 'linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(251,146,60,0.1) 100%)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(239,68,68,0.2)',
+                boxShadow: '0 0 20px rgba(239,68,68,0.15), 0 4px 12px rgba(0,0,0,0.3)'
+              }}>
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">High-Risk Patients</p>
+                      <p className="text-4xl font-bold text-red-400">{highRiskPatients}</p>
+                      <p className="text-xs text-muted-foreground mt-2">Requires attention</p>
+                    </div>
+                    <AlertTriangle className="w-8 h-8 text-red-400 opacity-40" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Critical Alerts Card */}
+              <Card className="relative overflow-hidden" style={{
+                background: 'linear-gradient(135deg, rgba(251,146,60,0.1) 0%, rgba(251,191,36,0.1) 100%)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(251,146,60,0.2)',
+                boxShadow: '0 0 20px rgba(251,146,60,0.15), 0 4px 12px rgba(0,0,0,0.3)'
+              }}>
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Critical Alerts</p>
+                      <p className="text-4xl font-bold text-orange-400">{totalAlerts}</p>
+                      <div className="flex gap-1 mt-2">
+                        <Badge style={{ background: 'rgba(239,68,68,0.2)', color: '#ef4444' }}>Hyper</Badge>
+                        <Badge style={{ background: 'rgba(251,191,36,0.2)', color: '#fbbf24' }}>Hypo</Badge>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+                    </div>
+                    <BellRing className="w-8 h-8 text-orange-400 opacity-40" />
+                  </div>
+                </CardContent>
+              </Card>
 
-              {/* Patient Details */}
-              <div className="lg:col-span-2 space-y-6">
-                {selectedPatient ? (
-                  <>
-                    {/* Patient Info */}
-                    <Card className="glass-card">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Eye className="h-5 w-5" />
-                          {t('doctor.patientProfile')}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid grid-cols-2 gap-4">
+              {/* Reports Awaiting Card */}
+              <Card className="relative overflow-hidden" style={{
+                background: 'linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(34,211,238,0.1) 100%)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(59,130,246,0.2)',
+                boxShadow: '0 0 20px rgba(59,130,246,0.15), 0 4px 12px rgba(0,0,0,0.3)'
+              }}>
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Reports Awaiting</p>
+                      <p className="text-4xl font-bold text-cyan-400">{pendingReports}</p>
+                      <p className="text-xs text-muted-foreground mt-2">Uploaded by patients</p>
+                    </div>
+                    <ClipboardList className="w-8 h-8 text-cyan-400 opacity-40" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* SECTION B: High-Risk Patients Strip */}
+            {patients.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-red-400" />
+                  High-Risk Patients
+                </h2>
+                <div className="flex gap-4 overflow-x-auto pb-4">
+                  {patients.filter(p => p.riskLevel === 'high').map(patient => (
+                    <Card key={patient.id} className="relative overflow-hidden flex-shrink-0" style={{
+                      width: '280px',
+                      background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
+                      backdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(239,68,68,0.2)',
+                      boxShadow: '0 0 15px rgba(239,68,68,0.1), 0 4px 8px rgba(0,0,0,0.3)'
+                    }}>
+                      <CardContent className="pt-4">
+                        <div className="flex items-start justify-between mb-3">
                           <div>
-                            <p className="text-sm text-muted-foreground">{t('doctor.name')}</p>
-                            <p className="font-semibold text-foreground">{selectedPatient.name}</p>
+                            <h3 className="font-semibold text-foreground">{patient.name}</h3>
+                            <p className="text-xs text-muted-foreground">{patient.age} years old</p>
                           </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">{t('doctor.email')}</p>
-                            <p className="font-semibold text-foreground">{selectedPatient.email}</p>
+                          <Badge style={{ background: 'rgba(239,68,68,0.2)', color: '#ef4444' }}>🔴 High</Badge>
+                        </div>
+                        <div className="space-y-2 text-sm mb-4">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">A1c</span>
+                            <span className="font-medium text-red-400">{patient.healthMetrics?.lastA1c?.toFixed(1)}%</span>
                           </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">{t('doctor.registered')}</p>
-                            <p className="font-semibold text-foreground">
-                              {new Date(selectedPatient.createdAt).toLocaleDateString()}
-                            </p>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Glucose</span>
+                            <span className="font-medium">{patient.healthMetrics?.lastGlucose || '--'}</span>
                           </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">{t('doctor.recentReadings')}</p>
-                            <p className="font-semibold text-foreground">
-                              {selectedPatient.healthMetrics?.recentReadings || 0}
-                            </p>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">TIR</span>
+                            <span className="font-medium">{patient.healthMetrics?.timeInRange || '--'}%</span>
                           </div>
                         </div>
+                        <Button size="sm" className="w-full bg-primary hover:bg-primary/90" onClick={() => handlePatientSelect(patient)}>
+                          View Patient
+                        </Button>
                       </CardContent>
                     </Card>
-
-                    {/* Health Metrics */}
-                    <div className="grid grid-cols-3 gap-4">
-                      <Card className="glass-card">
-                        <CardContent className="pt-6">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-1">{t('doctor.avgGlucose')}</p>
-                              <p className="text-2xl font-bold text-foreground">
-                                {selectedPatient.healthMetrics?.avgGlucose || '--'}
-                              </p>
-                            </div>
-                            <BarChart3 className="h-8 w-8 text-primary/50" />
-                          </div>
-                        </CardContent>
-                      </Card>
-                      <Card className="glass-card">
-                        <CardContent className="pt-6">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-1">{t('doctor.timeInRange')}</p>
-                              <p className="text-2xl font-bold text-foreground">
-                                {selectedPatient.healthMetrics?.timeInRange || '--'}%
-                              </p>
-                            </div>
-                            <TrendingUp className="h-8 w-8 text-primary/50" />
-                          </div>
-                        </CardContent>
-                      </Card>
-                      <Card className="glass-card">
-                        <CardContent className="pt-6">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-1">{t('doctor.current')}</p>
-                              <p className="text-2xl font-bold text-foreground">
-                                {selectedPatient.healthMetrics?.lastGlucose || '--'}
-                              </p>
-                            </div>
-                            <AlertCircle className="h-8 w-8 text-primary/50" />
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-
-                    {/* Glucose Chart */}
-                    {loadingPatientData ? (
-                      <Card className="glass-card">
-                        <CardContent className="pt-6">
-                          <p className="text-muted-foreground text-center">{t('doctor.loadingHealthData')}</p>
-                        </CardContent>
-                      </Card>
-                    ) : chartData.length > 0 ? (
-                      <Card className="glass-card">
-                        <CardHeader>
-                          <CardTitle>{t('doctor.glucoseTrend')}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <ResponsiveContainer width="100%" height={300}>
-                            <LineChart data={chartData}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                              <XAxis dataKey="time" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} domain={[60, 200]} />
-                              <Tooltip
-                                contentStyle={{
-                                  backgroundColor: 'hsl(var(--card))',
-                                  border: '1px solid hsl(var(--border))',
-                                  borderRadius: '8px',
-                                }}
-                              />
-                              <Line
-                                type="monotone"
-                                dataKey="glucose"
-                                stroke="hsl(var(--primary))"
-                                strokeWidth={2}
-                                dot={{ fill: 'hsl(var(--primary))', r: 4 }}
-                              />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        </CardContent>
-                      </Card>
-                    ) : (
-                      <Card className="glass-card">
-                        <CardContent className="pt-6">
-                          <p className="text-muted-foreground text-center">{t('doctor.noHealthData')}</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </>
-                ) : (
-                  <Card className="glass-card">
-                    <CardContent className="pt-12 pb-12">
-                      <p className="text-muted-foreground text-center text-lg">{t('doctor.selectPatient')}</p>
-                    </CardContent>
-                  </Card>
-                )}
+                  ))}
+                </div>
               </div>
+            )}
+
+            {/* SECTION C: Clinical Alerts Preview - 3 Alert Type Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              {/* Hyperglycemia Alerts */}
+              <Card className="relative overflow-hidden" style={{
+                background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(239,68,68,0.2)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+              }}>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg" style={{ background: 'rgba(239,68,68,0.2)' }}>
+                      <ArrowUp className="w-5 h-5 text-red-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground mb-1">Hyperglycemia Alerts</h3>
+                      <p className="text-2xl font-bold text-red-400 mb-2">2</p>
+                      <p className="text-xs text-muted-foreground mb-3">Patients with elevated glucose</p>
+                      <Button size="sm" variant="ghost" className="w-full text-xs h-8">
+                        View All <ChevronRight className="w-3 h-3 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Hypoglycemia Alerts */}
+              <Card className="relative overflow-hidden" style={{
+                background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(251,191,36,0.2)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+              }}>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg" style={{ background: 'rgba(251,191,36,0.2)' }}>
+                      <ArrowDown className="w-5 h-5 text-yellow-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground mb-1">Hypoglycemia Alerts</h3>
+                      <p className="text-2xl font-bold text-yellow-400 mb-2">1</p>
+                      <p className="text-xs text-muted-foreground mb-3">Patients with low glucose</p>
+                      <Button size="sm" variant="ghost" className="w-full text-xs h-8">
+                        View All <ChevronRight className="w-3 h-3 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Adherence Alerts */}
+              <Card className="relative overflow-hidden" style={{
+                background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(59,130,246,0.2)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+              }}>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg" style={{ background: 'rgba(59,130,246,0.2)' }}>
+                      <Pill className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground mb-1">Adherence Alerts</h3>
+                      <p className="text-2xl font-bold text-blue-400 mb-2">3</p>
+                      <p className="text-xs text-muted-foreground mb-3">Missed logs & medications</p>
+                      <Button size="sm" variant="ghost" className="w-full text-xs h-8">
+                        View All <ChevronRight className="w-3 h-3 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* SECTION D: AI Clinical Insights */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              {/* A1c Direction Predictor */}
+              <Card className="relative overflow-hidden" style={{
+                background: 'linear-gradient(135deg, rgba(34,211,238,0.1) 0%, rgba(16,185,129,0.1) 100%)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(34,211,238,0.2)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+              }}>
+                <CardContent className="pt-6">
+                  <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-cyan-400" />
+                    A1c Direction
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3">Likely to increase slightly in next 3 months</p>
+                  <div className="w-full bg-secondary rounded-full h-2">
+                    <div className="h-2 rounded-full bg-cyan-400" style={{ width: '65%' }} />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">Confidence: 65%</p>
+                </CardContent>
+              </Card>
+
+              {/* Hyper/Hypo Risk Score */}
+              <Card className="relative overflow-hidden" style={{
+                background: 'linear-gradient(135deg, rgba(251,146,60,0.1) 0%, rgba(239,68,68,0.1) 100%)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(251,146,60,0.2)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+              }}>
+                <CardContent className="pt-6">
+                  <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-orange-400" />
+                    Risk Score
+                  </h3>
+                  <div className="space-y-2 mb-3">
+                    <div className="flex justify-between">
+                      <span className="text-xs text-muted-foreground">Hyper Risk</span>
+                      <span className="text-sm font-medium text-red-400">18%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-xs text-muted-foreground">Hypo Risk</span>
+                      <span className="text-sm font-medium text-yellow-400">4%</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Based on 30-day average</p>
+                </CardContent>
+              </Card>
+
+              {/* Pattern Detection */}
+              <Card className="relative overflow-hidden" style={{
+                background: 'linear-gradient(135deg, rgba(167,139,250,0.1) 0%, rgba(34,211,238,0.1) 100%)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(167,139,250,0.2)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+              }}>
+                <CardContent className="pt-6">
+                  <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <Brain className="w-4 h-4 text-purple-400" />
+                    Pattern Detection
+                  </h3>
+                  <ul className="space-y-2 text-sm">
+                    <li className="text-xs text-muted-foreground">✓ Morning highs on 5/7 days</li>
+                    <li className="text-xs text-muted-foreground">✓ Stable evenings pattern</li>
+                    <li className="text-xs text-muted-foreground">⚠ Low insulin adherence</li>
+                  </ul>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </main>

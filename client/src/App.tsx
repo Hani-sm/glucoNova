@@ -4,29 +4,46 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
+import { lazy, Suspense } from "react";
+import '@/i18n/config'; // Initialize i18n
+
+// Eager-loaded auth pages (always needed)
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import RoleSelectionPage from "@/pages/RoleSelectionPage";
-import DashboardPage from "@/pages/DashboardPage";
-import DoctorDashboard from "@/pages/DoctorDashboard";
-import AdminDashboard from "@/pages/AdminDashboard";
-import HealthDataPage from "@/pages/HealthDataPage";
-import MealLoggingPage from "@/pages/MealLoggingPage";
-import MedicalReportsPage from "@/pages/MedicalReportsPage";
-import DoctorsPage from "@/pages/DoctorsPage";
-import GlucosePage from "@/pages/GlucosePage";
-import InsulinPage from "@/pages/InsulinPage";
-import MedicationsPage from "@/pages/MedicationsPage";
-import VoiceAIPage from "@/pages/VoiceAIPage";
-import MessagesPage from "@/pages/MessagesPage";
-import AIInsightsPage from "@/pages/AIInsightsPage";
-import ActivityPage from "@/pages/ActivityPage";
-import AlertsPage from "@/pages/AlertsPage";
-import AppointmentsPage from "@/pages/AppointmentsPage";
-import DocumentsOCRPage from "@/pages/DocumentsOCRPage";
 import NotFound from "@/pages/not-found";
+
+// Lazy-loaded dashboard pages (loaded on demand based on role)
+const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
+const DoctorDashboard = lazy(() => import("@/pages/DoctorDashboard"));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+
+// Lazy-loaded feature pages (loaded when accessed)
+const HealthDataPage = lazy(() => import("@/pages/HealthDataPage"));
+const MealLoggingPage = lazy(() => import("@/pages/MealLoggingPage"));
+const MedicalReportsPage = lazy(() => import("@/pages/MedicalReportsPage"));
+const DoctorsPage = lazy(() => import("@/pages/DoctorsPage"));
+const GlucosePage = lazy(() => import("@/pages/GlucosePage"));
+const InsulinPage = lazy(() => import("@/pages/InsulinPage"));
+const MedicationsPage = lazy(() => import("@/pages/MedicationsPage"));
+const VoiceAIPage = lazy(() => import("@/pages/VoiceAIPage"));
+const MessagesPage = lazy(() => import("@/pages/MessagesPage"));
+const DoctorMessagesPage = lazy(() => import("@/pages/DoctorMessagesPage"));
+const AIInsightsPage = lazy(() => import("@/pages/AIInsightsPage"));
+const ActivityPage = lazy(() => import("@/pages/ActivityPage"));
+const AlertsPage = lazy(() => import("@/pages/AlertsPage"));
+const AppointmentsPage = lazy(() => import("@/pages/AppointmentsPage"));
+const DocumentsOCRPage = lazy(() => import("@/pages/DocumentsOCRPage"));
+
+// Newly merged pages (Redesigned Sidebar Navigation)
+const GlucoseInsulinPage = lazy(() => import("@/pages/GlucoseInsulinPage"));
+const AIFoodLogPage = lazy(() => import("@/pages/AIFoodLogPage"));
+const SuggestionsActivityPage = lazy(() => import("@/pages/SuggestionsActivityPage"));
+const FoodActivityPage = lazy(() => import("@/pages/FoodActivityPage"));
+const ReportsDocumentsPage = lazy(() => import("@/pages/ReportsDocumentsPage"));
+const CareTeamPage = lazy(() => import("@/pages/CareTeamPage"));
+
 import { ReactNode, Component } from "react";
-import '@/i18n/config'; // Initialize i18n
 
 // Error Boundary Component
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
@@ -93,6 +110,18 @@ function TestComponent() {
   );
 }
 
+// Loading fallback component for lazy-loaded pages
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-900 via-zinc-900 to-neutral-950">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+        <p className="text-emerald-400 font-medium">Loading page...</p>
+      </div>
+    </div>
+  );
+}
+
 function ProtectedRoute({ component: Component, allowedRoles, requireApproval = true, ...rest }: any) {
   const { user, loading } = useAuth();
 
@@ -118,6 +147,24 @@ function ProtectedRoute({ component: Component, allowedRoles, requireApproval = 
   return <Component {...rest} />;
 }
 
+// Dashboard route handler with role-based lazy loading
+function DashboardRouteHandler(params: any) {
+  const { user } = useAuth();
+  
+  if (!user) {
+    return <Redirect to="/login" />;
+  }
+
+  // Lazy load the appropriate dashboard based on role
+  if (user.role === 'doctor') {
+    return <DoctorDashboard {...params} />;
+  }
+  if (user.role === 'admin') {
+    return <AdminDashboard {...params} />;
+  }
+  return <DashboardPage {...params} />;
+}
+
 function Router() {
   console.log('Router component rendering...');
   const { user } = useAuth();
@@ -133,145 +180,250 @@ function Router() {
       <Route path="/role-selection" component={RoleSelectionPage} />
       <Route path="/register" component={RegisterPage} />
       <Route path="/dashboard">
-        {(params) => {
-          const { user } = useAuth();
-          // For skip auth users or authenticated users, show the appropriate dashboard
-          if (user?.role === 'doctor') {
-            return <DoctorDashboard {...params} />;
-          }
-          if (user?.role === 'admin') {
-            return <AdminDashboard {...params} />;
-          }
-          // For patient role or skip auth patient users, show patient dashboard
-          return <DashboardPage {...params} />;
-        }}
+        {(params) => (
+          <Suspense fallback={<LoadingFallback />}>
+            <DashboardRouteHandler {...params} />
+          </Suspense>
+        )}
       </Route>
       <Route path="/health-data">
         {(params) => (
-          <ProtectedRoute 
-            component={HealthDataPage}
-            allowedRoles={['patient']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={HealthDataPage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
       <Route path="/meals">
         {(params) => (
-          <ProtectedRoute 
-            component={MealLoggingPage}
-            allowedRoles={['patient']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={MealLoggingPage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
       <Route path="/reports">
         {(params) => (
-          <ProtectedRoute 
-            component={MedicalReportsPage}
-            allowedRoles={['patient', 'doctor']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={MedicalReportsPage}
+              allowedRoles={['patient', 'doctor']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
       <Route path="/doctors">
         {(params) => (
-          <ProtectedRoute 
-            component={DoctorsPage}
-            allowedRoles={['patient']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={DoctorsPage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
       <Route path="/glucose">
         {(params) => (
-          <ProtectedRoute 
-            component={GlucosePage}
-            allowedRoles={['patient']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={GlucosePage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
       <Route path="/insulin">
         {(params) => (
-          <ProtectedRoute 
-            component={InsulinPage}
-            allowedRoles={['patient']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={InsulinPage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
       <Route path="/medications">
         {(params) => (
-          <ProtectedRoute 
-            component={MedicationsPage}
-            allowedRoles={['patient']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={MedicationsPage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
       <Route path="/voice">
         {(params) => (
-          <ProtectedRoute 
-            component={VoiceAIPage}
-            allowedRoles={['patient']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={VoiceAIPage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
       <Route path="/messages">
-        {(params) => (
-          <ProtectedRoute 
-            component={MessagesPage}
-            allowedRoles={['patient', 'doctor']}
-            {...params}
-          />
-        )}
+        {(params) => {
+          const { user } = useAuth();
+          const MessageComponent = user?.role === 'doctor' ? DoctorMessagesPage : MessagesPage;
+          return (
+            <Suspense fallback={<LoadingFallback />}>
+              <ProtectedRoute 
+                component={MessageComponent}
+                allowedRoles={['patient', 'doctor']}
+                {...params}
+              />
+            </Suspense>
+          );
+        }}
       </Route>
       <Route path="/ai-insights">
         {(params) => (
-          <ProtectedRoute 
-            component={AIInsightsPage}
-            allowedRoles={['patient', 'doctor']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={AIInsightsPage}
+              allowedRoles={['patient', 'doctor']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
       <Route path="/activity">
         {(params) => (
-          <ProtectedRoute 
-            component={ActivityPage}
-            allowedRoles={['patient']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={ActivityPage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
+        )}
+      </Route>
+      <Route path="/patients">
+        {(params) => (
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={DoctorsPage}
+              allowedRoles={['doctor']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
       <Route path="/alerts">
         {(params) => (
-          <ProtectedRoute 
-            component={AlertsPage}
-            allowedRoles={['patient', 'doctor']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={AlertsPage}
+              allowedRoles={['patient', 'doctor']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
       <Route path="/appointments">
         {(params) => (
-          <ProtectedRoute 
-            component={AppointmentsPage}
-            allowedRoles={['patient', 'doctor']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={AppointmentsPage}
+              allowedRoles={['patient', 'doctor']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
       <Route path="/documents">
         {(params) => (
-          <ProtectedRoute 
-            component={DocumentsOCRPage}
-            allowedRoles={['patient', 'doctor']}
-            {...params}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={DocumentsOCRPage}
+              allowedRoles={['patient', 'doctor']}
+              {...params}
+            />
+          </Suspense>
         )}
       </Route>
+
+      {/* New Merged Routes (Redesigned Sidebar) */}
+      <Route path="/glucose-insulin">
+        {(params) => (
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={GlucoseInsulinPage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
+        )}
+      </Route>
+      <Route path="/ai-food-log">
+        {(params) => (
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={AIFoodLogPage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
+        )}
+      </Route>
+      <Route path="/suggestions-activity">
+        {(params) => (
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={SuggestionsActivityPage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
+        )}
+      </Route>
+      <Route path="/food-activity">
+        {(params) => (
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={FoodActivityPage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
+        )}
+      </Route>
+      <Route path="/reports-documents">
+        {(params) => (
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={ReportsDocumentsPage}
+              allowedRoles={['patient', 'doctor']}
+              {...params}
+            />
+          </Suspense>
+        )}
+      </Route>
+      <Route path="/care-team">
+        {(params) => (
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={CareTeamPage}
+              allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
+        )}
+      </Route>
+
       <Route component={NotFound} />
     </Switch>
   );

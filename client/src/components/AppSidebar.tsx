@@ -17,7 +17,14 @@ import {
   MessageCircle,
   Calendar,
   Camera,
-  Zap
+  Sparkles,
+  Users,
+  FolderOpen,
+  Zap,
+  AlertCircle,
+  BarChart3,
+  BellRing,
+  Brain
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Link, useLocation } from 'wouter';
@@ -25,42 +32,34 @@ import { useAuth } from '@/lib/auth-context';
 import SettingsDrawer from '@/components/SettingsDrawer';
 import { useTranslation } from 'react-i18next';
 
-// Patient navigation menu items - Complete feature set
+// Redesigned Patient navigation menu - Clean 7-item structure
 const patientMenuItems = [
-  { title: 'navigation.overview', icon: LayoutDashboard, url: '/dashboard' },
-  { title: 'navigation.glucoseMonitoring', icon: Activity, url: '/glucose' },
-  { title: 'navigation.insulinMedication', icon: Droplet, url: '/insulin' },
-  { title: 'navigation.foodNutrition', icon: Utensils, url: '/meals' },
-  { title: 'navigation.activityLifestyle', icon: TrendingUp, url: '/activity' },
-  { title: 'navigation.aiInsights', icon: Zap, url: '/ai-insights' },
-  { title: 'navigation.reportsProgress', icon: FileText, url: '/reports' },
-  { title: 'navigation.alertsNotifications', icon: Bell, url: '/alerts' },
-  { title: 'navigation.messagesChat', icon: MessageCircle, url: '/messages' },
-  { title: 'navigation.appointments', icon: Calendar, url: '/appointments' },
-  { title: 'navigation.documentsOCR', icon: Camera, url: '/documents' },
-  { title: 'navigation.myDoctors', icon: Heart, url: '/doctors' },
-  { title: 'navigation.voiceAI', icon: Mic, url: '/voice' },
+  { title: 'navigation.overview', icon: LayoutDashboard, url: '/dashboard', section: 'Health' },
+  { title: 'navigation.glucoseInsulin', icon: Activity, url: '/glucose-insulin', section: 'Health' },
+  { title: 'navigation.aiFoodLog', icon: Utensils, url: '/ai-food-log', section: 'Health' },
+  { title: 'navigation.suggestionsActivity', icon: Sparkles, url: '/suggestions-activity', section: 'Health' },
+  { title: 'navigation.reportsDocuments', icon: FolderOpen, url: '/reports-documents', section: 'Medical' },
+  { title: 'navigation.aiCoach', icon: Brain, url: '/ai-insights', section: 'AI' },
+  { title: 'navigation.careTeam', icon: Users, url: '/care-team', section: 'Care' },
+  { title: 'navigation.settings', icon: Settings, url: '/settings', section: 'Account' },
 ];
 
-// Doctor navigation menu items - Complete clinical feature set
+// Doctor navigation menu - Clinical workspace
 const doctorMenuItems = [
-  { title: 'navigation.overview', icon: LayoutDashboard, url: '/dashboard' },
-  { title: 'navigation.patientDirectory', icon: User, url: '/patients' },
-  { title: 'navigation.patientDetails', icon: FileText, url: '/patient-details' },
-  { title: 'navigation.clinicalAlerts', icon: Bell, url: '/alerts' },
-  { title: 'navigation.aiInsights', icon: Zap, url: '/ai-insights' },
-  { title: 'navigation.treatmentPlans', icon: Pill, url: '/treatment-plans' },
-  { title: 'navigation.reportsAnalytics', icon: TrendingUp, url: '/reports' },
-  { title: 'navigation.messages', icon: MessageCircle, url: '/messages' },
-  { title: 'navigation.appointments', icon: Calendar, url: '/appointments' },
-  { title: 'navigation.documentsOCR', icon: Camera, url: '/documents' },
+  { title: 'navigation.overview', icon: LayoutDashboard, url: '/dashboard', section: 'Clinical' },
+  { title: 'navigation.patientDirectory', icon: Users, url: '/patients', section: 'Patients' },
+  { title: 'navigation.clinicalAlerts', icon: BellRing, url: '/alerts', section: 'Patients' },
+  { title: 'navigation.reportsAnalytics', icon: BarChart3, url: '/reports', section: 'Analytics' },
+  { title: 'navigation.messages', icon: MessageCircle, url: '/messages', section: 'Communication' },
+  { title: 'navigation.appointments', icon: Calendar, url: '/appointments', section: 'Communication' },
+  { title: 'navigation.settings', icon: Settings, url: '/settings', section: 'Account' },
 ];
 
 const adminMenuItems = [
-  { title: 'navigation.overview', icon: LayoutDashboard, url: '/dashboard' },
-  { title: 'navigation.users', icon: User, url: '/users' },
-  { title: 'navigation.reports', icon: FileText, url: '/reports' },
-  { title: 'navigation.settings', icon: Settings, url: '/settings' },
+  { title: 'navigation.overview', icon: LayoutDashboard, url: '/dashboard', section: 'Dashboard' },
+  { title: 'navigation.users', icon: User, url: '/users', section: 'Management' },
+  { title: 'navigation.reports', icon: FileText, url: '/reports', section: 'Management' },
+  { title: 'navigation.settings', icon: Settings, url: '/settings', section: 'Settings' },
 ];
 
 export default function AppSidebar() {
@@ -193,96 +192,81 @@ export default function AppSidebar() {
             overflowY: 'auto',
             marginBottom: '16px',
           }}>
-            <div className="space-y-2">
-              {menuItems.map((item) => {
+            <div className="space-y-3">
+              {menuItems.map((item, index) => {
                 const isActive = location === item.url;
                 const Icon = item.icon;
+                const showSection = index === 0 || menuItems[index - 1]?.section !== item.section;
                 
                 return (
-                  <Link 
-                    key={item.title}
-                    href={item.url}
-                  >
-                    <button
-                      className="w-full flex items-center gap-4 rounded-xl transition-all duration-300 group relative overflow-hidden"
-                      style={{
-                        padding: '16px 18px',
-                        backgroundColor: isActive ? 'rgba(33,200,155,0.15)' : 'transparent',
-                        color: isActive ? '#21C89B' : '#8B92A6',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: '15px',
-                        fontWeight: 500,
-                        borderLeft: isActive ? '4px solid #21C89B' : '4px solid transparent',
-                        marginLeft: isActive ? '0' : '0',
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'rgba(33,200,155,0.08)';
-                          e.currentTarget.style.color = '#B4BCD0';
-                          e.currentTarget.style.transform = 'translateX(4px)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = '#8B92A6';
-                          e.currentTarget.style.transform = 'translateX(0)';
-                        }
-                      }}
-                      data-testid={`link-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
+                  <div key={item.title}>
+                    {showSection && item.section && (
+                      <div style={{ 
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        color: '#6B7280',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        padding: '12px 18px 8px 18px',
+                        marginTop: index === 0 ? '0' : '8px',
+                      }}>
+                        {item.section}
+                      </div>
+                    )}
+                    <Link 
+                      key={item.title}
+                      href={item.url}
                     >
-                      <Icon 
-                        className="flex-shrink-0" 
-                        style={{ 
-                          width: '20px', 
-                          height: '20px', 
-                          strokeWidth: 2.5,
-                          color: isActive ? '#21C89B' : 'currentColor',
-                        }} 
-                      />
-                      <span className="flex-1 text-left">{t(item.title)}</span>
-                      
-                      {isActive && (
-                        <div 
-                          className="rounded-full bg-primary"
-                          style={{ width: '6px', height: '6px' }}
+                      <button
+                        className="w-full flex items-center gap-4 rounded-xl transition-all duration-300 group relative overflow-hidden"
+                        style={{
+                          padding: '14px 18px',
+                          backgroundColor: isActive ? 'rgba(33,200,155,0.15)' : 'transparent',
+                          color: isActive ? '#21C89B' : '#8B92A6',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          fontWeight: 500,
+                          borderLeft: isActive ? '4px solid #21C89B' : '4px solid transparent',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isActive) {
+                            e.currentTarget.style.backgroundColor = 'rgba(33,200,155,0.08)';
+                            e.currentTarget.style.color = '#B4BCD0';
+                            e.currentTarget.style.transform = 'translateX(4px)';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isActive) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.color = '#8B92A6';
+                            e.currentTarget.style.transform = 'translateX(0)';
+                          }
+                        }}
+                        data-testid={`link-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
+                      >
+                        <Icon 
+                          className="flex-shrink-0" 
+                          style={{ 
+                            width: '18px', 
+                            height: '18px', 
+                            strokeWidth: 2.5,
+                            color: isActive ? '#21C89B' : 'currentColor',
+                          }} 
                         />
-                      )}
-                    </button>
-                  </Link>
+                        <span className="flex-1 text-left">{t(item.title)}</span>
+                        
+                        {isActive && (
+                          <div 
+                            className="rounded-full bg-primary"
+                            style={{ width: '6px', height: '6px' }}
+                          />
+                        )}
+                      </button>
+                    </Link>
+                  </div>
                 );
               })}
-
-              {/* Settings Item */}
-              <button
-                onClick={() => setIsSettingsOpen(true)}
-                className="w-full flex items-center gap-4 rounded-xl transition-all duration-300"
-                style={{ 
-                  padding: '16px 18px',
-                  color: '#8B92A6',
-                  fontSize: '15px',
-                  fontWeight: 500,
-                  border: 'none',
-                  background: 'transparent',
-                  cursor: 'pointer',
-                  marginTop: '8px',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(33,200,155,0.08)';
-                  e.currentTarget.style.color = '#B4BCD0';
-                  e.currentTarget.style.transform = 'translateX(4px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#8B92A6';
-                  e.currentTarget.style.transform = 'translateX(0)';
-                }}
-                data-testid="button-settings"
-              >
-                <Settings className="flex-shrink-0" style={{ width: '20px', height: '20px', strokeWidth: 2.5 }} />
-                <span className="flex-1 text-left">{t('common.settings')}</span>
-              </button>
             </div>
           </nav>
         </div>
@@ -298,34 +282,7 @@ export default function AppSidebar() {
           }}
         >
           <div className="flex gap-3 mb-4">
-            {/* Voice/Mic Button */}
-            <Link href="/voice" className="flex-1">
-              <button
-                className="w-full rounded-xl flex items-center justify-center transition-all duration-300"
-                style={{
-                  height: '56px',
-                  background: 'rgba(33, 200, 155, 0.12)',
-                  border: '1px solid rgba(33, 200, 155, 0.2)',
-                  color: '#21C89B',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(33, 200, 155, 0.2)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(33, 200, 155, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(33, 200, 155, 0.12)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-                data-testid="button-voice"
-                aria-label="Voice Assistant"
-              >
-                <Mic style={{ width: '24px', height: '24px', strokeWidth: 2.5 }} />
-              </button>
-            </Link>
-
-            {/* Upload/Share Button */}
+            {/* Upload Report Button */}
             <Link href="/reports" className="flex-1">
               <button
                 className="w-full rounded-xl flex items-center justify-center transition-all duration-300"

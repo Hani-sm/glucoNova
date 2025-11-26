@@ -12,6 +12,7 @@ export async function apiRequest(
   options?: RequestInit
 ): Promise<Response> {
   const token = localStorage.getItem('token');
+  const skipAuth = localStorage.getItem('skipAuth');
   const headers: Record<string, string> = {
     ...(options?.headers as Record<string, string> || {}),
   };
@@ -30,6 +31,12 @@ export async function apiRequest(
     credentials: "include",
   });
 
+  // If skip auth mode and 401, don't mock the response - let it fail
+  // The frontend has its own local analysis fallback
+  if (skipAuth === 'true' && res.status === 401) {
+    console.log('Skip auth mode: 401 detected, frontend will use local analysis');
+  }
+
   await throwIfResNotOk(res);
   return res;
 }
@@ -41,6 +48,7 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const token = localStorage.getItem('token');
+    const skipAuth = localStorage.getItem('skipAuth');
     const headers: Record<string, string> = {};
     
     if (token) {
@@ -51,6 +59,12 @@ export const getQueryFn: <T>(options: {
       headers,
       credentials: "include",
     });
+
+    // If skip auth mode and 401, return empty data instead of error
+    if (skipAuth === 'true' && res.status === 401) {
+      console.log('Skip auth mode: returning empty data for', queryKey.join("/"));
+      return { data: [], reports: [], patients: [], users: [] } as any;
+    }
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
       return null;

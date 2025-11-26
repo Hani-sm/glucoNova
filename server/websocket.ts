@@ -13,9 +13,11 @@ interface UserSocket {
   ws: WebSocket;
   userId: string;
   role: string;
+  rooms: Set<string>;
 }
 
 const userConnections = new Map<string, UserSocket[]>();
+const roomConnections = new Map<string, Set<UserSocket>>();
 
 export function setupWebSocket(server: Server) {
   const wss = new WebSocketServer({ noServer: true });
@@ -55,7 +57,7 @@ function handleConnection(ws: WebSocket, decoded: { userId: string; role: UserRo
   const userId = decoded.userId;
   const role = decoded.role;
 
-  const userSocket: UserSocket = { ws, userId, role };
+  const userSocket: UserSocket = { ws, userId, role, rooms: new Set() };
   
   if (!userConnections.has(userId)) {
     userConnections.set(userId, []);
@@ -103,6 +105,51 @@ function handleConnection(ws: WebSocket, decoded: { userId: string; role: UserRo
 
 function handleMessage(message: any, userSocket: UserSocket) {
   switch (message.type) {
+    case 'message:send':
+      broadcastToRoom(`conversation:${message.conversationId}`, {
+        type: 'message:new',
+        data: message.data,
+        timestamp: new Date(),
+      });
+      break;
+    case 'message:read':
+      broadcastToRoom(`conversation:${message.conversationId}`, {
+        type: 'message:read',
+        messageId: message.messageId,
+        userId: userSocket.userId,
+        timestamp: new Date(),
+      });
+      break;
+    case 'report:uploaded':
+      broadcastToUser(message.doctorId, {
+        type: 'report:new',
+        data: message.data,
+        timestamp: new Date(),
+      });
+      broadcastToRoom(`conversation:${message.conversationId}`, {
+        type: 'message:new',
+        data: {
+          type: 'report_shared',
+          text: message.data.fileName,
+          attachments: [message.data],
+        },
+        timestamp: new Date(),
+      });
+      break;
+    case 'report:reviewed':
+      broadcastToUser(message.patientId, {
+        type: 'report:updated',
+        data: message.data,
+        timestamp: new Date(),
+      });
+      break;
+    case 'join:conversation':
+      userSocket.rooms.add(`conversation:${message.conversationId}`);
+      if (!roomConnections.has(`conversation:${message.conversationId}`)) {
+        roomConnections.set(`conversation:${message.conversationId}`, new Set());
+      }
+      roomConnections.get(`conversation:${message.conversationId}`)!.add(userSocket);
+      break;
     case 'glucose_update':
       broadcastToUser(userSocket.userId, {
         type: 'glucose_alert',
@@ -160,23 +207,13 @@ export function broadcastToAll(message: any) {
   });
 }
 
-export function broadcastAlert(alert: {
-  type: string;
-  severity: 'low' | 'medium' | 'high';
-  message: string;
-  data?: any;
-}) {
-  userConnections.forEach((connections, userId) => {
-    connections.forEach((conn) => {
-      if (conn.ws.readyState === WebSocket.OPEN) {
-        conn.ws.send(JSON.stringify({
-          alertType: alert.type,
-          severity: alert.severity,
-          message: alert.message,
-          data: alert.data,
-          timestamp: new Date(),
-        }));
+export function broadcastToRoom(roomId: string, message: any) {
+  const room = roomConnections.get(roomId);
+  if (room) {
+    room.forEach((userSocket) => {
+      if (userSocket.ws.readyState === WebSocket.OPEN) {
+        userSocket.ws.send(JSON.stringify(message));
       }
     });
-  });
+  }
 }

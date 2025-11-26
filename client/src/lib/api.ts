@@ -27,6 +27,15 @@ class ApiClient {
       },
     });
 
+    // Check if skip auth mode
+    const skipAuth = localStorage.getItem('skipAuth');
+    
+    // If 401 and skip auth mode, return empty data structure
+    if (response.status === 401 && skipAuth === 'true') {
+      console.log(`API: Skip auth mode - returning empty data for ${endpoint}`);
+      return { data: [], reports: [], patients: [], users: [], profile: null } as T;
+    }
+
     // If 401 (unauthorized) and no token, return empty response for login page
     if (response.status === 401 && !this.getToken()) {
       console.log(`API: 401 Unauthorized for ${endpoint} (no token - user not logged in)`);
@@ -146,6 +155,7 @@ export const api = new ApiClient();
 // Utility function for direct API requests
 export async function apiRequest(endpoint: string, method: string = 'GET', body?: any): Promise<any> {
   const token = getAuthToken();
+  const skipAuth = localStorage.getItem('skipAuth');
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
@@ -159,6 +169,12 @@ export async function apiRequest(endpoint: string, method: string = 'GET', body?
     headers,
     body: body ? JSON.stringify(body) : undefined,
   });
+
+  // If skip auth mode and 401, return empty data
+  if (skipAuth === 'true' && response.status === 401) {
+    console.log(`apiRequest: Skip auth mode - returning empty data for ${endpoint}`);
+    return { data: [], reports: [], patients: [], users: [], profile: null, prediction: null };
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Request failed' }));

@@ -128,7 +128,8 @@ export default function GlucoseTrendChart() {
               stroke="hsl(var(--primary))" 
               strokeWidth={3}
               fill="url(#glucoseGradient)"
-              dot={{ fill: 'hsl(var(--primary))', r: 4 }}
+              dot={{ fill: '#22d3ee', r: 5, strokeWidth: 2, stroke: '#22d3ee' }}
+              activeDot={{ r: 7, fill: '#22d3ee', stroke: '#fff', strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>
