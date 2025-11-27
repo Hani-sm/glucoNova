@@ -86,12 +86,13 @@ export default function DashboardPage() {
     console.log('showOnboarding state:', showOnboarding);
     console.log('isOnboardingMandatory state:', isOnboardingMandatory);
     
-    // PRIORITY 1: For new users (just registered or first login), onboarding is MANDATORY
+    // PRIORITY 1: For ALL new users (registered, first login, or skip-auth), show banner if not completed
+    // This ensures all new users see the onboarding prompt
     if (isNewUser === 'true' && !onboardingCompleted) {
-      console.log('✅ Showing MANDATORY onboarding for NEW USER');
-      setShowOnboarding(true);
-      setShowBanner(false);
-      setIsOnboardingMandatory(true);
+      console.log('✅ Showing BANNER for NEW USER');
+      setShowBanner(true);
+      setShowOnboarding(false);
+      setIsOnboardingMandatory(false);
       return;
     }
     
@@ -106,7 +107,7 @@ export default function DashboardPage() {
     }
     
     // PRIORITY 3: For authenticated returning users who haven't completed onboarding
-    if (!onboardingCompleted && !onboardingSkipped && !skipAuth) {
+    if (!onboardingCompleted && !onboardingSkipped && !skipAuth && !isNewUser) {
       console.log('ℹ️ Showing OPTIONAL onboarding for returning authenticated user');
       setShowOnboarding(true);
       setIsOnboardingMandatory(false);

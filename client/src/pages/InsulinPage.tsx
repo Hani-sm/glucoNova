@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AppSidebar from '@/components/AppSidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Droplet, TrendingUp, Brain, Upload, Zap, Activity, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +14,21 @@ export default function InsulinPage() {
   const { t } = useTranslation();
   const [manualInsulin, setManualInsulin] = useState('');
   const [showAIPrediction, setShowAIPrediction] = useState(true);
+  const [aiPredictionEnabled, setAiPredictionEnabled] = useState(true);
+
+  // Load AI prediction preference from localStorage
+  useEffect(() => {
+    const savedPreference = localStorage.getItem('aiPredictionEnabled');
+    if (savedPreference !== null) {
+      setAiPredictionEnabled(savedPreference === 'true');
+    }
+  }, []);
+
+  // Save AI prediction preference to localStorage when it changes
+  const handleAiPredictionToggle = (enabled: boolean) => {
+    setAiPredictionEnabled(enabled);
+    localStorage.setItem('aiPredictionEnabled', enabled.toString());
+  };
 
   const { data: healthData } = useQuery({
     queryKey: ['/api/health-data'],
@@ -58,6 +75,16 @@ export default function InsulinPage() {
             <Droplet className="w-6 h-6 text-primary" />
             <h2 className="text-xl font-semibold">{t('insulin.title')}</h2>
           </div>
+          <div className="flex items-center gap-3">
+            <Label htmlFor="ai-toggle" className="text-sm text-muted-foreground">
+              AI Predictions
+            </Label>
+            <Switch
+              id="ai-toggle"
+              checked={aiPredictionEnabled}
+              onCheckedChange={handleAiPredictionToggle}
+            />
+          </div>
         </header>
         
         <main className="flex-1 overflow-y-auto">
@@ -68,7 +95,7 @@ export default function InsulinPage() {
             </div>
 
             {/* AI Insulin Prediction Card */}
-            {showAIPrediction && (
+            {showAIPrediction && aiPredictionEnabled && (
               <Card className="mb-6 border-primary/50 bg-gradient-to-br from-primary/10 to-primary/5">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">

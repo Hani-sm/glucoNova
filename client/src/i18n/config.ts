@@ -27,6 +27,10 @@ i18n
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
+      lookupLocalStorage: 'preferredLanguage',
+    },
+    react: {
+      useSuspense: false, // Disable suspense to ensure immediate translations
     },
   });
 
@@ -51,6 +55,9 @@ export const SUPPORTED_LANGUAGES = [
 export const changeLanguage = (languageCode: string) => {
   i18n.changeLanguage(languageCode);
   localStorage.setItem('preferredLanguage', languageCode);
+  localStorage.setItem('i18nextLng', languageCode); // Also set this for language detector
+  // Force a page reload to ensure all components re-render with new language
+  window.location.reload();
 };
 
 export const getCurrentLanguage = () => {
