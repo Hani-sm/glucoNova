@@ -3,18 +3,19 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from '@shared/schema';
 
-const databaseUrl = process.env.DATABASE_URL || (process.env.NODE_ENV === 'development' ? 'postgresql://localhost/gluconova' : '');
+// Use only DATABASE_URL for Railway compatibility
+const databaseUrl = process.env.DATABASE_URL;
 
 let pool: Pool;
 let db: any;
 
 try {
-  if (!databaseUrl && process.env.NODE_ENV !== 'development') {
+  if (!databaseUrl) {
     throw new Error('DATABASE_URL environment variable is required');
   }
 
   pool = new Pool({
-    connectionString: databaseUrl || 'postgresql://localhost/gluconova',
+    connectionString: databaseUrl,
     // Reduce connection timeout for quicker failure detection
     connectionTimeoutMillis: 5000,
   });

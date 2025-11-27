@@ -7,8 +7,9 @@ import { authMiddleware, roleMiddleware, approvalMiddleware, authWithApproval, o
 import { hashPassword, comparePassword } from "./utils/password";
 import { insertUserSchema, loginSchema, healthDataSchema, mealSchema, insertUserProfileSchema, insertMedicationSchema } from "@shared/schema";
 
+// Use memory storage instead of disk storage for Railway compatibility
 const upload = multer({
-  dest: 'uploads/',
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 20 * 1024 * 1024, // 20MB
   },
@@ -1564,12 +1565,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: 'Access denied' });
       }
 
+      // For Railway deployment, we store file metadata but not the actual file
+      // In a production environment, you would integrate with a storage service like AWS S3
+      const fileUrl = `memory://${req.file.buffer.length}-bytes`; // Placeholder for Railway
+
       const report = await storage.createMedicalReport(
         patientId || req.user!.userId,
         req.user!.userId,
         {
           fileName: req.file.originalname,
-          fileUrl: req.file.path,
+          fileUrl: fileUrl,
           fileType: req.file.mimetype,
           fileSize: req.file.size,
           description,
@@ -2112,15 +2117,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==================== REPORT ROUTES ====================
 
-  app.post('/api/reports/upload', authMiddleware, roleMiddleware('patient'), upload.single('file'), async (req: AuthRequest, res) => {
+  app.post('/api/upload-report', authMiddleware, upload.single('file'), async (req: AuthRequest, res) => {
     try {
       if (!req.file) {
-        return res.status(400).json({ message: 'File is required' });
+        return res.status(400).json({ message: 'No file uploaded' });
       }
 
       const patientId = req.user!.userId;
       const doctorId = req.body.doctorId || null;
-      const fileUrl = `/uploads/${req.file.filename}`;
+      // For Railway deployment, we store file metadata but not the actual file
+      // In a production environment, you would integrate with a storage service like AWS S3
+      const fileUrl = `memory://${req.file.buffer.length}-bytes`; // Placeholder for Railway
       const fileName = req.file.originalname;
 
       const report = await storage.createReport(patientId, fileUrl, fileName, doctorId);
