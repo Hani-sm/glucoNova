@@ -1,12 +1,23 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
-import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
 
-const viteLogger = createLogger();
+// Lazy load vite for development only
+let viteLogger: any = null;
+let createViteServer: any = null;
+let viteConfig: any = null;
+
+async function loadVite() {
+  if (!createViteServer) {
+    const viteModule = await import('vite');
+    const configModule = await import('../vite.config');
+    createViteServer = viteModule.createServer;
+    viteLogger = viteModule.createLogger();
+    viteConfig = configModule.default;
+  }
+}
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -20,6 +31,8 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  await loadVite();
+  
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
@@ -31,7 +44,7 @@ export async function setupVite(app: Express, server: Server) {
     configFile: false,
     customLogger: {
       ...viteLogger,
-      error: (msg, options) => {
+      error: (msg: any, options: any) => {
         viteLogger.error(msg, options);
         // Don't exit on error in development - just log it
         console.error('Vite error:', msg);
