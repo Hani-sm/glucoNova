@@ -38,7 +38,7 @@ export default function GlucoseInsulinPage() {
 
   const { data: latestPrediction } = useQuery({
     queryKey: ['/api/predictions/latest'],
-  });
+  }) as { data?: any };
 
   const createHealthDataMutation = useMutation({
     mutationFn: async (data: any) => {

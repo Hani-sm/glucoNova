@@ -92,7 +92,7 @@ export default function SettingsPage() {
                   <Input
                     id="email"
                     type="email"
-                    defaultValue={user?.email}
+                    defaultValue={user ? (user as any).email || '' : ''}
                     className="bg-secondary/50 border-primary/20 text-white"
                   />
                 </div>

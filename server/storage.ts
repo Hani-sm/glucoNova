@@ -25,6 +25,7 @@ import {  type User,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
+import mongoose from "mongoose";
 import { MessageModel } from "./models/Message";
 import { ConversationModel } from "./models/Conversation";
 import { ReportModel } from "./models/Report";
@@ -786,13 +787,14 @@ export class DrizzleStorage implements IStorage {
 
   async getMessages(conversationId: string, limit: number = 50, before?: string): Promise<any[]> {
     try {
-      let query = MessageModel.find({ conversationId });
-
+      const query: any = { conversationId };
+      
       if (before) {
-        query = query.where('_id').lt(before);
+        // Add _id comparison for pagination
+        query._id = { $lt: before };
       }
 
-      const messages = await query
+      const messages = await MessageModel.find(query)
         .sort({ createdAt: -1 })
         .limit(limit)
         .populate('attachments.reportId');
