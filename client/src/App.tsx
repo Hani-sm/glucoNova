@@ -42,6 +42,7 @@ const SuggestionsActivityPage = lazy(() => import("@/pages/SuggestionsActivityPa
 const FoodActivityPage = lazy(() => import("@/pages/FoodActivityPage"));
 const ReportsDocumentsPage = lazy(() => import("@/pages/ReportsDocumentsPage"));
 const CareTeamPage = lazy(() => import("@/pages/CareTeamPage"));
+const SettingsPage = lazy(() => import("@/pages/SettingsPage"));
 
 import { ReactNode, Component } from "react";
 
@@ -418,6 +419,19 @@ function Router() {
             <ProtectedRoute 
               component={CareTeamPage}
               allowedRoles={['patient']}
+              {...params}
+            />
+          </Suspense>
+        )}
+      </Route>
+
+      {/* Settings Route - Available for all roles */}
+      <Route path="/settings">
+        {(params) => (
+          <Suspense fallback={<LoadingFallback />}>
+            <ProtectedRoute 
+              component={SettingsPage}
+              allowedRoles={['patient', 'doctor', 'admin']}
               {...params}
             />
           </Suspense>
